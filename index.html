@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>High Dynamic Range and Wide Gamut Color on the Web</title>
+    <meta charset="utf-8">
+    <script src="https://www.w3.org/Tools/respec/respec-w3c-common" async class="remove"></script>
+    <script class="remove">
+      var respecConfig = {
+        specStatus: "CG-NOTE",
+        edDraftURI: "https://w3c.github.io/ColorWeb-CG/",
+        shortName: "hdr-wcg-color",
+        editors: [
+          {
+            name: "Chris Needham",
+            mailto: "chris.needham@bbc.co.uk",
+            company: "British Broadcasting Corporation",
+            companyURL: "https://www.bbc.co.uk"
+          },
+        ],
+        wg: "Color on the Web Community Group",
+        wgURI: "https://www.w3.org/2011/webtv/",
+        charterDisclosureURI: "https://www.w3.org/2017/03/webtv-charter.html",
+        github: {
+          repoURL: "https://github.com/w3c/ColorWeb-CG/",
+          branch: "master"
+        },
+        localBiblio: {
+          "media-capabilities-explainer": {
+            title: "Media Capabilities Explainer",
+            href: "https://github.com/w3c/media-capabilities/blob/master/explainer.md",
+            publisher: "W3C",
+            date: "24 July 2019"
+          },
+          "canvas-colorspace": {
+            title: "Color managing canvas contents",
+            href: "https://github.com/WICG/canvas-color-space/blob/master/CanvasColorSpaceProposal.md",
+            publisher: "WICG",
+            date: "22 March 2018"
+          },
+          "hdr-chrome": {
+            title: "Principles of HDR in Chrome",
+            href: "https://docs.google.com/document/d/1A__vvTDKXt4qcuCcSN-vLzcQKuchnYmu8TFMDseIZJE/edit",
+            publisher: "Google",
+            date: "2017"
+          },
+          "hdr-hlg-faq": {
+            title: "Frequently Asked Questions on High Dynamic Range and Hybrid Log-Gamma",
+            href: "https://downloads.bbc.co.uk/rd/pubs/papers/HDR/BBC_HDRTV_FAQ.pdf",
+            publisher: "BBC",
+            date: "December 2016"
+          },
+          "netflix-hdr": {
+            title: "Enhancing the Netflix UI Experience with HDR",
+            authors: [
+              "Yuji Mano", "Benbuck Nason", "Joe Drago"
+            ],
+            href: "https://medium.com/netflix-techblog/enhancing-the-netflix-ui-experience-with-hdr-1e7506ad3e8",
+            publisher: "Netflix",
+            date: "24 September 2018",
+          }
+        }
+      };
+    </script>
+  </head>
+  <body>
+    <section id="abstract">
+      <p class="note">
+        TODO: ...
+      </p>
+    </section>
+    <section id="sotd">
+    </section>
+    <section>
+      <h2>Introduction</h2>
+      <p class="note">
+        TODO: Add initial context, describe HDR and WGC
+      </p>
+      <p>
+        There are two main
+        systems defined for HDR: HLG, developed by BBC and NHK, and Dolby PQ.
+        While improvement in video quality has driven the innovation of HDR,
+        support for content on the web more generally, e.g., for static images,
+        the <code>&lt;canvas&gt;</code> element, and in CSS in general, is still
+        needed.
+      </p>
+      <p class="note">
+        Add a brief description of PQ and HLG approaches, including: use of
+        metadata, absolute vs relative brightness, proprietary vs open standard,
+        etc.
+      </p>
+      <p>
+        The BBC has published a frequently-asked questions document
+        [[hdr-hlg-faq]] that gives a high level introduction to HDR, and the
+        PQ and HLG solutions.
+      </p>
+      <p>
+        Fredrik Hubinette from Google has written a useful document
+        [[hdr-chrome]] that discusses the issues with presenting, and in
+        particular compositing, SDR and HDR content. This was presented at
+        TPAC 2017. It considers both PQ and HLG.
+      </p>
+      <p class="note">
+        TODO: Link to minutes from the TPAC 2017 meeting?
+      </p>
+      <p>
+        On the web, SDR, and HDR content using both HLG and PQ is expected to
+        coexist, potentially within the same page, as authors can include
+        arbitrary content in their web pages. An example is a page that contains
+        multiple embedded videos, or their poster images. This raises the
+        question of how to composite content with different color spaces and
+        dynamic range encodings.
+      </p>
+    </section>
+    <section>
+      <h2>Goals</h2>
+      <p>
+        Support for HDR and WCG on the web is important to allow color and
+        luminance matching between HDR video content and surrounding or
+        overlaid graphic and textual content in web pages.
+      </p>
+      <p>
+        Some specific goals include:
+      </p>
+      <ul>
+        <li>
+          Ensure support for HDR encoded video as a first class citizen on the
+          web, including both HLG and PQ, with appropriate rules defined for
+          composition of content.
+        </li>
+        <li>
+          Enable support for HDR static images, texual content, and graphics
+          rendered via Canvas or SVG.
+        </li>
+        <li>
+          Promote understanding of HDR graphics issues among the web developer
+          community.
+        </li>
+      </ul>
+      <p>
+        There are a number of specifications potentially impacted by HDR.
+        One of the purposes of this document is to identify all documents that
+        are possibly affected, so that we can review them and determine any
+        changes needed.
+      </p>
+      <ul>
+        <li>Media Capabilities API [[media-capabilities]], [[media-capabilities-explainer]]</li>
+        <li>CSSOM View Module [[cssom-view]]</li>
+        <li>CSS Color Module Level 4 [[css-color-4]]</li>
+        <li>HTML canvas Element [[canvas-colorspace]]</li>
+        <li>TTML2 [[ttml2]], IMSC1.1 [[ttml-imsc1.1]]</li>
+        <li>Using the ITU BT.2100 PQ EOTF with the PNG Format [[png-hdr-pq]]</li>
+      </ul>
+      <p class="note">
+        TODO: Check impact on SVG 1.1, SVG2 resolves this by referencing CSS Color?
+      </p>
+    </section>
+    <section>
+      <h2>Specifying Colors in Web Pages</h2>
+      <section>
+        <h3>CSS Color Module</h3>
+        <p>
+          CSS defines several ways of specifying the colors to use in web
+          pages, in the CSS Color Module specifications. The current version is
+          Level 3 [[css-color-3]], and its successor, Level 4, is now being
+          drafted [[css-color-4]]. The various methods in Level 4 are:
+        </p>
+        <ul>
+          <li>RGB (Red, Green, Blue), using the <code>rgb()</code> and <code>rgba()</code> functions</li>
+          <li>Named colors, from early HTML, e.g., 'aqua', 'black', 'blue', 'fuchsia', etc</li>
+          <li>HSL (Hue, Saturation, Lightness), using the <code>hsl()</code> and <code>hsla()</code> functions</li>
+          <li>(*) HWB (Hue, Whiteness, Blackness), using the <code>hwb()</code> function</li>
+          <li>(*) Lab and LCH (Lightness, Chroma, Hue), using the <code>lab()</code> and <code>lch()</code> functions</li>
+          <li>(*) Grayscale, using the <code>gray()</code> function</li>
+          <li>(*) Profiled, device-dependent colors</li>
+        </ul>
+        <p>Items marked (*) are new in Level 4.</p>
+        <p>
+          Section 12 in [[css-color-4]] is titled "Working Color Space", and
+          currently empty. We need to define how should compositing work, if
+          there is HLG, PQ, and sRGB content present. The [[hdr-chrome]]
+          discussion document provides useful input.
+        </p>
+        <p class="note">
+          TODO: Review the draft CSS Color Module Level 4 [[css-color-4]], to
+          determine whether HLG and Dolby PQ have an impact. Are their
+          capabilities covered by the new additions (*) in Level 4?
+        </p>
+        <p class="note">
+          TODO: Add info on Rec. 2100 (HDR version of Rec. 2020) for different
+          transfer functions: for HLG and PQ.
+        </p>
+        <section>
+          <h4>Open Issues</h4>
+          <p>There are a few open issues that relate to HDR and WCG support:</p>
+          <ul>
+            <li><a href="https://github.com/w3c/csswg-drafts/issues/554">SDR and HDR compositing</a></li>
+            <li><a href="https://github.com/w3c/csswg-drafts/issues/553">Predefined HDR profile with BT.2100 and the PQ transfer curve</a></li>
+            <li><a href="https://github.com/w3c/csswg-drafts/issues/300">Working color space</a></li>
+          </ul>
+        </section>
+      </section>
+      <section>
+        <h3>Canvas API</h3>
+        <p>
+          The HTML <code>&lt;canvas&gt;</code> element provides web applications
+          with a resolution-dependent bitmap canvas, which can be used for
+          rendering graphs, game graphics, art, or other visual images on the
+          fly. The <code>&lt;canvas&gt;</code> element supports either 2D or
+          WebGL rendering.
+        </p>
+        <p>
+          The 2D API [[canvas-2d]] defines primitive operations for drawing
+          graphics in to a <code>&lt;canvas&gt;</code> element, such as drawing
+          lines, shapes, and text.
+        </p>
+        <p>
+          The "Color managing canvas contents" proposal [[canvas-colorspace]]
+          attempts to address the following use cases:
+        </p>
+        <blockquote>
+          <ul>
+            <li>
+              Content displayed through a <code>&lt;canvas&gt;</code> element
+              should be color managed in order to minimize differences in
+              appearance across browsers and display devices. Improving color
+              fidelity matters a lot for artistic uses (e.g., photo and paint
+              apps) and for e-commerce (product presentation).
+            </li>
+            <li>
+              Canvases should be able to take advantage of the full color gamut
+              and dynamic range of the display device.
+            </li>
+            <li>
+              Creative apps that do image manipulation generally prefer
+              compositing, filtering and interpolation calculations to be
+              performed in a linear color space.
+            </li>
+          </ul>
+        </blockquote>
+        <p class="note">
+          TODO: Review the proposal [[canvas-colorspace]] to determine whether
+          HDR capable <code>&lt;canvas&gt;</code> elements are supported.
+          See <a href="https://groups.google.com/a/chromium.org/forum/#!msg/blink-dev/QILBb4Oqb-k/tvdXEy7dBwAJ">
+          Blink Intent to Ship</a>,
+          <a href="https://github.com/w3ctag/design-reviews/issues/315">TAG
+          review</a>, and <a href="https://github.com/whatwg/html/issues/4167">
+          this issue</a> against the HTML standard.
+        </p>
+      </section>
+    </section>
+    <section>
+      <h2>Device Capabilities</h2>
+      <section>
+        <h3>Media Capabilities API</h3>
+        <p>
+          Media Capabilities [[media-capabilities]] is a draft specification
+          being developed by the Media Working Group. It intends to provide APIs
+          to allow websites to make an optimal decision when picking audiovisual
+          media content for the user. The APIs will expose information about the
+          decoding and encoding capabilities for a given format but also output
+          capabilities to find the best match based on the device's display.
+        </p>
+        <p>
+          The API is a replacement for the existing <code>canPlayType()</code>
+          function in HTML [canplaytype], and <code>isTypeSupported()</code> in
+          Media Source Extensions [[media-source]].
+        </p>
+        <p>
+          The Introduction document [media-capabilities-intro] gives a good
+          explanation of the problem that this API is trying to solve.
+        </p>
+        <section>
+          <h4>Open Issues</h4>
+          <p>
+            There are a number of open issues where the Color on the Web CG
+            could usefully provide input.
+          </p>
+          <ul>
+            <li>
+              <a href="https://github.com/w3c/media-capabilities/issues/10">Need
+              to add EOTF support for HDR</a>
+            </li>
+            <li>
+              <a href="https://github.com/WICG/media-capabilities/issues/14">
+              Distinguish video rendering and screen support for color gamut</a>
+            </li>
+            <li>
+              <a href=">https://github.com/WICG/media-capabilities/issues/67">
+              Define an audio or video configuration by supplying the init
+              segment</a>
+            </li>
+          </ul>
+        </section>
+      </section>
+      <section>
+        <h3>CSS Media Queries</h3>
+        <p>
+          Media Queries [[mediaqueries-4]] allow authors to test and query
+          values or features of the browser or display device, independent of
+          the document being rendered. They are used in the CSS
+          <code>@media</code> rule to conditionally apply styles to a document,
+          and in various other contexts and languages, such as HTML and
+          JavaScript.
+          <a href="https://drafts.csswg.org/mediaqueries-4/#color-gamut">
+          Section 6.4</a> describes the <code>color-gamut</code> feature, which
+          describes the approximate range of colors that are supported by the
+          browser and output device.
+        </p>
+      </section>
+    </section>
+    <section>
+      <h2>Timed Text</h2>
+      <p class="note">
+        TODO: HLG / HDR colors in TTML etc.
+      </p>
+    </section>
+    <section>
+      <h2>Static Image Formats</h2>
+      <p>
+        A static image format is required to store graphics (both camera-capture
+        and artificially generated). Suggested use cases include, but are not
+        limited to:
+      </p>
+      <ul>
+        <li>
+          Video catch-up website layout objects e.g., a content provider log
+          rendered by a browser UI on a television
+        </li>
+        <li>
+          Images of programme content shown on websites
+        </li>
+      </ul>
+      <p>
+        Any such graphics format would need to:
+      </p>
+      <ul>
+        <li>
+          Store the information with sufficient bit-depth to allow correct
+          display of HDR material
+        </li>
+        <li>
+          Allow use of the correct primaries and white point
+        </li>
+        <li>
+          Allow use of the correct transform function
+        </li>
+      </ul>
+      <p>
+        Knowledge of the image primaries allows correct display of color on all
+        displays, including displays which would need to apply a gamut reduction
+        to the image.
+      </p>
+      <p>
+        Taking Portable Network Graphics (PNG) as an example, it is possible to
+        store graphics using 16-bits per channel and it is possible to store the
+        primaries and white point. Two methods of storing the transfer function
+        exist: the storage of a value for gamma, and the storage of an ICC
+        profile. The first method, storage of gamma would allow a backwards
+        compatible image to be displayed on non-HDR monitors. The second would
+        allow the correct display of this image on an HDR display.
+      </p>
+      <p>
+        ICC Profiles store data which allows the correct mapping of captured
+        data to/from an all encompassing color space and from/to the all
+        encompassing color space to a display device. Version 4 has only a
+        D50 based color space and lookup-table based transforms. Version 5
+        allows different color working spaces and an algorithmic calculator
+        for the transforms. Version 5 is not well supported.
+      </p>
+      <p>
+        The Timed Text Working Group has published a draft specification
+        [[png-hdr-pq]] that extends the PNG format to include an iCCP chunk with
+        the name "ITUR_2100_PQ_FULL". The chunk contains a given ICC profile,
+        linked from the specification, although this profile is not actually
+        used, and only its presence is used to enable external rendering of the
+        PQ encoded image by the platform. See
+        <a href="https://lists.w3.org/Archives/Public/public-colorweb/2017May/0001.html">
+        this discussion</a> on the Color on the Web CG mailing list.
+      </p>
+      <p class="note">
+        Open questions: How can we define an ICC / ICCMax profile for HLG?
+        If we define an ICC / ICCMax profile for HLG, how can we test it?
+      </p>
+      <p>
+        Netflix have published a blog post [[netflix-hdr]] that describes their
+        approach for static images.
+      </p>
+    </section>
+    <section>
+      <h2>WebGL</h2>
+      <p class="note">
+        TODO: ...
+      </p>
+    </section>
+    <section>
+      <h2>Recommendations</h2>
+      <p class="note">
+        TODO: ...
+      </p>
+    </section>
+  </body>
+</html>
