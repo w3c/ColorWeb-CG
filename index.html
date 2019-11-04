@@ -173,25 +173,37 @@
         <h3>CSS Color Module</h3>
         <p>
           CSS defines several ways of specifying the colors to use in web
-          pages, in the CSS Color Module specifications. The current version is
+          pages, in the CSS Color Module specifications. The current Recommendation is
           Level 3 [[css-color-3]], and its successor, Level 4, is now being
           drafted [[css-color-4]]. The various methods in Level 4 are:
         </p>
         <ul>
-          <li>RGB (Red, Green, Blue), using the <code>rgb()</code> and <code>rgba()</code> functions</li>
-          <li>Named colors, from early HTML, e.g., 'aqua', 'black', 'blue', 'fuchsia', etc</li>
+          <li>sRGB (Red, Green, Blue), using the <code>rgb()</code> and <code>rgba()</code> functions</li>
+          <li>Named colors, from early HTML and X11, e.g., 'aqua', 'black', 'blue', 'fuchsia', etc</li>
           <li>HSL (Hue, Saturation, Lightness), using the <code>hsl()</code> and <code>hsla()</code> functions</li>
           <li>(*) HWB (Hue, Whiteness, Blackness), using the <code>hwb()</code> function</li>
           <li>(*) Lab and LCH (Lightness, Chroma, Hue), using the <code>lab()</code> and <code>lch()</code> functions</li>
           <li>(*) Grayscale, using the <code>gray()</code> function</li>
-          <li>(*) Profiled, device-dependent colors</li>
+          <li>(*) Profiled, device-dependent colors:
+            <ul>
+              <li>predefined colorspaces: <code>display-p3</code>, <code>a98-rgb</code> (compatible with Adobe® RGB (1998)), <code>prophoto-rgb</code>, <code>rec-2020</code> </li>
+              <li>calibrated colorspaces, using <code>@profile</code> to link to an ICC profile.
+              This is not limited to RGB: CMYK and wide-gamut print spaces are also covered.</li>
+            </ul>
+          </li>
         </ul>
-        <p>Items marked (*) are new in Level 4.</p>
+        <p>Items marked (*) are new in Level 4. <code>rgb()</code>,
+          <code>named colors</code>, <code>HSL</code> and <code>HWB</code>
+          all resolve to sRGB. The others are WCG.
+          To date, all of these are SDR colorspaces.</p>
         <p>
           Section 12 in [[css-color-4]] is titled "Working Color Space", and
-          currently empty. We need to define how should compositing work, if
-          there is HLG, PQ, and sRGB content present. The [[hdr-chrome]]
-          discussion document provides useful input.
+          currently empty. It is intended to cover compositing multiple colorspaces.
+          We need to define how should compositing work, if
+          there is HLG, PQ, and SDR content present. The [[hdr-chrome]]
+          discussion document provides useful input. This will require defining
+          where black, media/paper white, and peak whites (full-screen and small-area hilights)
+          map in the various spaces.
         </p>
         <p class="note">
           TODO: Review the draft CSS Color Module Level 4 [[css-color-4]], to
@@ -209,6 +221,12 @@
             <li><a href="https://github.com/w3c/csswg-drafts/issues/554">SDR and HDR compositing</a></li>
             <li><a href="https://github.com/w3c/csswg-drafts/issues/553">Predefined HDR profile with BT.2100 and the PQ transfer curve</a></li>
             <li><a href="https://github.com/w3c/csswg-drafts/issues/300">Working color space</a></li>
+            <li><a href="https://github.com/w3c/csswg-drafts/issues/4471">Dealing with bi-plane (video/graphics) when reporting values</a></li>
+            <li><a href="https://github.com/w3c/csswg-drafts/issues/3844">Effect of working color space on computed & used values</a></li>
+            <li><a href="https://github.com/w3c/csswg-drafts/issues/3435">sRGB doesn't really use 80 cd/m^2 white luminance</a></li>
+            <li><a href="https://github.com/w3c/csswg-drafts/issues/3249">extend rgb() for HDR</a></li>
+            <li><a href="https://github.com/w3c/csswg-drafts/issues/296">Canvas may add a half-float, gamma-corrected, Rec. 2020 colorspace </a></li>
+            <li><a href="https://github.com/w3c/csswg-drafts/issues/299">black point compensation</a></li>
           </ul>
         </section>
       </section>
