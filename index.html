@@ -329,7 +329,7 @@
       <section>
         <h3>CSS Media Queries</h3>
         <p>
-          Media Queries [[mediaqueries-4]] allow authors to test and query
+          Media Queries 4 [[mediaqueries-4]] allow authors to test and query
           values or features of the browser or display device, independent of
           the document being rendered. They are used in the CSS
           <code>@media</code> rule to conditionally apply styles to a document,
@@ -339,6 +339,20 @@
           Section 6.4</a> describes the <code>color-gamut</code> feature, which
           describes the approximate range of colors that are supported by the
           browser and output device.
+        </p>
+        <p>
+          Media Queries 5 [[mediaqueries-5]]
+          also allows authors to test and query
+          the ambient light level (<code>dim | normal | washed</code>),
+          although the assumption seems to be
+          that <code>dim</code> means
+          "excessive contrast and brightness would be distracting or uncomfortable"
+          rather than
+          "standard viewing conditions for HDR content".
+          The enumeration is,
+          deliberately,
+          not tied to specific light levels,
+          although ambient light sensors are mentioned.
         </p>
       </section>
     </section>
