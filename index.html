@@ -199,7 +199,7 @@
             <ul>
               <li>predefined colorspaces: <code>display-p3</code>, <code>a98-rgb</code> (compatible with Adobe® RGB (1998)), <code>prophoto-rgb</code>, <code>rec-2020</code> </li>
               <li>calibrated colorspaces, using <code>@profile</code> to link to an ICC profile.
-              This is not limited to RGB: CMYK and wide-gamut print spaces are also covered.</li>
+              This is not limited to RGB: <a href="https://drafts.csswg.org/css-color-4/#cal-cmyk">CMYK and wide-gamut print spaces</a> are also covered.</li>
             </ul>
           </li>
         </ul>
@@ -220,6 +220,7 @@
           TODO: Review the draft CSS Color Module Level 4 [[css-color-4]], to
           determine whether HLG and Dolby PQ have an impact. Are their
           capabilities covered by the new additions (*) in Level 4?
+          No, they are not. Rec. 2020 is covered, but only for SDR.
         </p>
         <p class="note">
           TODO: Add info on Rec. 2100 (HDR version of Rec. 2020) for different
