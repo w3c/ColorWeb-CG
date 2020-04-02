@@ -388,9 +388,35 @@
     </section>
     <section>
       <h2>Timed Text</h2>
-      <p class="note">
-        TODO: HLG / HDR colors in TTML etc.
+      <p>Timed Text Markup Language [[TTML2]] has a
+        <a href="https://www.w3.org/TR/ttml/#style-attribute-color">tts:color attribute</a>
+        whose <a href="https://www.w3.org/TR/ttml/#style-value-color">type</a>
+        is defined to be a value in sRGB, with 8-bit percomponent precision.
+        Titles in TTML are thus SDR.</p>
+      <p>However, subtitles are composited onto video content
+        and TTML does provide a (non-normative)
+        <a href="https://www.w3.org/TR/ttml/#hdr-compositing">Appendix Q
+          High Dynamic Range Compositing</a>
+          which gives equations for converting the sRGB values into either
+          <a href="https://www.w3.org/TR/ttml/#pq-hdr">PQ</a> or
+          <a href="https://www.w3.org/TR/ttml/#hlg-hdr">HLG</a>
+          for compositing onto HDR video.</p>
+      <p>Realizing that sRGB is defined to have a peak luminance
+        of 80 cd/m² in theory,
+        and a somewhat higher value in practice,
+        TTML also provides a
+        <a href="https://www.w3.org/TR/ttml/#style-attribute-luminanceGain">tts:luminanceGain</a>
+        attribute to boost that value for systems (such as PQ)
+        which require an absolute luminance value.
       </p>
+      <section>
+        <h4>Open Issues</h4>
+        <ul>
+          <li><a href="https://github.com/w3c/ttml2/issues/1119">Add non-normative Appendix to cover SDR compositing</a> </li>
+          <li><a href="https://github.com/w3c/ttml2/issues/1118">Add informative note to tts:luminanceGain recommending that the content author override the initial value.</a> </li>
+          <li><a href="https://github.com/w3c/ttml2/issues/1070">Gamma approximation in luminance gain</a> </li>
+        </ul>
+      </section>
     </section>
     <section>
       <h2>Static Image Formats</h2>
