@@ -96,12 +96,100 @@
     </section>
     <section>
       <h2>Introduction</h2>
-      <p class="note">
-        TODO: Add initial context, describe HDR and WGC
+
+      <p>The initial commercial application of Color Science
+        (principally colorimetry, rather than color appearance modelling)
+        to the reproduction of color
+        was concerned with surface colors
+        such as painted or printed objects,
+        lit by a single illuminant.
+        The achievable luminance range was thus constrained
+        to the luminance of a perfect diffuse reflector
+        (practically, an unprinted sheet of good paper)
+        at the high end,
+        and the densest printed or painted black
+        that could be achieved without the paper tearing or deforming,
+        at the darkest end. This produced luminance ranges
+        from as low as 20:1
+        to as high as 90:1 (Fairchild, p.399 [[Fairchild-CAM]]).
+        The achievable Chroma range was also limited
+        by the vibrancy of mass-produced paints and inks,
+        and the prohibitive cost of using additional spot colors
+        to extend the gamut.
+        <!-- add UCS diagram of coated and uncoated FOGRA21 and 39 -->
+        Self-luminous displays, in that commercial environment,
+        were primarily used at low luminances
+        for soft proofing of an eentual printed product,
+        and were intended to replicate the appearance of a viewing booth.
+      </p>
+
+      <p>Over time, self-luminous displays were seen
+        as a worthy color management target in their own right:
+        for computer displays,
+        for the display of digital photography,
+        for digital cinema,
+        and for the consumption of media such as television and movies in the home.
+        The luminance range increased:
+        media consumed in near-dark environments such as the cinema
+        could have much deeper blacks,
+        while media consumed in dim to normal viewing environments
+        enjoyed an increased peak white luminance of 200 to 300 cd/m².
+        The darkest blacks in such environments were constrained by viewing flare,
+        which is why the sRGB standard mandated a viewing flare of 5%,
+        typical for glossy glass CRT displays of the time;
+        coupled with a peak luminance of only 80cd/m²
+        the luminance range was still relatively modest.
+        The introduction of matt LCD and OLED screens,
+        and the commercial success of HDTV, increased the dynamic range somewhat,
+        but it was still comfortable encoded in 8 bits per gamma-corrected component.
+        This is referred to as <b>Standard Dynamic Range (SDR)</b>.
+        The achievable Chroma range for sRGB and Rec.709 HDTV, although extending beyond that of printed material at the primaries, was also relatively modest.
+        Wider gamut displays were available professionally,
+        covering most of the Adobe 1998 RGB™ colorspace,
+        but wre typically not found in a home or office environment.
+        <!-- sRGB gamut on UCS diagram -->
+      </p>
+
+      </p>Commercial availability of displays covering the Display P3 gamut
+      (a derivative of DCI P3 used for digital cinema,
+      but altered to account for a non-dark viewing environment
+      with an sRGB transfer curve and D65 white point)
+      meant that <b>Wide Color Gamut (WCG)</b> displays became commonplace
+      on laptops, external monitors, mobile phones, and even watches.
+      WCG requires a modest increase in the
+      number of bits per gamma-corrected component,
+      from 8 to 10 or 12 (for the widest gamut
+      in common use for content delivery,
+      Rec.2020).</p>
+
+      <p>The deployment of 4k and then 8k television,
+      accompanied by digital content delivery,
+      brought not only a similarly increased color gamut
+      to the media space, but also a greatly increased dynamic range
+      of 4000:1 or more.
+      Increased phosphor efficiency and purity,
+      together with bright and modulatable backlights,
+      brought <b>High Dynamic Range (HDR)</b> into widespread use.
+      Computers, however, remained limited to SDR for the most part.</p>
+
+      <p>
+        The human visual system can,
+        with appropriate adaptation,
+        function over an enormous luminance range —
+        from starlight or moonlight at 0.01 cd/m² and  0.1 cd/m²,
+        through the dim lighting at dawn and dusk (10 cd/m²),
+        office lighting (100 cd/m²),
+        modern displays (800 cd/m²),
+        overcast daylight (1,000 cd/m²),
+        bright daylight (10,000 cd/m²)
+        and full direct sunlight (100,000 cd/m²).
+        However, the full range cannot be simultaneously percieved
+        in the same scene
+        at the same time.
       </p>
       <p>
         There are two main
-        systems defined for HDR: HLG, developed by BBC and NHK, and Dolby PQ.
+        systems defined for HDR video: HLG, developed by BBC and NHK, and Dolby PQ.
         While improvement in video quality has driven the innovation of HDR,
         support for content on the web more generally, e.g., for static images,
         the <code>&lt;canvas&gt;</code> element, and in CSS in general, is still
