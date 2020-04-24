@@ -309,11 +309,17 @@
           where black, media/paper white, and peak whites (full-screen and small-area hilights)
           map in the various spaces.
         </p>
-        <p class="note">
-          TODO: Review the draft CSS Color Module Level 4 [[css-color-4]], to
-          determine whether HLG and Dolby PQ have an impact. Are their
-          capabilities covered by the new additions (*) in Level 4?
-          No, they are not. Rec. 2020 is covered, but only for SDR.
+        <p>
+          The draft CSS Color Module Level 4 [[css-color-4]],
+          adds WCG support. Rec. 2020 is covered, but only for SDR.
+          Rec. 2100, HLG and Dolby PQ are not covered.
+          The range of CIE Lightness (in Lab and LCH)
+          is not constrained to 100,
+          and a figure of 400 is mentioned because
+          it is known that Lab is a fair model for
+          up to four times the luminance of diffuse white
+          (Fairchild, pp.403-413 [[Fairchild-CAM]]),
+          but no meaning is yet ascribed for values greater than 100.
         </p>
         <p class="note">
           TODO: Add info on Rec. 2100 (HDR version of Rec. 2020) for different
