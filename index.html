@@ -500,12 +500,20 @@
           not tied to specific light levels,
           although ambient light sensors are mentioned.
         </p>
+        <p>
+          Media Queries 5 also adds
+          <a href="https://drafts.csswg.org/mediaqueries-5/#dynamic-range"><code>dynamic-range</code></a> and
+          <a href="https://drafts.csswg.org/mediaqueries-5/#video-dynamic-range"><code>video-dynamic-range </code> features</a>, both with the values <code>standard</code> and <code>high</code>,
+          for SDR and HDR respectively. The two queries can return different results
+          in the case of, for example, a 4k TV with HDR video plane and SDR content overlay plane.
+        </p>
         <section>
           <h4>Open Issues</h4>
           <ul>
             <li><a href="https://github.com/w3c/csswg-drafts/issues/3882">Detect all available color schemes</a> </li>
             <li><a href="https://github.com/w3c/csswg-drafts/issues/4471">Dealing with bi-plane (video/graphics) when reporting values</a></li>
             <li><a href="https://github.com/w3c/csswg-drafts/issues/1727">Clarify definition and use cases for light-level feature</a></li>
+            <li><a href="https://github.com/w3c/csswg-drafts/issues/5045">In-gamut media query</a></li>
           </ul>
         </section>
       </section>
