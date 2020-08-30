@@ -556,8 +556,32 @@
         </p>
         <section>
           <h4>Open Issues</h4>
-          <p>No open WCG or HDR issues</p>
+          <p>No open WCG or HDR issues. However,
+            CSSWG decided that the color-related aspects of the CSS OM
+            should migrate from that specification to CSS Color 4.
+          </p>
         </section>
+      </section>
+      <section>
+        <h3>CSS Typed OM Level 1</h3>
+        <p>The CSS Typed OM Level 1 [[css-typed-om]]
+          is an extensible API for the CSSOM that reduces
+          the burden of manipulating a CSS property's value via string manipulation.
+          It does so by exposing CSS values as typed JavaScript objects
+          rather than strings. There is <a href="https://github.com/w3c/css-houdini-drafts/blob/master/css-typed-om/README.md">an explainer document</a>.
+        </p>
+        <section>
+          <h4>Open Issues</h4>
+          <p>There is current discussion on extending the CSS Typed OM
+            for WCG and perhaps HDR color.
+            Helper functions to calculate luminance contrast (for WCAG) are also in scope.</p>
+          <p>There is <a href="https://colorjs.io/">initial prototyping work</a> for an object-oriented,
+            typed, CSS Color model.</p>
+          <ul>
+            <li><a href="https://github.com/w3c/css-houdini-drafts/issues/989">Color conversion and contrast ratio</a></li>
+          </ul>
+        </section>
+
       </section>
     </section>
     <section>
