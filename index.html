@@ -87,6 +87,12 @@
             href: "https://medium.com/netflix-techblog/enhancing-the-netflix-ui-experience-with-hdr-1e7506ad3e8",
             publisher: "Netflix",
             date: "24 September 2018",
+          },
+          "webgpu": {
+            title: "WebGPU",
+            href: "https://gpuweb.github.io/gpuweb/",
+            publisher: "W3C",
+            date: "August 2020"
           }
         }
       };
@@ -691,7 +697,7 @@
     <section>
       <h2>WebGL</h2>
       <p class="note">
-        TODO: ...
+        TODO: (might be moot, see WebGPU)
       </p>
       <section>
         <h4>Open Issues</h4>
@@ -699,6 +705,27 @@
         <li><a href="https://github.com/KhronosGroup/WebGL/issues/2508">Issues needing to be solved in WEBGL_video_texture proposal </a></li>
       </ul>
       </section>
+    </section>
+    <section>
+      <h2>WebGPU</h2>
+      <p>The GPU on the Web Working Group develops the WebGPU API [[webgpu]],
+        a more modern version of WebGL. The draft spec does not mention "color spaces".
+      It has an RGBA color object, which consists of four double-precision floats.
+    It therefore has the potential to cover HDR, as well as WCG;
+    but the meaning of the values, their range, transfer function,
+    and colorspace is currently undefined.
+    However, a passing mention of the
+    naming convention for texture formats
+    <a href="https://gpuweb.github.io/gpuweb/#texture-formats">seems to indicate
+      that both gamma-corrected and linear sRGB are supported,
+      with conversion on-the-fly.</a>
+  </p>
+    <section>
+      <h3>Open Issues</h3>
+      <ul>
+        <li><a href="https://github.com/w3c/ColorWeb-CG/issues/8">WebGPU, WCG and HDR</a></li>
+      </ul>
+    </section>
     </section>
     <section>
       <h2>Recommendations</h2>
