@@ -43,6 +43,12 @@
             publisher: "WICG",
             date: "22 March 2018"
           },
+          "css-color-hdr": {
+            title: "CSS Color HDR Module Level 1",
+            href: "https://drafts.csswg.org/css-color-hdr/",
+            publisher: "W3C",
+            date: "3 June 2020"
+          },
           "Fairchild-CAM": {
             title: "Color Appearance Models, 3rd Edition",
             author: "Fairchild, Mark D.",
@@ -125,7 +131,7 @@
         <!-- add UCS diagram of coated and uncoated FOGRA21 and 39 -->
         Self-luminous displays, in that commercial environment,
         were primarily used at low luminances
-        for soft proofing of an eentual printed product,
+        for soft proofing of an eventual printed product,
         and were intended to replicate the appearance of a viewing booth.
       </p>
 
@@ -158,8 +164,8 @@
 
       </p>Commercial availability of displays covering the Display P3 gamut
       (a derivative of DCI P3 used for digital cinema,
-      but altered to account for a non-dark viewing environment
-      with an sRGB transfer curve and D65 white point)
+      but altered to account for a non-dark viewing environment,
+      with an sRGB transfer curve ,and D65 white point)
       meant that <b>Wide Color Gamut (WCG)</b> displays became commonplace
       on laptops, external monitors, mobile phones, and even watches.
       WCG requires a modest increase in the
@@ -279,8 +285,9 @@
         <p>
           CSS defines several ways of specifying the colors to use in web
           pages, in the CSS Color Module specifications. The current Recommendation is
-          Level 3 [[css-color-3]], and its successor, Level 4, is now being
-          drafted [[css-color-4]]. The various methods in Level 4 are:
+          Level 3 [[css-color-3]], and its successor, Level 4, is becoming stable
+          and starting to be implemented [[css-color-4]].
+          The various methods in Level 4 cover WCG but not HDR, and are:
         </p>
         <ul>
           <li>sRGB (Red, Green, Blue), using the <code>rgb()</code> and <code>rgba()</code> functions</li>
@@ -312,7 +319,6 @@
         <p>
           The draft CSS Color Module Level 4 [[css-color-4]],
           adds WCG support. Rec. 2020 is covered, but only for SDR.
-          Rec. 2100, HLG and Dolby PQ are not covered.
           The range of CIE Lightness (in Lab and LCH)
           is not constrained to 100,
           and a figure of 400 is mentioned because
@@ -322,8 +328,11 @@
           but no meaning is yet ascribed for values greater than 100.
         </p>
         <p class="note">
-          TODO: Add info on Rec. 2100 (HDR version of Rec. 2020) for different
-          transfer functions: for HLG and PQ.
+          Rec. 2100, with both HLG and Dolby PQ is added to CSS
+          in an Unofficial Draft [[css-color-hdr]].
+          It also adds J<sub>z</sub>a<sub>z</sub>b<sub>z</sub> (which uses the PQ transfer characteristic),
+          J<sub>z</sub>C<sub>z</sub>h<sub>z</sub> (the polar form),
+          and Dolby ICtCp.
         </p>
         <section>
           <h4>Open Issues</h4>
