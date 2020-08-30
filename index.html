@@ -310,6 +310,8 @@
         <p>
           Section 12 in [[css-color-4]] is titled "Working Color Space", and
           currently empty. It is intended to cover compositing multiple colorspaces.
+          There is as yet no consensus on whether this should be per-document or a per-element property;
+          nor on whether a single value is appropriate for all operations.
           We need to define how should compositing work, if
           there is HLG, PQ, and SDR content present. The [[hdr-chrome]]
           discussion document provides useful input. This will require defining
@@ -332,7 +334,7 @@
           in an Unofficial Draft [[css-color-hdr]].
           It also adds J<sub>z</sub>a<sub>z</sub>b<sub>z</sub> (which uses the PQ transfer characteristic),
           J<sub>z</sub>C<sub>z</sub>h<sub>z</sub> (the polar form),
-          and Dolby ICtCp.
+          and Dolby ICtCp. Lastly, it adds a (normative) section "Compositing SDR and HDR content".
         </p>
         <section>
           <h4>Open Issues</h4>
@@ -347,6 +349,9 @@
             <li><a href="https://github.com/w3c/csswg-drafts/issues/3249">extend rgb() for HDR</a></li>
             <li><a href="https://github.com/w3c/csswg-drafts/issues/296">Canvas may add a half-float, gamma-corrected, Rec. 2020 colorspace </a></li>
             <li><a href="https://github.com/w3c/csswg-drafts/issues/299">black point compensation</a></li>
+            <li><a href="https://github.com/w3c/csswg-drafts/issues/5323">Compositing SDR in HDR outputs</a></li>
+            <li><a href="https://github.com/w3c/csswg-drafts/issues/5322"> Query 9: Black Level</a></li>
+            <li><a href="https://github.com/w3c/csswg-drafts/issues/4647">Do gradients/animations using lab/lch colors interpolate in the Lab colorspace?</a></li>
           </ul>
         </section>
       </section>
