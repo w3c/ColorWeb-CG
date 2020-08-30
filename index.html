@@ -423,6 +423,26 @@
         </section>
       </section>
       <section>
+        <h3>Filter Effects</h3>
+        <p>The CSS Filter Effects Module [[filter-effects]],
+          which generalizes to CSS and HTML the filter effect already available on SVG,
+          performs all operations in linear-light sRGB colorspace.
+          For example, the <a href="https://drafts.fxtf.org/filter-effects/#feColorMatrixElement"><code>luminanceToAlpha</code> definition</a>
+          hard-codes the matrix operations for linear-sRGB to Luminance.
+          Operations are defined in terms of an equivalent SG filter function.
+        </p>
+        <p>It would be desirable to extend the filteroperations to at least other RGB spaces, such as display-p3; provided this can be done
+          in an opt-in manner, without Web-incompatible changes to existing content. Currently, the SVG WG is focussed on documenting existing implementations rather than extending SVG.</p>
+          <section>
+            <h4>Open Issues</h4>
+            <ul>
+              <li><a href="https://github.com/w3c/ColorWeb-CG/issues/6">Filters and WCG</a></li>
+              <li><a href="https://github.com/w3c/fxtf-drafts/issues/364">How to handle feColorMatrix with type=saturate and values outside a 0..1 range?</a></li>
+              <li><a href="https://github.com/w3c/fxtf-drafts/issues/326">Clarify color-interpolation-filters behavior on feMerge</a></li>
+            </ul>
+          </section>
+      </section>
+      <section>
         <h3>HTML color input</h3>
         <p>
           The HTML input element has a color type, <input type="color">
@@ -445,7 +465,7 @@
       </section>
     </section>
     <section>
-      <h2>Device Capabilities</h2>
+      <h2>Device Capabilities and APIs</h2>
       <section>
         <h3>Media Capabilities API</h3>
         <p>
@@ -536,26 +556,7 @@
           </ul>
         </section>
       </section>
-      <section>
-        <h3>Filter Effects</h3>
-        <p>The CSS Filter Effects Module [[filter-effects]],
-          which generalizes to CSS and HTML the filter effect already available on SVG,
-          performs all operations in linear-light sRGB colorspace.
-          For example, the <a href="https://drafts.fxtf.org/filter-effects/#feColorMatrixElement"><code>luminanceToAlpha</code> definition</a>
-          hard-codes the matrix operations for linear-sRGB to Luminance.
-          Operations are defined in terms of an equivalent SG filter function.
-        </p>
-        <p>It would be desirable to extend the filteroperations to at least other RGB spaces, such as display-p3; provided this can be done
-          in an opt-in manner, without Web-incompatible changes to existing content. Currently, the SVG WG is focussed on documenting existing implementations rather than extending SVG.</p>
-          <section>
-            <h4>Open Issues</h4>
-            <ul>
-              <li><a href="https://github.com/w3c/ColorWeb-CG/issues/6">Filters and WCG</a></li>
-              <li><a href="https://github.com/w3c/fxtf-drafts/issues/364">How to handle feColorMatrix with type=saturate and values outside a 0..1 range?</a></li>
-              <li><a href="https://github.com/w3c/fxtf-drafts/issues/326">Clarify color-interpolation-filters behavior on feMerge</a></li>
-            </ul>
-          </section>
-      </section>
+
       <section>
         <h3>CSSOM View Module</h3>
         <p>The CSS Object Model View Module [[cssom-view-1]] has a
