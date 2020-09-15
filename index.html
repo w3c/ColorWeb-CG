@@ -416,10 +416,18 @@
         </p>
         <section>
           <h4>Open Issues</h4>
+          <p>Merging of a  <a href="https://github.com/WICG/canvas-color-space/pull/28">recent pull reqest</a>
+          indicates the canvas-colorspace proposal might move forward again.
+          In particular, colorspaces are now defined relative to CSS Color 4 predefined RGB spaces,
+          instead of being assumed to be sRGB.
+        </p>
           <ul>
             <li><a href="https://github.com/GoogleChromeLabs/squoosh/issues/802">HDR / wide color gamut support</a></li>
             <li><a href="https://github.com/w3c/ColorWeb-CG/issues/5">Canvas, bitmap rendering context and readback</a></li>
             <li><a href="https://github.com/WICG/canvas-color-space/issues/24">CSS for HDR values?</a></li>
+            <li><a href="https://github.com/WICG/canvas-color-space/issues/19">Allow colorSpace attributes in getImageData and toDataURL</a></li>
+            <li><a href="https://github.com/WICG/canvas-color-space/issues/16">Absolute vs relative luminance</a></li>
+            <li><a href="https://github.com/WICG/canvas-color-space/issues/15">Question on scope + P3</a></li>
           </ul>
         </section>
       </section>
@@ -632,6 +640,8 @@
     </section>
     <section>
       <h2>Static Image Formats</h2>
+      <section>
+        <h3>Requirements</h3>
       <p>
         A static image format is required to store graphics (both camera-capture
         and artificially generated). Suggested use cases include, but are not
@@ -667,15 +677,6 @@
         to the image.
       </p>
       <p>
-        Taking Portable Network Graphics (PNG) as an example, it is possible to
-        store graphics using 16-bits per channel and it is possible to store the
-        primaries and white point. Two methods of storing the transfer function
-        exist: the storage of a value for gamma, and the storage of an ICC
-        profile. The first method, storage of gamma would allow a backwards
-        compatible image to be displayed on non-HDR monitors. The second would
-        allow the correct display of this image on an HDR display.
-      </p>
-      <p>
         ICC Profiles store data which allows the correct mapping of captured
         data to/from an all encompassing color space and from/to the all
         encompassing color space to a display device. Version 4 has only a
@@ -683,16 +684,7 @@
         allows different color working spaces and an algorithmic calculator
         for the transforms. Version 5 is not well supported.
       </p>
-      <p>
-        The Timed Text Working Group has published a draft specification
-        [[png-hdr-pq]] that extends the PNG format to include an iCCP chunk with
-        the name "ITUR_2100_PQ_FULL". The chunk contains a given ICC profile,
-        linked from the specification, although this profile is not actually
-        used, and only its presence is used to enable external rendering of the
-        PQ encoded image by the platform. See
-        <a href="https://lists.w3.org/Archives/Public/public-colorweb/2017May/0001.html">
-        this discussion</a> on the Color on the Web CG mailing list.
-      </p>
+
       <p class="note">
         Open questions: How can we define an ICC / ICCMax profile for HLG?
         If we define an ICC / ICCMax profile for HLG, how can we test it?
@@ -701,6 +693,37 @@
         Netflix have published a blog post [[netflix-hdr]] that describes their
         approach for static images.
       </p>
+      </section>
+      <section>
+        <h3>Candidates</h3>
+        <section>
+          <h4>PNG</h4>
+          <p>
+            Portable Network Graphics (PNG) can
+            store graphics using 16-bits per channel and it is possible to store the
+            primaries and white point. Two methods of storing the transfer function
+            exist: the storage of a value for gamma, and the storage of an ICC
+            profile. The first method, storage of gamma would allow a backwards
+            compatible image to be displayed on non-HDR monitors. The second would
+            allow the correct display of this image on an HDR display.
+            A new, HDR-specific tag (with values "HLG" and "PQ") could be a third option
+          </p>
+          <p>
+            The Timed Text Working Group has published a draft specification
+            [[png-hdr-pq]] that extends the PNG format to include an iCCP chunk with
+            the name "ITUR_2100_PQ_FULL". The chunk contains a given ICC profile,
+            linked from the specification, although this profile is not actually
+            used, and only its presence is used to enable external rendering of the
+            PQ encoded image by the platform. See
+            <a href="https://lists.w3.org/Archives/Public/public-colorweb/2017May/0001.html">
+            this discussion</a> on the Color on the Web CG mailing list.
+          </p>
+        </section>
+        <section>
+          <h4>AVIF</h4>
+          <p>Mozilla bug <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1634741">AVIF (AV1 Image File Format): ICC profile support</a></p>
+        </section>
+      </section>
     </section>
     <section>
       <h2>WebGL</h2>
