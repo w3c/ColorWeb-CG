@@ -103,6 +103,9 @@
         }
       };
     </script>
+    <style>
+      .closed {color: #999;}
+    </style>
   </head>
   <body>
     <section id="abstract">
@@ -213,7 +216,9 @@
       </p>
       <p>
         There are two main
-        systems defined for HDR video: HLG, developed by BBC and NHK, and Dolby PQ.
+        systems defined for HDR video:
+        Hyprid Log Gamma (HLG), developed by BBC and NHK, and
+        Dolby Perceptual Quantizer (PQ).
         While improvement in video quality has driven the innovation of HDR,
         support for content on the web more generally, e.g., for static images,
         the <code>&lt;canvas&gt;</code> element, and in CSS in general, is still
@@ -348,6 +353,14 @@
           J<sub>z</sub>C<sub>z</sub>h<sub>z</sub> (the polar form),
           and Dolby ICtCp. Lastly, it adds a (normative) section "Compositing SDR and HDR content".
         </p>
+        <p>
+          Other CSS specifications assume that all colors are sRGB.
+          For example, CSS Images
+          (which defines linear, radial, and conic gradients)
+          assumes that all color stops are sRGB colors
+          and mandates that interpolation happen as premultiplied,
+          gamma-encoded, sRGB values.
+        </p>
         <section>
           <h4>Open Issues</h4>
           <p>There are a few open issues that relate to HDR and WCG support:</p>
@@ -357,13 +370,14 @@
             <li><a href="https://github.com/w3c/csswg-drafts/issues/300">Working color space</a></li>
             <li><a href="https://github.com/w3c/csswg-drafts/issues/4471">Dealing with bi-plane (video/graphics) when reporting values</a></li>
             <li><a href="https://github.com/w3c/csswg-drafts/issues/3844">Effect of working color space on computed & used values</a></li>
-            <li><a href="https://github.com/w3c/csswg-drafts/issues/3435">sRGB doesn't really use 80 cd/m^2 white luminance</a></li>
+            <li class="closed"><a href="https://github.com/w3c/csswg-drafts/issues/3435">sRGB doesn't really use 80 cd/m^2 white luminance</a></li>
             <li><a href="https://github.com/w3c/csswg-drafts/issues/3249">extend rgb() for HDR</a></li>
             <li><a href="https://github.com/w3c/csswg-drafts/issues/296">Canvas may add a half-float, gamma-corrected, Rec. 2020 colorspace </a></li>
             <li><a href="https://github.com/w3c/csswg-drafts/issues/299">black point compensation</a></li>
             <li><a href="https://github.com/w3c/csswg-drafts/issues/5323">Compositing SDR in HDR outputs</a></li>
             <li><a href="https://github.com/w3c/csswg-drafts/issues/5322"> Query 9: Black Level</a></li>
             <li><a href="https://github.com/w3c/csswg-drafts/issues/4647">Do gradients/animations using lab/lch colors interpolate in the Lab colorspace?</a></li>
+            <li><a href="https://github.com/w3c/csswg-drafts/issues/5669">sRGBA assumption on gradients, and premultiplied other color spaces</a></li>
           </ul>
         </section>
       </section>
