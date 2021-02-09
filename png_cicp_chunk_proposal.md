@@ -1,5 +1,5 @@
 # Adding support for HDR imagery to the PNG format
-Authors (alphabetical): Chris Blume, Pierre-Anthony Lemieux, Chris Seeger
+Editors: Chris Blume, Pierre-Anthony Lemieux, Chris Seeger
 
 Status: Draft
 
