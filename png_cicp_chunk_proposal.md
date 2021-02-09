@@ -6,7 +6,7 @@ Status: Draft
 ## Problem to be solved
 The gAMA chunk of the Portable Network Graphics (PNG) format (specified in [PNG]) parameterized the transfer function of the image as a power law. As such, it cannot model the Reference PQ or HLG OOTFs specified in [BT2100-1], which are commonly used for HDR images.
 
-An existing W3C group note (https://www.w3.org/TR/png-hdr-pq/) specifies an approach which is limited: it supports signaling of only the ITU BT.2100 PQ EOTF and uses magic values in the iCCP chunk to signal color spaces.
+An existing W3C group note, [BT2100-in-PNG]  specifies an approach which is limited: it supports signaling of only the ITU BT.2100 PQ EOTF and uses magic values in the iCCP chunk to signal color spaces.
 
 ## Basic requirements
 * does not break current implementations
@@ -47,3 +47,6 @@ Use [ITU-T Series H Supplement 19](https://www.itu.int/rec/T-REC-H.Sup19-201910-
 
 [PNG]
 [Portable Network Graphics (PNG) Specification (Second Edition)](https://www.w3.org/TR/PNG/). Tom Lane. W3C. 10 November 2003. W3C Recommendation. URL: https://www.w3.org/TR/PNG
+
+[BT2100-in-PNG]
+[Using the ITU BT.2100 PQ EOTF with the PNG format](https://www.w3.org/TR/png-hdr-pq/)
