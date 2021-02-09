@@ -40,6 +40,8 @@ When the cICP chunk is present, PNG decoders that recognize it shall ignore the 
 NOTE: [ITU-T Series H Supplement 19](https://www.itu.int/rec/T-REC-H.Sup19-201910-I) summarize combinations of H.273 parameters corresponding to common baseband linear broadcasts and file-based Video-on-Demand(VOD) services.
 
 ## A. References
+
+[ITU-T Series H Supplement 19](https://www.itu.int/rec/T-REC-H.Sup19-201910-I). Series H: Audiovisual and multimedia systems - Usage of video signal type code points
 [BT2100-1]
 [Recommendation ITU-R BT.2100-1](https://www.itu.int/rec/R-REC-BT.2100), Image parameter values for high dynamic range television for use in production and international programme exchange
 
