@@ -4,7 +4,7 @@ Authors (alphabetical): Chris Blume, Chris Seeger, Pierre-Anthony Lemieux
 Status: Draft
 
 ## Problem to be solved
-The gAMA chunk of the Portable Network Graphics (PNG) format (specified in [PNG]) parameterized the transfer function of the image as a power law. As such, it cannot model the Reference PQ or HLG OTFs specified in [BT2100-1], which are commonly used for HDR images.
+The gAMA chunk of the Portable Network Graphics (PNG) format (specified in [PNG]) parameterized the transfer function of the image as a power law. As such, it cannot model the Reference PQ or HLG OOTFs specified in [BT2100-1], which are commonly used for HDR images.
 
 This specification uses the existing iCCP chunk to unambiguously signal the color system of an image that uses the Reference PQ EOTF specified in [BT2100-1]. It also allows graceful processing by decoders that do not conform to this specification by recommending fallback values for the gAMA chunk, cHRM chunk, and embedded ICC profile.
 
