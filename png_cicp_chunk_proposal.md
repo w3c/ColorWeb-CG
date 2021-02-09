@@ -37,7 +37,7 @@ When the cICP chunk is present, PNG decoders that recognize it shall ignore the 
 - cHRM 
 - sRGB 
 
-Use [ITU-T Series H Supplement 19](https://www.itu.int/rec/T-REC-H.Sup19-201910-I) “recommendations” to signal the controlled vocabulary for image formats commonly used for baseband linear broadcasts or file-based Video-on-Demand(VOD) services.
+NOTE: [ITU-T Series H Supplement 19](https://www.itu.int/rec/T-REC-H.Sup19-201910-I) summarize combinations of H.273 parameters corresponding to common baseband linear broadcasts and file-based Video-on-Demand(VOD) services.
 
 ## A. References
 [BT2100-1]
