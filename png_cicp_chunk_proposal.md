@@ -14,6 +14,9 @@ An existing W3C group note, [BT2100-in-PNG]  specifies an approach which is limi
 * does not require the presence of iCCP chunk and embedded ICC profiles
 
 ## Strawman approach
+[H.273](https://www.itu.int/rec/T-REC-H.273/en) specifies a controlled vocabulary for the parameterization of
+color space information.
+
 Define a cICP chunk that contains the 7 bytes necessary to carry the
 H.273 color space parameters:
 
@@ -33,12 +36,6 @@ When the cICP chunk is present, PNG decoders that recognize it shall ignore the 
 - gAMA 
 - cHRM 
 - sRGB 
-
-[H.273](https://www.itu.int/rec/T-REC-H.273/en) specifies a controlled vocabulary for the parameterization of
-color space information:
-* Color Primaries
-* Transfer Function
-* Matrix Coefficients (only required if essence is stored as Y’CbCr)
 
 Use [ITU-T Series H Supplement 19](https://www.itu.int/rec/T-REC-H.Sup19-201910-I) “recommendations” to signal the controlled vocabulary for image formats commonly used for baseband linear broadcasts or file-based Video-on-Demand(VOD) services.
 * Tables within this document summarize values most commonly used in broadcast for 47 different standards documents including H.273
