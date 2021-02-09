@@ -43,7 +43,6 @@ Use [ITU-T Series H Supplement 19](https://www.itu.int/rec/T-REC-H.Sup19-201910-
 * Tables within this document summarize values most commonly used in broadcast for 47 different standards documents including H.273
 
 ## A. References
-### A.1 Normative references
 [BT2100-1]
 [Recommendation ITU-R BT.2100-1](https://www.itu.int/rec/R-REC-BT.2100), Image parameter values for high dynamic range television for use in production and international programme exchange
 
