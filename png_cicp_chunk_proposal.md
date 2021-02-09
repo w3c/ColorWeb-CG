@@ -12,7 +12,6 @@ An existing W3C group note, [BT2100-in-PNG]  specifies an approach which is limi
 * does not break current implementations
 * extensible signaling of color space based on H.273
 * does not require the presence of iCCP chunk and embedded ICC profiles
-* cICP chunk comes before IDAT chunk
 
 ## Strawman approach
 Define a cICP chunk that contains the 7 bytes necessary to carry the
@@ -26,6 +25,8 @@ H.273 color space parameters:
 H.273 color space parameters]
 
 [ed.: The MATOEFFS parameter is not included because PNG does not support YCbCr]
+
+The cICP chunk comes before IDAT chunk.
 
 When the cICP chunk is present, PNG decoders that recognize it shall ignore the following chunks:
 - iCCP
