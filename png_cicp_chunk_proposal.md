@@ -13,31 +13,33 @@ An existing W3C group note, [BT2100-in-PNG]  specifies an approach which is limi
 * extensible signaling of color space based on H.273
 * does not require the presence of iCCP chunk and embedded ICC profiles
 
+## Non Requirements
+* compatibility with HDR colorspace definitions in any other raster image format (eg. JPEG, AVIF)
+
 ## Strawman approach
-[H.273](https://www.itu.int/rec/T-REC-H.273/en) specifies a controlled vocabulary for the parameterization of
-color space information.
+[H.273](https://www.itu.int/rec/T-REC-H.273/en) specifies a controlled vocabulary for the parameterization of color space information.
 
-Define a cICP chunk that contains the 7 bytes necessary to carry the
-H.273 color space parameters:
+Define a `cICP` chunk that contains the 7 bytes necessary to carry the H.273 color space parameters:
 
-* COLPRIMS, 2 bytes, One of the ColourPrimaries enumerated values specified in Rec. ITU-T H.273 | [ISO/IEC 23091-2]
-* TRANSFC, 2 bytes, One of the TransferCharacteristics enumerated values specified in Rec. ITU-T H.273 | [ISO/IEC 23091-2]
-* VIDFRNG, 1 byte, Value of the VideoFullRangeFlag specified in Rec. ITU-T H.273 | [ISO/IEC 23091-2]
+* **COLPRIMS**, 2 bytes, One of the ColourPrimaries enumerated values specified in Rec. ITU-T H.273 | [ISO/IEC 23091-2]
+* **TRANSFC**, 2 bytes, One of the TransferCharacteristics enumerated values specified in Rec. ITU-T H.273 | [ISO/IEC 23091-2]
+* **VIDFRNG**, 1 byte, Value of the VideoFullRangeFlag specified in Rec. ITU-T H.273 | [ISO/IEC 23091-2]
 
-[ed.: these are inspired from recent JPEG standards that incorporate
-H.273 color space parameters]
+[ed.: these are inspired from recent JPEG standards (eg. JPEG-XL) that incorporate H.273 color space parameters]
 
 [ed.: The MATOEFFS parameter is not included because PNG does not support YCbCr]
 
-The cICP chunk comes before IDAT chunk.
-
-When the cICP chunk is present, PNG decoders that recognize it shall ignore the following chunks:
-- iCCP
-- gAMA 
-- cHRM 
-- sRGB 
-
 NOTE: [ITU-T Series H Supplement 19](https://www.itu.int/rec/T-REC-H.Sup19-201910-I) summarize combinations of H.273 parameters corresponding to common baseband linear broadcasts and file-based Video-on-Demand(VOD) services.
+
+### Implementation Details
+The `cICP` chunk SHALL come before `IDAT` chunk.  
+
+A PNG SHALL not contain both a `cICP` chunk and an `iCCP` chunk. If a PNG decoder detects the presence of both a `cICP` and a `iCCP` chunk, the behavior is undefined.
+
+When the `cICP` chunk is present a PNG decoder SHALL ignore the following chunks:
+- `gAMA`
+- `cHRM` 
+- `sRGB` 
 
 ## A. References
 
