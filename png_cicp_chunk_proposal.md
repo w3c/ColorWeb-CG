@@ -24,7 +24,7 @@ Use [ITU-T Series H Supplement 19](https://www.itu.int/rec/T-REC-H.Sup19-201910-
 * does not break current implementations
 * extensible signaling of color space based on H.273
 * does not require the presence of iCCP chunk and embedded ICC profiles
-* cICP chunk comes before frame data
+* cICP chunk comes before IDAT chunk
 
 ## Strawman approach
 Define a cICP chunk that contains the 7 bytes necessary to carry the
