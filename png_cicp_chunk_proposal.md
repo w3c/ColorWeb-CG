@@ -20,11 +20,12 @@ H.273 color space parameters:
 
 * COLPRIMS, 2 bytes, One of the ColourPrimaries enumerated values specified in Rec. ITU-T H.273 | ISO/IEC 23001-8
 * TRANSFC, 2 bytes, One of the TransferCharacteristics enumerated values specified in Rec. ITU-T H.273 | ISO/IEC 23001-8
-* MATCOEFFS, 2 bytes, One of the MatrixCoefficients enumerated values specified in Rec. ITU-T H.273 | ISO/IEC 23001-8
 * VIDFRNG, 1 byte, Value of the VideoFullRangeFlag specified in Rec. ITU-T H.273 | ISO/IEC 23001-8
 
 [ed.: these are inspired from recent JPEG standards that incorporate
 H.273 color space parameters]
+
+[ed.: The MATOEFFS parameter is not included because PNG does not support YCbCr]
 
 This specification uses the existing iCCP chunk to unambiguously signal the color system of an image that uses the Reference PQ EOTF specified in [BT2100-1]. It also allows graceful processing by decoders that do not conform to this specification by recommending fallback values for the gAMA chunk, cHRM chunk, and embedded ICC profile.
 
