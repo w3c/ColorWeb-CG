@@ -27,7 +27,11 @@ H.273 color space parameters]
 
 [ed.: The MATOEFFS parameter is not included because PNG does not support YCbCr]
 
-This specification uses the existing iCCP chunk to unambiguously signal the color system of an image that uses the Reference PQ EOTF specified in [BT2100-1]. It also allows graceful processing by decoders that do not conform to this specification by recommending fallback values for the gAMA chunk, cHRM chunk, and embedded ICC profile.
+When the cICP chunk is present, PNG decoders that recognize it shall ignore the following chunks:
+- iCCP
+- gAMA 
+- cHRM 
+- sRGB 
 
 [H.273](https://www.itu.int/rec/T-REC-H.273/en) specifies a controlled vocabulary for the parameterization of
 color space information:
