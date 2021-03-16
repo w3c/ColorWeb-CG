@@ -38,7 +38,6 @@ When the cICP chunk is present, PNG decoders that recognize it shall ignore the 
 
 NOTE: [ITU-T Series H Supplement 19](https://www.itu.int/rec/T-REC-H.Sup19-201910-I) summarize combinations of H.273 parameters corresponding to common baseband linear broadcasts and file-based Video-on-Demand(VOD) services.
 
-[PNG](https://www.w3.org/TR/PNG/) section 4.4, figure 4.6, and section 6.1 should be updated to include a YUV 4:4:4 image type.
 
 ## A. References
 
