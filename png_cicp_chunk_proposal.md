@@ -22,7 +22,7 @@ H.273 color space parameters:
 
 * COLPRIMS, 2 bytes, One of the ColourPrimaries enumerated values specified in Rec. ITU-T H.273 | [ISO/IEC 23091-2]
 * TRANSFC, 2 bytes, One of the TransferCharacteristics enumerated values specified in Rec. ITU-T H.273 | [ISO/IEC 23091-2]
-* MATOEFFS, 1 byte, One of the MatrixCoefficients enumerated values specified in Rec. ITU-T H.273 | [ISO/IEC 23091-2]
+* MATCOEFFS, 1 byte, One of the MatrixCoefficients enumerated values specified in Rec. ITU-T H.273 | [ISO/IEC 23091-2]
 * VIDFRNG, 1 byte, Value of the VideoFullRangeFlag specified in Rec. ITU-T H.273 | [ISO/IEC 23091-2]
 
 [ed.: these are inspired from recent JPEG standards that incorporate
