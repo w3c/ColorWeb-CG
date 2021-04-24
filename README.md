@@ -1,4 +1,13 @@
 # ColorWeb-CG
-repo for the Color on the Web Community Group https://www.w3.org/community/colorweb/
 
-A draft CG report is available, https://w3c.github.io/ColorWeb-CG/
+Repository for the Color on the Web Community Group https://www.w3.org/community/colorweb/
+
+# Current deliverables
+
+* [draft CG report](./index.html)
+* [requirements for adding HDR support in PNG](./hdr-in-png-requirements.md)
+* [strawman API for adding HDR support to Canvas/WebGPU/WebGL](./hdr_html_canvas_element.md)
+
+# Issue tracking
+
+Please file issues directly on [GitHub](https://github.com/w3c/ColorWeb-CG/issues).
