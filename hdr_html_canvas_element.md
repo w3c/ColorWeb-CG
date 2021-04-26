@@ -225,7 +225,7 @@ No tone mapping will be applied by the browser, operating system, or display dev
 
 ### The `extended-linear-srgb` color space
 
-#### An HDR WebGL using
+#### WebGL using extended mode
 
 In this example, a WebGL application enables and HDR default drawing buffer, and clears it to the pixel value `(1,1,1,1)`.
 
@@ -242,7 +242,7 @@ In this example, a WebGL application enables and HDR default drawing buffer, and
 
 When composited, this canvas is guaranteed to be the same color as the CSS color `'white'`.
 
-#### Using passthrough
+#### WebGL using passthrough mode
 
 If this example were changed to specify the passthrough mode then there would no longer be a guarantee that the canvas would match the CSS color `'white'`.
 
@@ -276,8 +276,6 @@ In this example, we use an HLG 2D canvas to display a HLG image.
 
 ```javascript
     var canvas = document.getElementById('MyCanvas');
-    canvas.configureHighDynamicRange({enabled:true});
-
     var context = canvas.getContext('2d',
         {colorSpace:'rec2100-hlg', storageFormat:'unorm-10-10-10-2'});
 
@@ -302,7 +300,6 @@ Suppose we wish to change the above example to draw subtitles at a brightness th
 
 ```javascript
     var canvas = document.getElementById('MyCanvas');
-    canvas.configureHighDynamicRange({enabled:true});
     var context = canvas.getContext('2d',
         {colorSpace:'rec2100-hlg', storageFormat:'unorm-10-10-10-2'});
 
@@ -331,8 +328,6 @@ In this example, we use a PQ 2D canvas to display a PQ image.
 
 ```javascript
     var canvas = document.getElementById('MyCanvas');
-    canvas.configureHighDynamicRange({enabled:true});
-
     var context = canvas.getContext('2d',
         {colorSpace:'rec2100-pq', storageFormat:'unorm-10-10-10-2'});
 
