@@ -35,7 +35,7 @@ NOTE: [ITU-T Series H Supplement 19](https://www.itu.int/rec/T-REC-H.Sup19-20191
 
 The `cICP` chunk SHALL come before `IDAT` chunk.  
 
-A PNG MAY contain both a `cICP` chunk and an `iCCP` chunk. If a PNG decoder detects the presence of both a `cICP` and a `iCCP` chunk, the behavior is undefined.
+A PNG MAY contain both a `cICP` chunk and an `iCCP` chunk.
 
 When the `cICP` chunk is present, a PNG decoder SHALL ignore the following chunks:
 - `gAMA`
