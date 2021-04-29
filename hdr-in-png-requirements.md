@@ -22,7 +22,7 @@ An existing W3C group note, [BT2100-in-PNG]  specifies an approach which is limi
 
 [H.273](https://www.itu.int/rec/T-REC-H.273/en) specifies a controlled vocabulary for the parameterization of color space information.
 
-Define a `cICP` chunk that contains the 3 bytes necessary to carry the H.273 color space parameters:
+Define a `cICP` chunk that contains the 4 bytes necessary to carry the H.273 color space parameters:
 
 * **COLPRIMS**, 1 byte, One of the ColourPrimaries enumerated values specified in Rec. ITU-T H.273 | [ISO/IEC 23091-2]
 * **TRANSFC**, 1 byte, One of the TransferCharacteristics enumerated values specified in Rec. ITU-T H.273 | [ISO/IEC 23091-2]
