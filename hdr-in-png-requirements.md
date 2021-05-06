@@ -72,7 +72,7 @@ If the `iCCN` chunk is present, the image samples conform to the colour space re
 
 ### Decoder
 
-If the image contains a `cICP` chunk and will be rendered to a display or surface that supports `cICP`, then the PNG decoder shall ignore any `gAMA`, `cHRM`, and `iCCN` chunks and use the `cICP` chunk instead. Otherwise, when a `iCCN` chunk is present, PNG decoders that recognize it and are capable of colour management shall ignore any `gAMA`, `cHRM`, and `cICP` chunks and use the `iCCN` chunk instead and interpret it according to [ICC] or [ICC-2010] as appropriate. PNG decoders that are used in an environment that is incapable of full-fledged colour management shall use the `gAMA` and `cHRM` chunks if present.
+If the image contains a `cICP` chunk and will be rendered to a display or surface that supports `cICP`, then the PNG decoder shall ignore any `gAMA`, `cHRM`, `iCCP`, and `iCCN` chunks and use the `cICP` chunk instead. Otherwise, when a `iCCN` chunk is present, PNG decoders that recognize it and are capable of colour management shall ignore any `gAMA`, `cHRM`, and `cICP` chunks and use the `iCCN` chunk instead and interpret it according to [ICC] or [ICC-2010] as appropriate. PNG decoders that are used in an environment that is incapable of full-fledged colour management shall use the `gAMA` and `cHRM` chunks if present.
 
 #### Codestream
 
