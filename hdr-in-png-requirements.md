@@ -61,7 +61,10 @@ The profile name may be any convenient name for referring to the profile. It is 
 
 The only compression method defined in this International Standard is method 0 (zlib datastream with deflate compression, see 10.3: Other uses of compression). The compression method entry is followed by a compressed datastream of an ICC profile as defined in [ICC] or [ICC-2010]. The ICC profile shall either be an output profile (Device Class = `prtr`) or a monitor profile (Device Class = `mntr`). Decompression of this datastream yields the embedded ICC profile.
 
-NOTE: This is exactly the same as `iCCP` except the profile name is UTF-8 instead of Latin-1. Analogous to `tEXt` vs. `iTXt`
+NOTE: This is exactly the same as `iCCP` except:
+
+* `iCCP` is ICCv2 (although many decoders treat it as ICCv4) while `iCCN` is explicitly ICCv4
+* the profile name is UTF-8 instead of Latin-1. Analogous to `tEXt` vs. `iTXt`
 
 #### Encoder
 
