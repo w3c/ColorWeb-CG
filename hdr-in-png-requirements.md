@@ -29,7 +29,7 @@ Define a `cICP` chunk that contains the 4 bytes necessary to carry the H.273 col
 * **MATCOEFFS**, 1 byte, One of the MatrixCoefficients enumerated values specified in Rec. ITU-T H.273 | [ISO/IEC 23091-2]
 * **VIDFRNG**, 1 byte, Value of the VideoFullRangeFlag specified in Rec. ITU-T H.273 | [ISO/IEC 23091-2]
 
-NOTE: While these are inspired from recent JPEG standards (eg. JPEG-XL) that incorporate these color space parameters, this specification is only using 1 byte per value as defined in H.273 (vs. 2 bytes in JPEG-XL).
+NOTE: While these are inspired from recent JPEG standards (eg. JPEG-XL) that incorporate these color space parameters, this specification follows H.273.
 
 NOTE: [ITU-T Series H Supplement 19](https://www.itu.int/rec/T-REC-H.Sup19-201910-I) summarize combinations of H.273 parameters corresponding to common baseband linear broadcasts and file-based Video-on-Demand(VOD) services.
 
