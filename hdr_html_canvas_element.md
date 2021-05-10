@@ -424,3 +424,4 @@ Arguably, the HDR configuration data could be attached to the `CanvasRenderingCo
 
 The HDR configuration data should travel with an `ImageBitmap` when displayed in an `ImageBitmapRenderingContext`.
 That may inform where we should put this.
+
