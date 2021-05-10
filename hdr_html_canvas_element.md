@@ -81,7 +81,7 @@ Add a new `CanvasStorageFormat` enum to allow for higher bit storage formats.
   enum CanvasStorageFormat {
     'unorm-8',
     'unorm-10-10-10-2',
-    'float-16", 
+    'float-16', 
   }
 ```
 
@@ -101,7 +101,9 @@ WebGPU's ``GPUSwapChainDescriptor`` can allow for specifying higher bit depth fo
 
 ### Color spaces
 
-Update `PredefinedColorSpace` to include the following new color spaces.
+#### General
+
+Update `PredefinedColorSpace` to include the following color spaces.
 
 ```idl
   partial enum PredefinedColorSpace {
@@ -112,77 +114,115 @@ Update `PredefinedColorSpace` to include the following new color spaces.
   }
 ```
 
+#### extended-srgb
+
+The component signals are mapped to red, green and blue tristimulus values according to the following:
+
+* Red primary chromaticity: `(0.640, 0.330)`
+* Green primary chromaticity: `(0.300, 0.600)`
+* Blue primary chromaticity: `(0.150, 0.060)`
+* White point chromaticity: `(0.3127, 0.3290)`
+* Transfer function:
+
+```
+   E = | E' / 12.92, if abs(E') ≤ 0.04045
+       | ((E' + 0.055) / 1.055)^2.4, otherwise
+
+       with E' ∈ ℝ
+```
+
+where `E` is the non-linear colour value and `E` is the linear colour value
+
+_NOTE:_ The color primary chromaticities, white point chromaticity and transfer function are those of the scRGB-nl system specified at ISO/IEC 61966-2-2. Other aspects of ISO/IEC 61966-2-2 do not apply.
+
+#### extended-linear-srgb
+
+The component signals are mapped to red, green and blue tristimulus values according to the following:
+
+* Red primary chromaticity: `(0.640, 0.330)`
+* Green primary chromaticity: `(0.300, 0.600)`
+* Blue primary chromaticity: `(0.150, 0.060)`
+* White point chromaticity: `(0.3127, 0.3290)`
+* Transfer function: `E = E', with E' ∈ ℝ` where `E` is the non-linear colour value and `E` is the linear colour value
+
+
+_NOTE:_ The color primary chromaticities, white point chromaticity and transfer function are those of the scRGB system specified at ISO/IEC 61966-2-2. Other aspects of ISO/IEC 61966-2-2 do not apply.
+
+#### rec2100-hlg
+
+The component signals are mapped to red, green and blue tristimulus values according to the Hybrid Log-Gamma (HLG) system specified in Rec. ITU-R BT.2100.
+
+#### rec2100-pq
+
+The component signals are mapped to red, green and blue tristimulus values according to the PQ system system specified in Rec. ITU-R BT.2100.
+
 ### Conversion between color spaces
 
-All `PredefinedColorSpace` are defined by how they are converted to XYZD50 under relative colorimetric intent.
+#### General
 
-Converting from XYZD50 to a `PredefinedColorSpace` is done by performing the inverse of the conversion to XYZD50.
+There are several places in the HTML specification where a color space conversion is required (e.g, when [drawing images to a
+canvas](https://html.spec.whatwg.org/multipage/canvas.html#colour-spaces-and-colour-correction), [retrieving image data from a
+canvas](https://html.spec.whatwg.org/multipage/canvas.html#dom-context-2d-getimagedata), among others being added). There exists a
+standard conversion that is applied to all data in these situations, namely, a conversion using relative colorimetric intent.
 
-Color values in XYZD50 may assume any real value (including values less than zero and greater than one).
+This operation is defined for [CSS Predefined Color Spaces](https://www.w3.org/TR/css-color-4/#predefined) in the HTML specification
+[here](https://www.w3.org/TR/css-color-4/#predefined-to-lab).
 
-All color space conversions thus have the following properties:
+In this section we define this conversion for the new predefined color spaces.
 
-* They are invertible.
-  * Caveat, invertible up to precision and clamping limitations.
-* They are context independent.
-  * There is one and only one way to convert from one space to another, and it does not depend on the operation being performed.
-  * There is no implicit perceptual conversion (including tone mapping).
-  * We will note where explicit tone mapping would fit in.
-* They are path independent.
-  * Converting from space A to C is the same as converting from space A to B to C.
+These conversions are expressed using a connection color space with the system colorimetry specified in Rec. ITU-R BT.2100:
+
+* Red primary: `(0.708, 0.292)`
+* Green chromaticity: `(0.170, 0.797)`
+* Blue chromaticity: `(0.131, 0.046)`
+* White chromaticity: `(0.3127, 0.3290)`
+
+_Note:_ The system colorimetry specified in Rec. ITU-R BT.2100 is identical to that specified in Rec. ITU-R BT.2020.
+
+The conversion from color space A to color space B is performed according to the following steps:
+
+* apply the inverse transfer function of color space A
+* convert to the connection space by multiplying by the connection matrix of color space A
+* convert to color space B by multiplying by by the inverse of the connection matrix of color space B
+* apply the transfer function of color space B
+
+The domain and range of this conversion consist of all real values and the component signals in the connection color space are real numbers.
 
 #### `extended-linear-srgb`
 
-To convert `extended-linear-srgb` to XYZD50 under relative colorimetric intent, perform the following steps:
+* Transfer function: identity
 
-* Apply the matrix transformation to convert the [sRGB primaries](https://www.w3.org/TR/css-color-4/#valdef-color-srgb) to the XYZ primaries.
-* Apply the matrix transformation to convert the [sRGB white point](https://www.w3.org/TR/css-color-4/#valdef-color-srgb) to the D50 white point.
-
-Note that the domain of this transformation function is all real values. Its domain is not restricted to the unit interval [0, 1].
+* Connection matrix: matrix to convert the [sRGB primaries](https://www.w3.org/TR/css-color-4/#valdef-color-srgb) to the primary colours specified in Rec. ITU-R BT.2100
 
 #### `extended-srgb`
 
-To convert `extended-srgb` to XYZD50 under relative colorimetric intent, perform the following steps:
+* Transfer function: See [extended-linear-srgb](#extended-linear-srgb)
 
-* Convert each color channel to linear space.
-  * For each color channel value `x`, this means applying the following function:
-    * If `x < -0.4045`, then return `-pow((-x + 0.055)/1.055, 2.4)`
-    * Else if `x <= 0.4045` then return `x / 12.92`
-    * Else return `pow((x + 0.055)/1.055, 2.4)`
-* Apply the matrix transformation to convert the [sRGB primaries](https://www.w3.org/TR/css-color-4/#valdef-color-srgb) to the XYZ primaries.
-* Apply the matrix transformation to convert the [sRGB white point](https://www.w3.org/TR/css-color-4/#valdef-color-srgb) to the D50 white point.
+* Connection matrix: matrix to convert the [sRGB primaries](https://www.w3.org/TR/css-color-4/#valdef-color-srgb) to the primary colours specified in Rec. ITU-R BT.2100
 
-Note that the domain of this transformation function is all real values. Its domain is not restricted to the unit interval [0, 1].
+_Note:_ The domain of this transformation function is all real values. Its domain is not restricted to the unit interval [0, 1].
+
 Also see note in the Issues section at the bottom about whether this space should be distinct from the existing `'srgb'` space.
 
 #### `rec2100-hlg`
 
-To convert `rec2100-hlg` to XYZD50 under relative colorimetric intent, perform the following steps:
+* Transfer function: HLG Reference OETF specified at Rec. ITU-R BT.2100
 
-* Apply the HLG inverse OETF defined in Table 5 of [ITU-R 2100](https://www.itu.int/dms_pubrec/itu-r/rec/bt/R-REC-BT.2100-2-201807-I!!PDF-E.pdf).
-  * Note that this step of the transformation function is defined only on the domain of [0, 1].
-  * Pixel values outside of that domain are clamped to that domain.
-* Apply the matrix transformation to convert the primaries specified Table 2 of [ITU-R 2100](https://www.itu.int/dms_pubrec/itu-r/rec/bt/R-REC-BT.2100-2-201807-I!!PDF-E.pdf) to the XYZ primaries.
-* Apply the matrix transformation to convert the white point from the reference white specified Table 2 of [ITU-R 2100](https://www.itu.int/dms_pubrec/itu-r/rec/bt/R-REC-BT.2100-2-201807-I!!PDF-E.pdf) to the D50 white point.
+_Note:_ The range of the function is [0, 1].
 
-If this is followed, then converting from  `rec2100-hlg` to any SDR color space will not result in any luminance clipping.
-This is a desirable property.
+* Connection matrix: Identity
+
+_Note:_ Converting from `rec2100-hlg` to any SDR color space will not result in clipping.
 
 #### `rec2100-pq`
 
-To convert `rec2100-pq` to XYZD50 under relative colorimetric intent, perform the following steps:
+* Transfer function: `EOTF<sup>-1</sup>[F<sub>D</sub>/300]` where `EOTF<sup>-1</sup>` is the inverse of the Reference PQ EOTF specified at Rec. ITU-R BT.2100.
 
-* Apply the reference PQ EOTF defined in Table 4 of [ITU-R 2100](https://www.itu.int/dms_pubrec/itu-r/rec/bt/R-REC-BT.2100-2-201807-I!!PDF-E.pdf).
-  * Note that this step of the transformation function is defined only on the domain of [0, 1].
-  * Pixel values outside of that domain are clamped to that domain.
-* Apply the matrix transformation to convert the primaries specified Table 2 of [ITU-R 2100](https://www.itu.int/dms_pubrec/itu-r/rec/bt/R-REC-BT.2100-2-201807-I!!PDF-E.pdf) to the XYZ primaries.
-* Apply the matrix transformation to convert the white point from the reference white specified Table 2 of [ITU-R 2100](https://www.itu.int/dms_pubrec/itu-r/rec/bt/R-REC-BT.2100-2-201807-I!!PDF-E.pdf) to the D50 white point.
+_Note:_ The factor of 300 is such that a display luminance of 300 cd/m<sup>2</sup> results in a linear color value of 1 in the connection color space.
 
-If this is followed, then converting from `rec2100-pq` to any SDR color space will result in an undesirably dark image, because 10,000 nits will map to diffuse white.
-The alternative is to scale the result so that, say, 100 nits maps to diffuse white.
-That will be better in that it will be less undesirably dark, but it will be worse in that it will introduce severe luminance clipping.
-There is no way to win here.
-The most we can hope for is to make the math easy.
+_Note:_ The domain of `EOTF<sup>-1</sup>` is [0, 10000]
+
+* Connection matrix: Identity
 
 ### Compositing the HDR `HTMLCanvasElement`
 
@@ -389,4 +429,3 @@ Arguably, the HDR configuration data could be attached to the `CanvasRenderingCo
 
 The HDR configuration data should travel with an `ImageBitmap` when displayed in an `ImageBitmapRenderingContext`.
 That may inform where we should put this.
-
