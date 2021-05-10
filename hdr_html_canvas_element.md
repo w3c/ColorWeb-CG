@@ -114,14 +114,14 @@ Update `PredefinedColorSpace` to include the following color spaces.
   }
 ```
 
-#### extended-linear-srgb
+#### extended-srgb
 
 The component signals are mapped to red, green and blue tristimulus values according to the following:
 
-* Red primary: `(0.640, 0.330)`
-* Green chromaticity: `(0.300, 0.600)`
-* Blue chromaticity: `(0.150, 0.060)`
-* White chromaticity: `(0.3127, 0.3290)`
+* Red primary chromaticity: `(0.640, 0.330)`
+* Green primary chromaticity: `(0.300, 0.600)`
+* Blue primary chromaticity: `(0.150, 0.060)`
+* White point chromaticity: `(0.3127, 0.3290)`
 * Transfer function:
 
 ```
@@ -131,15 +131,22 @@ The component signals are mapped to red, green and blue tristimulus values accor
        with E' ∈ ℝ
 ```
 
-#### extended-srgb
+where `E` is the non-linear colour value and `E` is the linear colour value
+
+_NOTE:_ The color primary chromaticities, white point chromaticity and transfer function are those of the scRGB-nl system specified at ISO/IEC 61966-2-2. Other aspects of ISO/IEC 61966-2-2 do not apply.
+
+#### extended-linear-srgb
 
 The component signals are mapped to red, green and blue tristimulus values according to the following:
 
-* Red primary: `(0.640, 0.330)`
-* Green chromaticity: `(0.300, 0.600)`
-* Blue chromaticity: `(0.150, 0.060)`
-* White chromaticity: `(0.3127, 0.3290)`
-* Transfer function: `E = E', with E' ∈ ℝ`
+* Red primary chromaticity: `(0.640, 0.330)`
+* Green primary chromaticity: `(0.300, 0.600)`
+* Blue primary chromaticity: `(0.150, 0.060)`
+* White point chromaticity: `(0.3127, 0.3290)`
+* Transfer function: `E = E', with E' ∈ ℝ` where `E` is the non-linear colour value and `E` is the linear colour value
+
+
+_NOTE:_ The color primary chromaticities, white point chromaticity and transfer function are those of the scRGB system specified at ISO/IEC 61966-2-2. Other aspects of ISO/IEC 61966-2-2 do not apply.
 
 #### rec2100-hlg
 
@@ -153,7 +160,15 @@ The component signals are mapped to red, green and blue tristimulus values accor
 
 #### General
 
-This section specifies the color space conversion when compositing element with color space A onto a canvas element with color space B.
+There are several places in the HTML specification where a color space conversion is required (e.g, when [drawing images to a
+canvas](https://html.spec.whatwg.org/multipage/canvas.html#colour-spaces-and-colour-correction), [retrieving image data from a
+canvas](https://html.spec.whatwg.org/multipage/canvas.html#dom-context-2d-getimagedata), among others being added). There exists a
+standard conversion that is applied to all data in these situations, namely, a conversion using relative colorimetric intent.
+
+This operation is defined for [CSS Predefined Color Spaces](https://www.w3.org/TR/css-color-4/#predefined) in the HTML specification
+[here](https://www.w3.org/TR/css-color-4/#predefined-to-lab).
+
+In this section we define this conversion for the new predefined color spaces.
 
 These conversions are expressed using a connection color space with the system colorimetry specified in Rec. ITU-R BT.2100:
 
@@ -414,4 +429,3 @@ Arguably, the HDR configuration data could be attached to the `CanvasRenderingCo
 
 The HDR configuration data should travel with an `ImageBitmap` when displayed in an `ImageBitmapRenderingContext`.
 That may inform where we should put this.
-
