@@ -153,7 +153,7 @@ The component signals are mapped to red, green and blue tristimulus values accor
 * Green primary chromaticity: `(0.300, 0.600)`
 * Blue primary chromaticity: `(0.150, 0.060)`
 * White point chromaticity: `(0.3127, 0.3290)`
-* Transfer function: `E = E', with E' ∈ ℝ` where `E'` is the non-linear colour value and `E` is the linear colour value
+* Transfer function: `L = N, with N ∈ ℝ` where `N` is the non-linear colour value and `L` is the linear colour value
 
 
 _NOTE:_ The color primary chromaticities, white point chromaticity and transfer function are those of the scRGB system specified at ISO/IEC 61966-2-2. Other aspects of ISO/IEC 61966-2-2 do not apply.
