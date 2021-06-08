@@ -125,13 +125,23 @@ The component signals are mapped to red, green and blue tristimulus values accor
 * Transfer function:
 
 ```
-   E = | E' / 12.92, if abs(E') ≤ 0.04045
-       | ((E' + 0.055) / 1.055)^2.4, otherwise
+decoding equation (non-linear to linear):
 
-       with E' ∈ ℝ
+if N < -0.04045
+  L = -1.0 * (((-1.0*N) + 0.055) / 1.055)^2.4;
+elseif (N >= -0.04045 && N <= 0.04045)
+  L  = N / 12.92;
+else
+  L = ((N + 0.055) / 1.055)^2.4;
+end
+
 ```
 
-where `E'` is the non-linear colour value and `E` is the linear colour value
+where `N` is the non-linear colour value and `L` is the linear colour value
+
+![extended-srgb-decoding-function](https://user-images.githubusercontent.com/37905569/121105535-25ae7700-c7b9-11eb-92fd-a90e68cac7f3.png)
+![extended-srgb-decoding-function-linear-section](https://user-images.githubusercontent.com/37905569/121105539-27783a80-c7b9-11eb-8024-a8db2c110eb0.png)
+
 
 _NOTE:_ The color primary chromaticities, white point chromaticity and transfer function are those of the scRGB-nl system specified at ISO/IEC 61966-2-2. Other aspects of ISO/IEC 61966-2-2 do not apply.
 
