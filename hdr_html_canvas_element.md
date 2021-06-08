@@ -150,9 +150,8 @@ where `N` is the non-linear colour value and `L` is the linear colour value
 
 ![extended-srgb-decoding-function](https://user-images.githubusercontent.com/37905569/121105535-25ae7700-c7b9-11eb-92fd-a90e68cac7f3.png)
 ![extended-srgb-decoding-function-linear-section](https://user-images.githubusercontent.com/37905569/121105539-27783a80-c7b9-11eb-8024-a8db2c110eb0.png)
-![extended-srgb-encoding-function](https://user-images.githubusercontent.com/37905569/121106265-89856f80-c7ba-11eb-9263-a2d634f4a047.png)
-![extended-srgb-encoding-function-linear-section](https://user-images.githubusercontent.com/37905569/121106268-8b4f3300-c7ba-11eb-87fb-8f36c5b46e35.png)
-
+![extended-srgb-encoding-function](https://user-images.githubusercontent.com/37905569/121125179-f7419380-c7da-11eb-814c-6708dfcbba7a.png)
+![extended-srgb-encoding-function-linear-section](https://user-images.githubusercontent.com/37905569/121125183-fa3c8400-c7da-11eb-8cbd-c9344b7c96c1.png)
 
 _NOTE:_ The color primary chromaticities, white point chromaticity and transfer function are those of the scRGB-nl system specified at ISO/IEC 61966-2-2. Other aspects of ISO/IEC 61966-2-2 do not apply.
 
