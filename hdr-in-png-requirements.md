@@ -61,7 +61,7 @@ The `iCCN` chunk contains:
 
 The profile name may be any convenient name for referring to the profile. It is case-sensitive. Profile names shall be encoded as UTF-8. Leading, trailing, and consecutive spaces are not permitted. The profile name shall not contain a zero byte (null character). 
 
-The only compression method defined in this International Standard is method 0 (zlib datastream with deflate compression, see 10.3: Other uses of compression). The compression method entry is followed by a compressed datastream of an ICC profile as defined in [ICC] or [ICC-2010].
+The compression method shall be method 0 (zlib datastream with deflate compression). The compression method entry is followed by a compressed datastream of an ICC profile as defined in [ICC] or [ICC-2010].
 
 The ICC profile shall either be an output profile (Device Class = `prtr`) or a monitor profile (Device Class = `mntr`). Decompression of this datastream yields the embedded ICC profile.
 
