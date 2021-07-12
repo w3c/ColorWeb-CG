@@ -18,7 +18,9 @@ An existing W3C group note, [BT2100-in-PNG]  specifies an approach which is limi
 
 ## Strawman approach
 
-Two new PNG chunks are proposed, the `cICP` chunk and the `iCCN` chunk. Both of these new chunks SHALL come before the `IDAT` chunk. The `cICP` chunk acts as a color space label (much like the existing `sRGB` chunk), naming a color space that the viewer should understand. The `iCCN` chunk acts as a color space profile, providing the exact details of the color space.
+Two new PNG chunks are proposed, the `cICP` chunk and the `iCCN` chunk.
+
+The `cICP` chunk acts as a color space label (much like the existing `sRGB` chunk), specifying the color space to which the pixels within the PNG file conforms. The `iCCN` chunk (much like the existing `iCCP`) contains en embedded color profile.
 
 ### cICP chunk
 
