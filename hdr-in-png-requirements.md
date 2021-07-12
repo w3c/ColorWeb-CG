@@ -48,10 +48,6 @@ The `cICP` chunk SHALL come before `IDAT` chunk.
 
 #### Structure
 
-The four-byte chunk type field contains the decimal values
-
-`105 67 67 80`
-
 The `iCCN` chunk contains:
 
 | Profile name |  1-79 bytes (character string)
