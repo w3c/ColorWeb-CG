@@ -46,10 +46,6 @@ When the `cICP` chunk is present, a PNG decoder SHALL ignore the following chunk
 
 #### Structure
 
-The four-byte chunk type field contains the decimal values
-
-`105 67 67 80`
-
 The `iCCN` chunk contains:
 
 | Profile name |  1-79 bytes (character string)
