@@ -24,6 +24,8 @@ The `cICP` chunk acts as a color space label (much like the existing `sRGB` chun
 
 ### cICP chunk
 
+This chunk SHALL come before the `IDAT` chunk.
+
 [H.273](https://www.itu.int/rec/T-REC-H.273/en) specifies a controlled vocabulary for the parameterization of color space information.
 
 Define a `cICP` chunk that contains the 4 bytes necessary to carry the H.273 color space parameters:
@@ -45,6 +47,8 @@ When the `cICP` chunk is present, a PNG decoder SHALL ignore the following chunk
 - `sRGB` 
 
 ### iCCN chunk Embedded ICC profile (updated)
+
+This chunk SHALL come before the `IDAT` chunk.
 
 #### Structure
 
