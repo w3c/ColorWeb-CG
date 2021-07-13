@@ -18,7 +18,13 @@ An existing W3C group note, [BT2100-in-PNG]  specifies an approach which is limi
 
 ## Strawman approach
 
+Two new PNG chunks are proposed, the `cICP` chunk and the `iCCN` chunk.
+
+The `cICP` chunk acts as a color space label (much like the existing `sRGB` chunk), specifying the color space to which the pixels within the PNG file conforms. The `iCCN` chunk (much like the existing `iCCP`) contains an embedded color profile.
+
 ### cICP chunk
+
+This chunk SHALL come before the `IDAT` chunk.
 
 [H.273](https://www.itu.int/rec/T-REC-H.273/en) specifies a controlled vocabulary for the parameterization of color space information.
 
@@ -33,8 +39,6 @@ NOTE: While these are inspired from recent JPEG standards (eg. JPEG-XL) that inc
 
 NOTE: [ITU-T Series H Supplement 19](https://www.itu.int/rec/T-REC-H.Sup19-201910-I) summarize combinations of H.273 parameters corresponding to common baseband linear broadcasts and file-based Video-on-Demand(VOD) services.
 
-The `cICP` chunk SHALL come before `IDAT` chunk.  
-
 A PNG MAY contain both a `cICP` chunk and an `iCCP` chunk.
 
 When the `cICP` chunk is present, a PNG decoder SHALL ignore the following chunks:
@@ -43,6 +47,8 @@ When the `cICP` chunk is present, a PNG decoder SHALL ignore the following chunk
 - `sRGB` 
 
 ### iCCN chunk Embedded ICC profile (updated)
+
+This chunk SHALL come before the `IDAT` chunk.
 
 #### Structure
 
