@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>High Dynamic Range and Wide Gamut Color on the Web</title>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <script src="https://www.w3.org/Tools/respec/respec-w3c" class="remove" defer></script>
     <script class="remove">
       var respecConfig = {
@@ -86,9 +86,7 @@
           },
           "netflix-hdr": {
             title: "Enhancing the Netflix UI Experience with HDR",
-            authors: [
-              "Yuji Mano", "Benbuck Nason", "Joe Drago"
-            ],
+            authors: ["Yuji Mano", "Benbuck Nason", "Joe Drago"],
             href: "https://medium.com/netflix-techblog/enhancing-the-netflix-ui-experience-with-hdr-1e7506ad3e8",
             publisher: "Netflix",
             date: "24 September 2018",
@@ -98,188 +96,123 @@
             href: "https://gpuweb.github.io/gpuweb/",
             publisher: "W3C",
             date: "August 2020"
-          }
-        }
+          },
+        },
       };
     </script>
     <style>
-      .closed {color: #999;}
+      .closed {
+        color: #999;
+      }
     </style>
   </head>
+
   <body>
     <section id="abstract">
       <p>
-        The Note is a gap analysis document.
-        It identifieds the next steps
-        for enabling
-        Wide Color Gamut (WCG)
-        and
-        High Dynamic Range (HDR)
-        on the Open Web Platform.
+        The Note is a gap analysis document. It identifies the next steps for enabling Wide Color Gamut (WCG) and High
+        Dynamic Range (HDR) on the Open Web Platform.
       </p>
     </section>
-    <section id="sotd">
-    </section>
+    <section id="sotd"></section>
     <section>
       <h2>Introduction</h2>
-
-      <p>The initial commercial application of Color Science
-        (principally colorimetry, rather than color appearance modelling)
-        to the reproduction of color
-        was concerned with surface colors
-        such as painted or printed objects,
-        lit by a single illuminant.
-        The achievable luminance range was thus constrained
-        to the luminance of a perfect diffuse reflector
-        (practically, an unprinted sheet of good paper)
-        at the high end,
-        and the densest printed or painted black
-        that could be achieved without the paper tearing or deforming,
-        at the darkest end. This produced luminance ranges
-        from as low as 20:1
-        to as high as 90:1 (Fairchild, p.399 [[Fairchild-CAM]]).
-        The achievable Chroma range was also limited
-        by the vibrancy of mass-produced paints and inks,
-        and the prohibitive cost of using additional spot colors
-        to extend the gamut.
+      <p>
+        The initial commercial application of Color Science (principally colorimetry, rather than color appearance
+        modelling) to the reproduction of color was concerned with surface colors such as painted or printed objects,
+        lit by a single illuminant. The achievable luminance range was thus constrained to the luminance of a perfect
+        diffuse reflector (practically, an unprinted sheet of good paper) at the high end, and the densest printed or
+        painted black that could be achieved without the paper tearing or deforming, at the darkest end. This produced
+        luminance ranges from as low as 20:1 to as high as 90:1 (Fairchild, p.399 [[Fairchild-CAM]]). The achievable
+        Chroma range was also limited by the vibrancy of mass-produced paints and inks, and the prohibitive cost of
+        using additional spot colors to extend the gamut.
         <!-- add UCS diagram of coated and uncoated FOGRA21 and 39 -->
-        Self-luminous displays, in that commercial environment,
-        were primarily used at low luminances
-        for soft proofing of an eventual printed product,
-        and were intended to replicate the appearance of a viewing booth.
+        Self-luminous displays, in that commercial environment, were primarily used at low luminances for soft proofing
+        of an eventual printed product, and were intended to replicate the appearance of a viewing booth.
       </p>
-
-      <p>Over time, self-luminous displays were seen
-        as a worthy color management target in their own right:
-        for computer displays,
-        for the display of digital photography,
-        for digital cinema,
-        and for the consumption of media such as television and movies in the home.
-        The luminance range increased:
-        media consumed in near-dark environments such as the cinema
-        could have much deeper blacks,
-        while media consumed in dim to normal viewing environments
-        enjoyed an increased peak white luminance of 200 to 300 cd/m².
-        The darkest blacks in such environments were constrained by viewing flare,
-        which is why the sRGB standard mandated a viewing flare of 5%,
-        typical for glossy glass CRT displays of the time;
-        coupled with a peak luminance of only 80cd/m²
-        the luminance range was still relatively modest.
-        The introduction of matt LCD and OLED screens,
-        and the commercial success of HDTV, increased the dynamic range somewhat,
-        but it was still comfortable encoded in 8 bits per gamma-corrected component.
-        This is referred to as <b>Standard Dynamic Range (SDR)</b>.
-        The achievable Chroma range for sRGB and Rec.709 HDTV, although extending beyond that of printed material at the primaries, was also relatively modest.
-        Wider gamut displays were available professionally,
-        covering most of the Adobe 1998 RGB™ colorspace,
-        but wre typically not found in a home or office environment.
+      <p>
+        Over time, self-luminous displays were seen as a worthy color management target in their own right: for computer
+        displays, for the display of digital photography, for digital cinema, and for the consumption of media such as
+        television and movies in the home. The luminance range increased: media consumed in near-dark environments such
+        as the cinema could have much deeper blacks, while media consumed in dim to normal viewing environments enjoyed
+        an increased peak white luminance of 200 to 300 cd/m<sup>2</sup>. The darkest blacks in such environments were
+        constrained by viewing flare, which is why the sRGB standard mandated a viewing flare of 5%, typical for glossy
+        glass CRT displays of the time; coupled with a peak luminance of only 80cd/m<sup>2</sup> the luminance range was
+        still relatively modest. The introduction of matte LCD and OLED screens, and the commercial success of HDTV,
+        increased the dynamic range somewhat, but it was still comfortable encoded in 8 bits per gamma-corrected
+        component. This is referred to as <b>Standard Dynamic Range (SDR)</b>. The achievable Chroma range for sRGB and
+        Rec.709 HDTV, although extending beyond that of printed material at the primaries, was also relatively modest.
+        Wider gamut displays were available professionally, covering most of the Adobe 1998 RGB&trade; color space, but
+        were typically not found in a home or office environment.
         <!-- sRGB gamut on UCS diagram -->
       </p>
-
-      </p>Commercial availability of displays covering the Display P3 gamut
-      (a derivative of DCI P3 used for digital cinema,
-      but altered to account for a non-dark viewing environment,
-      with an sRGB transfer curve ,and D65 white point)
-      meant that <b>Wide Color Gamut (WCG)</b> displays became commonplace
-      on laptops, external monitors, mobile phones, and even watches.
-      WCG requires a modest increase in the
-      number of bits per gamma-corrected component,
-      from 8 to 10 or 12 (for the widest gamut
-      in common use for content delivery,
-      Rec.2020).</p>
-
-      <p>The deployment of 4k and then 8k television,
-      accompanied by digital content delivery,
-      brought not only a similarly increased color gamut
-      to the media space, but also a greatly increased dynamic range
-      of 4000:1 or more.
-      Increased phosphor efficiency and purity,
-      together with bright and modulatable backlights,
-      brought <b>High Dynamic Range (HDR)</b> into widespread use.
-      Computers, however, remained limited to SDR for the most part.</p>
-
       <p>
-        The human visual system can,
-        with appropriate adaptation,
-        function over an enormous luminance range —
-        from starlight or moonlight at 0.01 cd/m² and  0.1 cd/m²,
-        through the dim lighting at dawn and dusk (10 cd/m²),
-        office lighting (100 cd/m²),
-        modern displays (800 cd/m²),
-        overcast daylight (1,000 cd/m²),
-        bright daylight (10,000 cd/m²)
-        and full direct sunlight (100,000 cd/m²).
-        However, the full range cannot be simultaneously percieved
-        in the same scene
-        at the same time.
+        Commercial availability of displays covering the Display P3 gamut (a derivative of DCI P3 used for digital
+        cinema, but altered to account for a non-dark viewing environment, with an sRGB transfer curve, and D65 white
+        point) meant that <b>Wide Color Gamut (WCG)</b> displays became commonplace on laptops, external monitors,
+        mobile phones, and even watches. WCG requires a modest increase in the number of bits per gamma-corrected
+        component, from 8 to 10 or 12 (for the widest gamut in common use for content delivery, Rec.2020).
       </p>
       <p>
-        There are two main
-        systems defined for HDR video:
-        Hyprid Log Gamma (HLG), developed by BBC and NHK, and
-        Dolby Perceptual Quantizer (PQ).
-        While improvement in video quality has driven the innovation of HDR,
-        support for content on the web more generally, e.g., for static images,
-        the <code>&lt;canvas&gt;</code> element, and in CSS in general, is still
-        needed.
+        The deployment of 4K and then 8K television, accompanied by digital content delivery, brought not only a
+        similarly increased color gamut to the media space, but also a greatly increased dynamic range of 4000:1 or
+        more. Increased phosphor efficiency and purity, together with bright and modulatable backlights, brought
+        <b>High Dynamic Range (HDR)</b> into widespread use. Computers, however, remained limited to SDR for the most
+        part.
+      </p>
+      <p>
+        The human visual system can, with appropriate adaptation, function over an enormous luminance range — from
+        starlight or moonlight at 0.01 cd/m<sup>2</sup> and 0.1 cd/m<sup>2</sup>, through the dim lighting at dawn and
+        dusk (10 cd/m<sup>2</sup>), office lighting (100 cd/m<sup>2</sup>), modern displays (800 cd/m<sup>2</sup>),
+        overcast daylight (1,000 cd/m<sup>2</sup>), bright daylight (10,000 cd/m<sup>2</sup>) and full direct sunlight
+        (100,000 cd/m<sup>2</sup>). However, the full range cannot be simultaneously perceived in the same scene at the
+        same time.
+      </p>
+      <p>
+        There are two main systems defined for HDR video: Hybrid Log Gamma (HLG), developed by BBC and NHK, and Dolby
+        Perceptual Quantizer (PQ). While improvement in video quality has driven the innovation of HDR, support for
+        content on the web more generally, e.g., for static images, the <code>&lt;canvas&gt;</code> element, and in CSS
+        in general, is still needed.
       </p>
       <p class="note">
-        Add a brief description of PQ and HLG approaches, including: use of
-        metadata, absolute vs relative brightness, proprietary vs open standard,
-        etc.
+        Add a brief description of PQ and HLG approaches, including: use of metadata, absolute vs relative brightness,
+        proprietary vs open standard, etc.
       </p>
       <p>
-        The BBC has published a frequently-asked questions document
-        [[hdr-hlg-faq]] that gives a high level introduction to HDR, and the
-        PQ and HLG solutions.
+        The BBC has published a frequently-asked questions document [[hdr-hlg-faq]] that gives a high level introduction
+        to HDR, and the PQ and HLG solutions.
       </p>
       <p>
-        Fredrik Hubinette from Google has written a useful document
-        [[hdr-chrome]] that discusses the issues with presenting, and in
-        particular compositing, SDR and HDR content. This was presented at
-        TPAC 2017. It considers both PQ and HLG. (<a href="https://www.w3.org/2017/11/07-colorweb-minutes.html">minutes
-          of the TPAC 2017 meeting</a>)
+        Fredrik Hubinette from Google has written a useful document [[hdr-chrome]] that discusses the issues with
+        presenting, and in particular compositing, SDR and HDR content. This was presented at TPAC 2017. It considers
+        both PQ and HLG. (<a href="https://www.w3.org/2017/11/07-colorweb-minutes.html">minutes of the TPAC 2017
+        meeting</a>)
       </p>
-
       <p>
-        On the web, SDR, and HDR content using both HLG and PQ is expected to
-        coexist, potentially within the same page, as authors can include
-        arbitrary content in their web pages. An example is a page that contains
-        multiple embedded videos, or their poster images. This raises the
-        question of how to composite content with different color spaces and
-        dynamic range encodings.
+        On the web, SDR, and HDR content using both HLG and PQ is expected to coexist, potentially within the same page,
+        as authors can include arbitrary content in their web pages. An example is a page that contains multiple
+        embedded videos, or their poster images. This raises the question of how to composite content with different
+        color spaces and dynamic range encodings.
       </p>
     </section>
     <section>
       <h2>Goals</h2>
       <p>
-        Support for HDR and WCG on the web is important to allow color and
-        luminance matching between HDR video content and surrounding or
-        overlaid graphic and textual content in web pages.
+        Support for HDR and WCG on the web is important to allow color and luminance matching between HDR video content
+        and surrounding or overlaid graphic and textual content in web pages.
       </p>
-      <p>
-        Some specific goals include:
-      </p>
+      <p>Some specific goals include:</p>
       <ul>
         <li>
-          Ensure support for HDR encoded video as a first class citizen on the
-          web, including both HLG and PQ, with appropriate rules defined for
-          composition of content.
+          Ensure support for HDR encoded video as a first class citizen on the web, including both HLG and PQ, with
+          appropriate rules defined for composition of content.
         </li>
-        <li>
-          Enable support for HDR static images, texual content, and graphics
-          rendered via Canvas or SVG.
-        </li>
-        <li>
-          Promote understanding of HDR graphics issues among the web developer
-          community.
-        </li>
+        <li>Enable support for HDR static images, textual content, and graphics rendered via Canvas or SVG.</li>
+        <li>Promote understanding of HDR graphics issues among the web developer community.</li>
       </ul>
       <p>
-        There are a number of specifications potentially impacted by HDR.
-        One of the purposes of this document is to identify all documents that
-        are possibly affected, so that we can review them and determine any
-        changes needed.
+        There are a number of specifications potentially impacted by HDR. One of the purposes of this document is to
+        identify all documents that are possibly affected, so that we can review them and determine any changes needed.
       </p>
       <ul>
         <li>Media Capabilities API [[media-capabilities]], [[media-capabilities-explainer]]</li>
@@ -292,197 +225,248 @@
         <li>TTML2 [[ttml2]], IMSC1.1 [[ttml-imsc1.1]]</li>
         <li>Using the ITU BT.2100 PQ EOTF with the PNG Format [[png-hdr-pq]]</li>
       </ul>
-
     </section>
     <section>
       <h2>Specifying Colors in Web Pages</h2>
       <section>
         <h3>CSS Color Module</h3>
         <p>
-          CSS defines several ways of specifying the colors to use in web
-          pages, in the CSS Color Module specifications. The current Recommendation is
-          Level 3 [[css-color-3]], and its successor, Level 4, is becoming stable
-          and starting to be implemented [[css-color-4]].
-          The various methods in Level 4 cover WCG but not HDR, and are:
+          CSS defines several ways of specifying the colors to use in web pages, in the CSS Color Module specifications.
+          The current Recommendation is Level 3 [[css-color-3]], and its successor, Level 4, is becoming stable and
+          starting to be implemented [[css-color-4]]. The various methods in Level 4 cover WCG but not HDR, and are:
         </p>
         <ul>
           <li>sRGB (Red, Green, Blue), using the <code>rgb()</code> and <code>rgba()</code> functions</li>
           <li>Named colors, from early HTML and X11, e.g., 'aqua', 'black', 'blue', 'fuchsia', etc</li>
           <li>HSL (Hue, Saturation, Lightness), using the <code>hsl()</code> and <code>hsla()</code> functions</li>
-          <li>(*) HWB (Hue, Whiteness, Blackness), using the <code>hwb()</code> function</li>
-          <li>(*) Lab and LCH (Lightness, Chroma, Hue), using the <code>lab()</code> and <code>lch()</code> functions</li>
-          <li>(*) Profiled, device-dependent colors:
+          <li>
+            (*) HWB (Hue, Whiteness, Blackness), using the
+            <code>hwb()</code> function
+          </li>
+          <li>
+            (*) Lab and LCH (Lightness, Chroma, Hue), using the
+            <code>lab()</code> and <code>lch()</code> functions
+          </li>
+          <li>
+            (*) Profiled, device-dependent colors:
             <ul>
-              <li>predefined colorspaces: <code>display-p3</code>, <code>a98-rgb</code> (compatible with Adobe® RGB (1998)), <code>prophoto-rgb</code>, <code>rec-2020</code> </li>
-              <li>calibrated colorspaces, using <code>@profile</code> to link to an ICC profile.
-              This is not limited to RGB: <a href="https://drafts.csswg.org/css-color-4/#cal-cmyk">CMYK and wide-gamut print spaces</a> are also covered.</li>
+              <li>
+                predefined color spaces: <code>display-p3</code>, <code>a98-rgb</code> (compatible with Adobe® RGB
+                (1998)), <code>prophoto-rgb</code>,
+                <code>rec-2020</code>
+              </li>
+              <li>
+                calibrated color spaces, using <code>@profile</code> to link to an ICC profile. This is not limited to
+                RGB:
+                <a href="https://drafts.csswg.org/css-color-4/#cal-cmyk">CMYK and wide-gamut print spaces</a>
+                are also covered.
+              </li>
             </ul>
           </li>
         </ul>
-        <p>Items marked (*) are new in Level 4. <code>rgb()</code>,
-          <code>named colors</code>, <code>HSL</code> and <code>HWB</code>
-          all resolve to sRGB. The others are WCG.
-          To date, all of these are SDR colorspaces.</p>
         <p>
-          Section 12 in [[css-color-4]] is titled "Working Color Space", and
-          currently empty. It is intended to cover compositing multiple colorspaces.
-          There is as yet no consensus on whether this should be per-document or a per-element property;
-          nor on whether a single value is appropriate for all operations.
-          We need to define how should compositing work, if
-          there is HLG, PQ, and SDR content present. The [[hdr-chrome]]
-          discussion document provides useful input. This will require defining
-          where black, media/paper white, and peak whites (full-screen and small-area hilights)
-          map in the various spaces.
+          Items marked (*) are new in Level 4. <code>rgb()</code>, <code>named colors</code>, <code>HSL</code> and
+          <code>HWB</code> all resolve to sRGB. The others are WCG. To date, all of these are SDR color spaces.
         </p>
         <p>
-          The draft CSS Color Module Level 4 [[css-color-4]],
-          adds WCG support. Rec. 2020 is covered, but only for SDR.
-          The range of CIE Lightness (in Lab and LCH)
-          is not constrained to 100,
-          and a figure of 400 is mentioned because
-          it is known that Lab is a fair model for
-          up to four times the luminance of diffuse white
-          (Fairchild, pp.403-413 [[Fairchild-CAM]]),
-          but no meaning is yet ascribed for values greater than 100.
+          Section 12 in [[css-color-4]] is titled "Working Color Space", and currently empty. It is intended to cover
+          compositing multiple color spaces. There is as yet no consensus on whether this should be per-document or a
+          per-element property; nor on whether a single value is appropriate for all operations. We need to define how
+          should compositing work, if there is HLG, PQ, and SDR content present. The [[hdr-chrome]] discussion document
+          provides useful input. This will require defining where black, media/paper white, and peak whites (full-screen
+          and small-area highlights) map in the various spaces.
+        </p>
+        <p>
+          The draft CSS Color Module Level 4 [[css-color-4]], adds WCG support. Rec. 2020 is covered, but only for SDR.
+          The range of CIE Lightness (in Lab and LCH) is not constrained to 100, and a figure of 400 is mentioned
+          because it is known that Lab is a fair model for up to four times the luminance of diffuse white (Fairchild,
+          pp.403-413 [[Fairchild-CAM]]), but no meaning is yet ascribed for values greater than 100.
         </p>
         <p class="note">
-          Rec. 2100, with both HLG and Dolby PQ is added to CSS
-          in an Unofficial Draft [[css-color-hdr]].
-          It also adds J<sub>z</sub>a<sub>z</sub>b<sub>z</sub> (which uses the PQ transfer characteristic),
-          J<sub>z</sub>C<sub>z</sub>h<sub>z</sub> (the polar form),
-          and Dolby ICtCp. Lastly, it adds a (normative) section "Compositing SDR and HDR content".
+          Rec. 2100, with both HLG and Dolby PQ is added to CSS in an Unofficial Draft [[css-color-hdr]]. It also adds
+          J<sub>z</sub>a<sub>z</sub>b<sub>z</sub> (which uses the PQ transfer characteristic),
+          J<sub>z</sub>C<sub>z</sub>h<sub>z</sub> (the polar form), and Dolby ICtCp. Lastly, it adds a (normative)
+          section "Compositing SDR and HDR content".
         </p>
         <p>
-          Other CSS specifications assume that all colors are sRGB.
-          For example, CSS Images
-          (which defines linear, radial, and conic gradients)
-          assumes that all color stops are sRGB colors
-          and mandates that interpolation happen as premultiplied,
-          gamma-encoded, sRGB values.
+          Other CSS specifications assume that all colors are sRGB. For example, CSS Images (which defines linear,
+          radial, and conic gradients) assumes that all color stops are sRGB colors and mandates that interpolation
+          happen as premultiplied, gamma-encoded, sRGB values.
         </p>
         <section>
           <h4>Open Issues</h4>
           <p>There are a few open issues that relate to HDR and WCG support:</p>
           <ul>
-            <li><a href="https://github.com/w3c/csswg-drafts/issues/554">SDR and HDR compositing</a></li>
-            <li><a href="https://github.com/w3c/csswg-drafts/issues/553">Predefined HDR profile with BT.2100 and the PQ transfer curve</a></li>
-            <li><a href="https://github.com/w3c/csswg-drafts/issues/300">Working color space</a></li>
-            <li><a href="https://github.com/w3c/csswg-drafts/issues/4471">Dealing with bi-plane (video/graphics) when reporting values</a></li>
-            <li><a href="https://github.com/w3c/csswg-drafts/issues/3844">Effect of working color space on computed & used values</a></li>
-            <li class="closed"><a href="https://github.com/w3c/csswg-drafts/issues/3435">sRGB doesn't really use 80 cd/m^2 white luminance</a></li>
-            <li><a href="https://github.com/w3c/csswg-drafts/issues/3249">extend rgb() for HDR</a></li>
-            <li><a href="https://github.com/w3c/csswg-drafts/issues/296">Canvas may add a half-float, gamma-corrected, Rec. 2020 colorspace </a></li>
-            <li><a href="https://github.com/w3c/csswg-drafts/issues/299">black point compensation</a></li>
-            <li><a href="https://github.com/w3c/csswg-drafts/issues/5323">Compositing SDR in HDR outputs</a></li>
-            <li><a href="https://github.com/w3c/csswg-drafts/issues/5322"> Query 9: Black Level</a></li>
-            <li><a href="https://github.com/w3c/csswg-drafts/issues/4647">Do gradients/animations using lab/lch colors interpolate in the Lab colorspace?</a></li>
-            <li><a href="https://github.com/w3c/csswg-drafts/issues/5669">sRGBA assumption on gradients, and premultiplied other color spaces</a></li>
+            <li>
+              <a href="https://github.com/w3c/csswg-drafts/issues/554">SDR and HDR compositing</a>
+            </li>
+            <li>
+              <a href="https://github.com/w3c/csswg-drafts/issues/553">Predefined HDR profile with BT.2100 and the
+              PQ transfer curve</a>
+            </li>
+            <li>
+              <a href="https://github.com/w3c/csswg-drafts/issues/300">Working color space</a>
+            </li>
+            <li>
+              <a href="https://github.com/w3c/csswg-drafts/issues/4471">Dealing with bi-plane (video/graphics)
+              when reporting values</a>
+            </li>
+            <li>
+              <a href="https://github.com/w3c/csswg-drafts/issues/3844">Effect of working color space on computed
+              &amp; used values</a>
+            </li>
+            <li class="closed">
+              <a href="https://github.com/w3c/csswg-drafts/issues/3435">sRGB doesn't really use 80 cd/m^2 white
+              luminance</a>
+            </li>
+            <li>
+              <a href="https://github.com/w3c/csswg-drafts/issues/3249">extend rgb() for HDR</a>
+            </li>
+            <li>
+              <a href="https://github.com/w3c/csswg-drafts/issues/296">Canvas may add a half-float, gamma-corrected,
+              Rec. 2020 color space</a>
+            </li>
+            <li>
+              <a href="https://github.com/w3c/csswg-drafts/issues/299">black point compensation</a>
+            </li>
+            <li>
+              <a href="https://github.com/w3c/csswg-drafts/issues/5323">Compositing SDR in HDR outputs</a>
+            </li>
+            <li>
+              <a href="https://github.com/w3c/csswg-drafts/issues/5322">Query 9: Black Level</a>
+            </li>
+            <li>
+              <a href="https://github.com/w3c/csswg-drafts/issues/4647">Do gradients/animations using lab/lch colors
+              interpolate in the Lab color space?</a>
+            </li>
+            <li>
+              <a href="https://github.com/w3c/csswg-drafts/issues/5669">sRGBA assumption on gradients, and
+              premultiplied other color spaces</a>
+            </li>
           </ul>
         </section>
       </section>
       <section>
         <h3>Canvas API</h3>
         <p>
-          The HTML <code>&lt;canvas&gt;</code> element provides web applications
-          with a resolution-dependent bitmap canvas, which can be used for
-          rendering graphs, game graphics, art, or other visual images on the
-          fly. The <code>&lt;canvas&gt;</code> element supports either 2D or
-          WebGL rendering.
+          The HTML <code>&lt;canvas&gt;</code> element provides web applications with a resolution-dependent bitmap
+          canvas, which can be used for rendering graphs, game graphics, art, or other visual images on the fly. The
+          <code>&lt;canvas&gt;</code> element supports either 2D or WebGL rendering.
         </p>
         <p>
-          The 2D API [[canvas-2d]] defines primitive operations for drawing
-          graphics in to a <code>&lt;canvas&gt;</code> element, such as drawing
-          lines, shapes, and text.
+          The 2D API [[canvas-2d]] defines primitive operations for drawing graphics in to a
+          <code>&lt;canvas&gt;</code> element, such as drawing lines, shapes, and text.
         </p>
         <p>
-          The "Color managing canvas contents" proposal [[canvas-colorspace]]
-          attempts to address the following use cases:
+          The "Color managing canvas contents" proposal [[canvas-colorspace]] attempts to address the following use
+          cases:
         </p>
         <blockquote>
           <ul>
             <li>
-              Content displayed through a <code>&lt;canvas&gt;</code> element
-              should be color managed in order to minimize differences in
-              appearance across browsers and display devices. Improving color
-              fidelity matters a lot for artistic uses (e.g., photo and paint
-              apps) and for e-commerce (product presentation).
+              Content displayed through a <code>&lt;canvas&gt;</code> element should be color managed in order to
+              minimize differences in appearance across browsers and display devices. Improving color fidelity matters a
+              lot for artistic uses (e.g., photo and paint apps) and for e-commerce (product presentation).
             </li>
             <li>
-              Canvases should be able to take advantage of the full color gamut
-              and dynamic range of the display device.
+              Canvases should be able to take advantage of the full color gamut and dynamic range of the display device.
             </li>
             <li>
-              Creative apps that do image manipulation generally prefer
-              compositing, filtering and interpolation calculations to be
-              performed in a linear color space.
+              Creative apps that do image manipulation generally prefer compositing, filtering and interpolation
+              calculations to be performed in a linear color space.
             </li>
           </ul>
         </blockquote>
         <p class="note">
-          The proposal [[canvas-colorspace]] is not currently
-          HDR capable <code>&lt;canvas&gt;</code>; the proposal adds WCG support.
-          See <a href="https://groups.google.com/a/chromium.org/forum/#!msg/blink-dev/QILBb4Oqb-k/tvdXEy7dBwAJ">
-          Blink Intent to Ship</a>,
-          <a href="https://github.com/w3ctag/design-reviews/issues/315">TAG
-          review</a>, and <a href="https://github.com/whatwg/html/issues/4167">
-          this issue</a> against the HTML standard.
+          The proposal [[canvas-colorspace]] is not currently HDR capable <code>&lt;canvas&gt;</code>; the proposal
+          adds WCG support. See
+          <a href="https://groups.google.com/a/chromium.org/forum/#!msg/blink-dev/QILBb4Oqb-k/tvdXEy7dBwAJ">Blink
+          Intent to Ship</a>, <a href="https://github.com/w3ctag/design-reviews/issues/315">TAG review</a>, and
+          <a href="https://github.com/whatwg/html/issues/4167">this issue</a> against the HTML standard.
         </p>
         <section>
           <h4>Open Issues</h4>
-          <p>Merging of a  <a href="https://github.com/WICG/canvas-color-space/pull/28">recent pull reqest</a>
-          indicates the canvas-colorspace proposal might move forward again.
-          In particular, colorspaces are now defined relative to CSS Color 4 predefined RGB spaces,
-          instead of being assumed to be sRGB.
-        </p>
+          <p>
+            Merging of a
+            <a href="https://github.com/WICG/canvas-color-space/pull/28">recent pull request</a>
+            indicates the canvas-colorspace proposal might move forward again. In particular, color spaces are now
+            defined relative to CSS Color 4 predefined RGB spaces, instead of being assumed to be sRGB.
+          </p>
           <ul>
-            <li><a href="https://github.com/GoogleChromeLabs/squoosh/issues/802">HDR / wide color gamut support</a></li>
-            <li><a href="https://github.com/w3c/ColorWeb-CG/issues/5">Canvas, bitmap rendering context and readback</a></li>
-            <li><a href="https://github.com/WICG/canvas-color-space/issues/24">CSS for HDR values?</a></li>
-            <li><a href="https://github.com/WICG/canvas-color-space/issues/19">Allow colorSpace attributes in getImageData and toDataURL</a></li>
-            <li><a href="https://github.com/WICG/canvas-color-space/issues/16">Absolute vs relative luminance</a></li>
-            <li><a href="https://github.com/WICG/canvas-color-space/issues/15">Question on scope + P3</a></li>
+            <li>
+              <a href="https://github.com/GoogleChromeLabs/squoosh/issues/802">HDR / wide color gamut support</a>
+            </li>
+            <li>
+              <a href="https://github.com/w3c/ColorWeb-CG/issues/5">Canvas, bitmap rendering context and readback</a>
+            </li>
+            <li>
+              <a href="https://github.com/WICG/canvas-color-space/issues/24">CSS for HDR values?</a>
+            </li>
+            <li>
+              <a href="https://github.com/WICG/canvas-color-space/issues/19">Allow color space attributes in
+              getImageData and toDataURL</a>
+            </li>
+            <li>
+              <a href="https://github.com/WICG/canvas-color-space/issues/16">Absolute vs relative luminance</a>
+            </li>
+            <li>
+              <a href="https://github.com/WICG/canvas-color-space/issues/15">Question on scope + P3</a>
+            </li>
           </ul>
         </section>
       </section>
       <section>
         <h3>Filter Effects</h3>
-        <p>The CSS Filter Effects Module [[filter-effects]],
-          which generalizes to CSS and HTML the filter effect already available on SVG,
-          performs all operations in linear-light sRGB colorspace.
-          For example, the <a href="https://drafts.fxtf.org/filter-effects/#feColorMatrixElement"><code>luminanceToAlpha</code> definition</a>
-          hard-codes the matrix operations for linear-sRGB to Luminance.
-          Operations are defined in terms of an equivalent SG filter function.
+        <p>
+          The CSS Filter Effects Module [[filter-effects]], which generalizes to CSS and HTML the filter effect already
+          available on SVG, performs all operations in linear-light sRGB color space. For example, the
+          <a href="https://drafts.fxtf.org/filter-effects/#feColorMatrixElement"><code>luminanceToAlpha</code>
+          definition</a> hard-codes the matrix operations for linear-sRGB to Luminance. Operations are defined in terms
+          of an equivalent SG filter function.
         </p>
-        <p>It would be desirable to extend the filteroperations to at least other RGB spaces, such as display-p3; provided this can be done
-          in an opt-in manner, without Web-incompatible changes to existing content. Currently, the SVG WG is focussed on documenting existing implementations rather than extending SVG.</p>
-          <section>
-            <h4>Open Issues</h4>
-            <ul>
-              <li><a href="https://github.com/w3c/ColorWeb-CG/issues/6">Filters and WCG</a></li>
-              <li><a href="https://github.com/w3c/fxtf-drafts/issues/364">How to handle feColorMatrix with type=saturate and values outside a 0..1 range?</a></li>
-              <li><a href="https://github.com/w3c/fxtf-drafts/issues/326">Clarify color-interpolation-filters behavior on feMerge</a></li>
-            </ul>
-          </section>
+        <p>
+          It would be desirable to extend the filter operations to at least other RGB spaces, such as display-p3;
+          provided this can be done in an opt-in manner, without Web-incompatible changes to existing content.
+          Currently, the SVG WG is focussed on documenting existing implementations rather than extending SVG.
+        </p>
+        <section>
+          <h4>Open Issues</h4>
+          <ul>
+            <li>
+              <a href="https://github.com/w3c/ColorWeb-CG/issues/6">Filters and WCG</a>
+            </li>
+            <li>
+              <a href="https://github.com/w3c/fxtf-drafts/issues/364">How to handle feColorMatrix with type=saturate
+              and values outside a 0..1 range?</a>
+            </li>
+            <li>
+              <a href="https://github.com/w3c/fxtf-drafts/issues/326">Clarify color-interpolation-filters behavior on
+              feMerge</a>
+            </li>
+          </ul>
+        </section>
       </section>
       <section>
         <h3>HTML color input</h3>
         <p>
-          The HTML input element has a color type, <input type="color">
-          which allows the user to pick or otherwise indicate a color.
-          The picker is constrained to produce what HTML calls a
+          The HTML input element has a color type, <input type="color" /> which allows the user to pick or otherwise
+          indicate a color. The picker is constrained to produce what HTML calls a
           <a href="https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#simple-colour">'simple color'</a>
           such as '#123456'. This is limited to sRGB, and 8 bits per component precision.
         </p>
         <blockquote>
-            A simple color consists of three 8-bit numbers in the range 0..255,
-            representing the red, green, and blue components of the color respectively,
-            in the sRGB color space.
+          A simple color consists of three 8-bit numbers in the range 0..255, representing the red, green, and blue
+          components of the color respectively, in the sRGB color space.
         </blockquote>
         <section>
           <h4>Open issues</h4>
-        <ul>
-          <li><a href="https://github.com/whatwg/html/issues/3400">Allow &lt;input type="color"> to give an alpha channel?</a> is also discussing WCG and higher precision than 8bits/component. Not considering HDR at this time.</li>
-        </ul>
+          <ul>
+            <li>
+              <a href="https://github.com/whatwg/html/issues/3400">Allow &lt;input type="color"> to give an alpha
+              channel?</a> is also discussing WCG and higher precision than 8bits/component. Not considering HDR at
+              this time.
+            </li>
+          </ul>
         </section>
       </section>
     </section>
@@ -491,165 +475,185 @@
       <section>
         <h3>Media Capabilities API</h3>
         <p>
-          Media Capabilities [[media-capabilities]] is a draft specification
-          being developed by the Media Working Group. It intends to provide APIs
-          to allow websites to make an optimal decision when picking audiovisual
-          media content for the user. The APIs will expose information about the
-          decoding and encoding capabilities for a given format but also output
-          capabilities to find the best match based on the device's display.
+          Media Capabilities [[media-capabilities]] is a draft specification being developed by the Media Working Group.
+          It intends to provide APIs to allow websites to make an optimal decision when picking audiovisual media
+          content for the user. The APIs will expose information about the decoding and encoding capabilities for a
+          given format but also output capabilities to find the best match based on the device's display.
         </p>
         <p>
-          The API is a replacement for the existing <code>canPlayType()</code>
-          function in HTML [canplaytype], and <code>isTypeSupported()</code> in
-          Media Source Extensions [[media-source]].
+          The API is a replacement for the existing
+          <code>canPlayType()</code> function in HTML [canplaytype], and <code>isTypeSupported()</code> in Media Source
+          Extensions [[media-source]].
         </p>
         <p>
-          The Introduction document [media-capabilities-intro] gives a good
-          explanation of the problem that this API is trying to solve.
+          The Introduction document [media-capabilities-intro] gives a good explanation of the problem that this API is
+          trying to solve.
         </p>
         <section>
           <h4>Open Issues</h4>
-          <p>
-            There are a number of open issues where the Color on the Web CG
-            could usefully provide input.
-          </p>
+          <p>There are a number of open issues where the Color on the Web CG could usefully provide input.</p>
           <ul>
             <li>
-              <a href="https://github.com/w3c/media-capabilities/issues/10">Need
-              to add EOTF support for HDR</a>
+              <a href="https://github.com/w3c/media-capabilities/issues/10">Need to add EOTF support for HDR</a>
             </li>
             <li>
-              <a href="https://github.com/WICG/media-capabilities/issues/14">
-              Distinguish video rendering and screen support for color gamut</a>
+              <a href="https://github.com/WICG/media-capabilities/issues/14">Distinguish video rendering and screen
+              support for color gamut</a>
             </li>
             <li>
-              <a href=">https://github.com/WICG/media-capabilities/issues/67">
-              Define an audio or video configuration by supplying the init
-              segment</a>
+              <a href=">https://github.com/WICG/media-capabilities/issues/67">Define an audio or video configuration
+              by supplying the init segment</a>
             </li>
-            <li><a href="https://github.com/w3c/media-capabilities/issues/136">DolbyVision HDR Metadata</a></li>
-            <li><a href="https://github.com/w3c/media-capabilities/issues/135">hdrSupported - Screen.video or simply Screen?</a></li>
-            <li><a href="https://github.com/w3c/media-capabilities/issues/119">Add Support for Querying HDR & 4K Video Display Capabilities</a></li>
+            <li>
+              <a href="https://github.com/w3c/media-capabilities/issues/136">DolbyVision HDR Metadata</a>
+            </li>
+            <li>
+              <a href="https://github.com/w3c/media-capabilities/issues/135">hdrSupported - Screen.video or simply
+              Screen?</a>
+            </li>
+            <li>
+              <a href="https://github.com/w3c/media-capabilities/issues/119">Add Support for Querying HDR &amp; 4K
+              Video Display Capabilities</a>
+            </li>
           </ul>
         </section>
       </section>
       <section>
         <h3>CSS Media Queries</h3>
         <p>
-          Media Queries 4 [[mediaqueries-4]] allow authors to test and query
-          values or features of the browser or display device, independent of
-          the document being rendered. They are used in the CSS
-          <code>@media</code> rule to conditionally apply styles to a document,
-          and in various other contexts and languages, such as HTML and
-          JavaScript.
-          <a href="https://drafts.csswg.org/mediaqueries-4/#color-gamut">
-          Section 6.4</a> describes the <code>color-gamut</code> feature, which
-          describes the approximate range of colors that are supported by the
-          browser and output device.
+          Media Queries 4 [[mediaqueries-4]] allow authors to test and query values or features of the browser or
+          display device, independent of the document being rendered. They are used in the CSS
+          <code>@media</code> rule to conditionally apply styles to a document, and in various other contexts and
+          languages, such as HTML and JavaScript.
+          <a href="https://drafts.csswg.org/mediaqueries-4/#color-gamut"> Section 6.4</a>
+          describes the <code>color-gamut</code> feature, which describes the approximate range of colors that are
+          supported by the browser and output device.
         </p>
         <p>
-          Media Queries 5 [[mediaqueries-5]]
-          also allows authors to test and query
-          the ambient light level (<code>dim | normal | washed</code>),
-          although the assumption seems to be
-          that <code>dim</code> means
-          "excessive contrast and brightness would be distracting or uncomfortable"
-          rather than
-          "standard viewing conditions for HDR content".
-          The enumeration is,
-          deliberately,
-          not tied to specific light levels,
-          although ambient light sensors are mentioned.
+          Media Queries 5 [[mediaqueries-5]] also allows authors to test and query the ambient light level
+          (<code>dim | normal | washed</code>), although the assumption seems to be that <code>dim</code> means
+          "excessive contrast and brightness would be distracting or uncomfortable" rather than "standard viewing
+          conditions for HDR content". The enumeration is, deliberately, not tied to specific light levels, although
+          ambient light sensors are mentioned.
         </p>
         <p>
           Media Queries 5 also adds
-          <a href="https://drafts.csswg.org/mediaqueries-5/#dynamic-range"><code>dynamic-range</code></a> and
-          <a href="https://drafts.csswg.org/mediaqueries-5/#video-dynamic-range"><code>video-dynamic-range </code> features</a>, both with the values <code>standard</code> and <code>high</code>,
-          for SDR and HDR respectively. The two queries can return different results
-          in the case of, for example, a 4k TV with HDR video plane and SDR content overlay plane.
+          <a href="https://drafts.csswg.org/mediaqueries-5/#dynamic-range"><code>dynamic-range</code></a>
+          and
+          <a href="https://drafts.csswg.org/mediaqueries-5/#video-dynamic-range"><code>video-dynamic-range </code>
+          features</a>, both with the values <code>standard</code> and <code>high</code>, for SDR and HDR respectively.
+          The two queries can return different results in the case of, for example, a 4K TV with HDR video plane and
+          SDR content overlay plane.
         </p>
         <section>
           <h4>Open Issues</h4>
           <ul>
-            <li><a href="https://github.com/w3c/csswg-drafts/issues/3882">Detect all available color schemes</a> </li>
-            <li><a href="https://github.com/w3c/csswg-drafts/issues/4471">Dealing with bi-plane (video/graphics) when reporting values</a></li>
-            <li><a href="https://github.com/w3c/csswg-drafts/issues/1727">Clarify definition and use cases for light-level feature</a></li>
-            <li><a href="https://github.com/w3c/csswg-drafts/issues/5045">In-gamut media query</a></li>
+            <li>
+              <a href="https://github.com/w3c/csswg-drafts/issues/3882">Detect all available color schemes</a>
+            </li>
+            <li>
+              <a href="https://github.com/w3c/csswg-drafts/issues/4471"
+                >Dealing with bi-plane (video/graphics) when reporting values</a
+              >
+            </li>
+            <li>
+              <a href="https://github.com/w3c/csswg-drafts/issues/1727"
+                >Clarify definition and use cases for light-level feature</a
+              >
+            </li>
+            <li>
+              <a href="https://github.com/w3c/csswg-drafts/issues/5045">In-gamut media query</a>
+            </li>
           </ul>
         </section>
       </section>
-
       <section>
         <h3>CSSOM View Module</h3>
-        <p>The CSS Object Model View Module [[cssom-view-1]] has a
+        <p>
+          The CSS Object Model View Module [[cssom-view-1]] has a
           <a href="https://drafts.csswg.org/cssom-view/#the-screen-interface">screen interface</a>
-          with a <a href="https://drafts.csswg.org/cssom-view/#dom-screen-colordepth">colorDepth</a>
-          attribute which typically returns the value 24 for an 8 bits-per-component display.
-          An example in the specification combines colorDepth (with a value of 48!)
-          with a Media Query for the p3 gamut and unspecified "other checks"
-          to probe for an HDR screen.
+          with a
+          <a href="https://drafts.csswg.org/cssom-view/#dom-screen-colordepth">colorDepth</a>
+          attribute which typically returns the value 24 for an 8 bits-per-component display. An example in the
+          specification combines colorDepth (with a value of 48!) with a Media Query for the p3 gamut and unspecified
+          "other checks" to probe for an HDR screen.
         </p>
         <section>
           <h4>Open Issues</h4>
-          <p>No open WCG or HDR issues. However,
-            CSSWG decided that the color-related aspects of the CSS OM
-            should migrate from that specification to CSS Color 4.
-            That migration is in progress, with <a href="https://drafts.csswg.org/css-color-4/#serializing-color-values">CSS Color 4 defining serialization of WCG colorspaces</a>.
+          <p>
+            No open WCG or HDR issues. However, CSSWG decided that the color-related aspects of the CSS OM should
+            migrate from that specification to CSS Color 4. That migration is in progress, with
+            <a href="https://drafts.csswg.org/css-color-4/#serializing-color-values">CSS Color 4 defining serialization
+            of WCG color spaces</a>.
           </p>
         </section>
       </section>
       <section>
         <h3>CSS Typed OM Level 1</h3>
-        <p>The CSS Typed OM Level 1 [[css-typed-om]]
-          is an extensible API for the CSSOM that reduces
-          the burden of manipulating a CSS property's value via string manipulation.
-          It does so by exposing CSS values as typed JavaScript objects
-          rather than strings. There is <a href="https://github.com/w3c/css-houdini-drafts/blob/master/css-typed-om/README.md">an explainer document</a>.
+        <p>
+          The CSS Typed OM Level 1 [[css-typed-om]] is an extensible API for the CSSOM that reduces the burden of
+          manipulating a CSS property's value via string manipulation. It does so by exposing CSS values as typed
+          JavaScript objects rather than strings. There is
+          <a href="https://github.com/w3c/css-houdini-drafts/blob/master/css-typed-om/README.md">an explainer
+          document</a>.
         </p>
         <section>
           <h4>Open Issues</h4>
-          <p>There is current discussion on extending the CSS Typed OM
-            for WCG and perhaps HDR color.
-            Helper functions to calculate luminance contrast (for WCAG) are also in scope.</p>
-          <p>There is <a href="https://colorjs.io/">initial prototyping work</a> for an object-oriented,
-            typed, CSS Color model.</p>
+          <p>
+            There is current discussion on extending the CSS Typed OM for WCG and perhaps HDR color. Helper functions to
+            calculate luminance contrast (for WCAG) are also in scope.
+          </p>
+          <p>
+            There is
+            <a href="https://colorjs.io/">initial prototyping work</a> for an object-oriented, typed, CSS Color model.
+          </p>
           <ul>
-            <li><a href="https://github.com/w3c/css-houdini-drafts/issues/989">Color conversion and contrast ratio</a></li>
-            <li><a href="https://github.com/w3c/css-houdini-drafts/issues/1014">Inputs for the CSSColorValue constructors</a></li>
+            <li>
+              <a href="https://github.com/w3c/css-houdini-drafts/issues/989">Color conversion and contrast ratio</a>
+            </li>
+            <li>
+              <a href="https://github.com/w3c/css-houdini-drafts/issues/1014">Inputs for the CSSColorValue
+              constructors</a>
+            </li>
           </ul>
         </section>
-
       </section>
     </section>
     <section>
       <h2>Timed Text</h2>
-      <p>Timed Text Markup Language [[TTML2]] has a
+      <p>
+        Timed Text Markup Language [[TTML2]] has a
         <a href="https://www.w3.org/TR/ttml/#style-attribute-color">tts:color attribute</a>
-        whose <a href="https://www.w3.org/TR/ttml/#style-value-color">type</a>
-        is defined to be a value in sRGB, with 8-bit percomponent precision.
-        Titles in TTML are thus SDR.</p>
-      <p>However, subtitles are composited onto video content
-        and TTML does provide a (non-normative)
-        <a href="https://www.w3.org/TR/ttml/#hdr-compositing">Appendix Q
-          High Dynamic Range Compositing</a>
-          which gives equations for converting the sRGB values into either
-          <a href="https://www.w3.org/TR/ttml/#pq-hdr">PQ</a> or
-          <a href="https://www.w3.org/TR/ttml/#hlg-hdr">HLG</a>
-          for compositing onto HDR video.</p>
-      <p>Realizing that sRGB is defined to have a peak luminance
-        of 80 cd/m² in theory,
-        and a somewhat higher value in practice,
-        TTML also provides a
+        whose
+        <a href="https://www.w3.org/TR/ttml/#style-value-color">type</a> is defined to be a value in sRGB, with 8-bit
+        percomponent precision. Titles in TTML are thus SDR.
+      </p>
+      <p>
+        However, subtitles are composited onto video content and TTML does provide a (non-normative)
+        <a href="https://www.w3.org/TR/ttml/#hdr-compositing">Appendix Q High Dynamic Range Compositing</a>
+        which gives equations for converting the sRGB values into either
+        <a href="https://www.w3.org/TR/ttml/#pq-hdr">PQ</a> or <a href="https://www.w3.org/TR/ttml/#hlg-hdr">HLG</a> for
+        compositing onto HDR video.
+      </p>
+      <p>
+        Realizing that sRGB is defined to have a peak luminance of 80 cd/m<sup>2</sup>
+        in theory, and a somewhat higher value in practice, TTML also provides a
         <a href="https://www.w3.org/TR/ttml/#style-attribute-luminanceGain">tts:luminanceGain</a>
-        attribute to boost that value for systems (such as PQ)
-        which require an absolute luminance value.
+        attribute to boost that value for systems (such as PQ) which require an absolute luminance value.
       </p>
       <section>
         <h4>Open Issues</h4>
         <ul>
-          <li><a href="https://github.com/w3c/ttml2/issues/1119">Add non-normative Appendix to cover SDR compositing</a> </li>
-          <li><a href="https://github.com/w3c/ttml2/issues/1118">Add informative note to tts:luminanceGain recommending that the content author override the initial value.</a> </li>
-          <li><a href="https://github.com/w3c/ttml2/issues/1070">Gamma approximation in luminance gain</a> </li>
+          <li>
+            <a href="https://github.com/w3c/ttml2/issues/1119">Add non-normative Appendix to cover SDR compositing</a>
+          </li>
+          <li>
+            <a href="https://github.com/w3c/ttml2/issues/1118">Add informative note to tts:luminanceGain recommending
+            that the content author override the initial value.</a>
+          </li>
+          <li>
+            <a href="https://github.com/w3c/ttml2/issues/1070">Gamma approximation in luminance gain</a>
+          </li>
         </ul>
       </section>
     </section>
@@ -657,148 +661,108 @@
       <h2>Static Image Formats</h2>
       <section>
         <h3>Requirements</h3>
-      <p>
-        A static image format is required to store graphics (both camera-capture
-        and artificially generated). Suggested use cases include, but are not
-        limited to:
-      </p>
-      <ul>
-        <li>
-          Video catch-up website layout objects e.g., a content provider log
-          rendered by a browser UI on a television
-        </li>
-        <li>
-          Images of programme content shown on websites
-        </li>
-      </ul>
-      <p>
-        Any such graphics format would need to:
-      </p>
-      <ul>
-        <li>
-          Store the information with sufficient bit-depth to allow correct
-          display of HDR material
-        </li>
-        <li>
-          Allow use of the correct primaries and white point
-        </li>
-        <li>
-          Allow use of the correct transfer function
-        </li>
-      </ul>
-      <p>
-        Knowledge of the image primaries allows correct display of color on all
-        displays, including displays which would need to apply a gamut reduction
-        to the image.
-      </p>
-      <p>
-        ICC Profiles store data which allows the correct mapping of captured
-        data to/from an all encompassing color space and from/to the all
-        encompassing color space to a display device. Version 4 has only a
-        D50 based color space and lookup-table based transforms. Version 5
-        allows different color working spaces and an algorithmic calculator
-        for the transforms. Version 5 is not well supported.
-      </p>
-
-      <p class="note">
-        Open questions: How can we define an ICC / ICCMax profile for HLG?
-        If we define an ICC / ICCMax profile for HLG, how can we test it?
-        Lars Borg has written an HLG profile.
-      </p>
-      <p>
-        Netflix have published a blog post [[netflix-hdr]] that describes their
-        approach for static images.
-      </p>
-      <p>HDR-oriented <a href="https://afontenot.github.io/image-formats-comparison/#bath-from-alexandra-park&avif=s&png=s">image-formats-comparision</a></p>
+        <p>
+          A static image format is required to store graphics (both camera-capture and artificially generated).
+          Suggested use cases include, but are not limited to:
+        </p>
+        <ul>
+          <li>
+            Video catch-up website layout objects e.g., a content provider log rendered by a browser UI on a television
+          </li>
+          <li>Images of programme content shown on websites</li>
+        </ul>
+        <p>Any such graphics format would need to:</p>
+        <ul>
+          <li>Store the information with sufficient bit-depth to allow correct display of HDR material</li>
+          <li>Allow use of the correct primaries and white point</li>
+          <li>Allow use of the correct transfer function</li>
+        </ul>
+        <p>
+          Knowledge of the image primaries allows correct display of color on all displays, including displays which
+          would need to apply a gamut reduction to the image.
+        </p>
+        <p>
+          ICC Profiles store data which allows the correct mapping of captured data to/from an all encompassing color
+          space and from/to the all encompassing color space to a display device. Version 4 has only a D50 based color
+          space and lookup-table based transforms. Version 5 allows different color working spaces and an algorithmic
+          calculator for the transforms. Version 5 is not well supported.
+        </p>
+        <p class="note">
+          Open questions: How can we define an ICC / ICCMax profile for HLG? If we define an ICC / ICCMax profile for
+          HLG, how can we test it? Lars Borg has written an HLG profile.
+        </p>
+        <p>Netflix have published a blog post [[netflix-hdr]] that describes their approach for static images.</p>
+        <p>
+          HDR-oriented
+          <a href="https://afontenot.github.io/image-formats-comparison/#bath-from-alexandra-park&amp;avif=s&amp;png=s">image-formats-comparision</a>
+        </p>
       </section>
       <section>
         <h3>Candidates</h3>
         <section>
           <h4>PNG</h4>
           <p>
-            Portable Network Graphics (PNG) can
-            store graphics using 16-bits per channel and it is possible to store the
-            primaries and white point. Two methods of storing the transfer function
-            exist: the storage of a value for gamma, and the storage of an ICC
-            profile. The first method, storage of gamma would allow a backwards
-            compatible image to be displayed on non-HDR monitors. The second would
-            allow the correct display of this image on an HDR display.
-            A new, HDR-specific tag (with values "HLG" and "PQ") could be a third option
+            Portable Network Graphics (PNG) can store graphics using 16-bits per channel and it is possible to store the
+            primaries and white point. Two methods of storing the transfer function exist: the storage of a value for
+            gamma, and the storage of an ICC profile. The first method, storage of gamma would allow a backwards
+            compatible image to be displayed on non-HDR monitors. The second would allow the correct display of this
+            image on an HDR display. A new, HDR-specific tag (with values "HLG" and "PQ") could be a third option
           </p>
           <p>
-            The Timed Text Working Group has published a draft specification
-            [[png-hdr-pq]] that extends the PNG format to include an iCCP chunk with
-            the name "ITUR_2100_PQ_FULL". The chunk contains a given ICC profile,
-            linked from the specification, although this profile is not actually
-            used, and only its presence is used to enable external rendering of the
-            PQ encoded image by the platform. See
-            <a href="https://lists.w3.org/Archives/Public/public-colorweb/2017May/0001.html">
-            this discussion</a> on the Color on the Web CG mailing list.
+            The Timed Text Working Group has published a draft specification [[png-hdr-pq]] that extends the PNG format
+            to include an iCCP chunk with the name "ITUR_2100_PQ_FULL". The chunk contains a given ICC profile, linked
+            from the specification, although this profile is not actually used, and only its presence is used to enable
+            external rendering of the PQ encoded image by the platform. See
+            <a href="https://lists.w3.org/Archives/Public/public-colorweb/2017May/0001.html">this discussion</a>
+            on the Color on the Web CG mailing list.
           </p>
         </section>
         <section>
           <h4>AVIF</h4>
-          <p>Mozilla bug <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1634741">AVIF (AV1 Image File Format): ICC profile support</a></p>
+          <p>
+            Mozilla bug <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1634741">AVIF (AV1 Image File Format):
+            ICC profile support</a>
+          </p>
         </section>
       </section>
     </section>
     <section>
       <h2>WebGL</h2>
-      <p class="note">
-        TODO: (might be moot, see WebGPU)
-      </p>
+      <p class="note">TODO: (might be moot, see WebGPU)</p>
       <section>
         <h4>Open Issues</h4>
-      <ul>
-        <li><a href="https://github.com/KhronosGroup/WebGL/issues/2508">Issues needing to be solved in WEBGL_video_texture proposal </a></li>
-      </ul>
+        <ul>
+          <li>
+            <a href="https://github.com/KhronosGroup/WebGL/issues/2508">Issues needing to be solved in
+            WEBGL_video_texture proposal</a>
+          </li>
+        </ul>
       </section>
     </section>
     <section>
       <h2>WebGPU</h2>
-      <p>The GPU on the Web Working Group develops the WebGPU API [[webgpu]],
-        a more modern version of WebGL. The draft spec does not mention "color spaces".
-      It has an RGBA color object, which consists of four double-precision floats.
-    It therefore has the potential to cover HDR, as well as WCG;
-    but the meaning of the values, their range, transfer function,
-    and colorspace is currently undefined.
-    However, a passing mention of the
-    naming convention for texture formats
-    <a href="https://gpuweb.github.io/gpuweb/#texture-formats">seems to indicate
-      that both gamma-corrected and linear sRGB are supported,
-      with conversion on-the-fly.</a>
-  </p>
-    <section>
-      <h3>Open Issues</h3>
-      <ul>
-        <li><a href="https://github.com/w3c/ColorWeb-CG/issues/8">WebGPU, WCG and HDR</a></li>
-      </ul>
-    </section>
+      <p>
+        The GPU on the Web Working Group develops the WebGPU API [[webgpu]], a more modern version of WebGL. The draft
+        spec does not mention "color spaces". It has an RGBA color object, which consists of four double-precision
+        floats. It therefore has the potential to cover HDR, as well as WCG; but the meaning of the values, their range,
+        transfer function, and color space is currently undefined. However, a passing mention of the naming convention
+        for texture formats
+        <a href="https://gpuweb.github.io/gpuweb/#texture-formats">seems to indicate that both gamma-corrected and
+        linear sRGB are supported, with conversion on-the-fly.</a>
+      </p>
+      <section>
+        <h3>Open Issues</h3>
+        <ul>
+          <li>
+            <a href="https://github.com/w3c/ColorWeb-CG/issues/8">WebGPU, WCG and HDR</a>
+          </li>
+        </ul>
+      </section>
     </section>
     <section>
       <h2>Recommendations</h2>
-      <p class="note">
-        TODO: ...
-      </p>
+      <p class="note">TODO: ...</p>
     </section>
-
-
-<!-- To be added somewhere
-
-MQ5 add ambient light level dim | normal | washed
-https://drafts.csswg.org/mediaqueries-5/#light-level
-
-
-
-
-
-
-
-
-
-
--->
-
-
+    <!-- To be added somewhere MQ5 add ambient light level dim | normal | washed https://drafts.csswg.org/mediaqueries-5/#light-level -->
   </body>
 </html>
