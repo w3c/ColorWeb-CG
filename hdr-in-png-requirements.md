@@ -22,6 +22,15 @@ Two new PNG chunks are proposed, the `cICP` chunk and the `iCCN` chunk.
 
 The `cICP` chunk acts as a color space label (much like the existing `sRGB` chunk), specifying the color space to which the pixels within the PNG file conforms. The `iCCN` chunk (much like the existing `iCCP`) contains an embedded color profile.
 
+A PNG may contain multiple chunks with color space information. A PNG viewer should use the highest priority color space chunk that it can honor, ignoring the others. The priorities are from highest to lowest:
+
+* `cICP`
+* `iCCN`
+* `iCCP`
+* `gAMA`
+* `cHRM`
+* `sRGB`
+
 ### cICP chunk
 
 This chunk SHALL come before the `IDAT` chunk.
@@ -38,13 +47,6 @@ Define a `cICP` chunk that contains the 4 bytes necessary to carry the H.273 col
 NOTE: While these are inspired from recent JPEG standards (eg. JPEG-XL) that incorporate these color space parameters, this specification follows H.273.
 
 NOTE: [ITU-T Series H Supplement 19](https://www.itu.int/rec/T-REC-H.Sup19-201910-I) summarize combinations of H.273 parameters corresponding to common baseband linear broadcasts and file-based Video-on-Demand(VOD) services.
-
-A PNG MAY contain both a `cICP` chunk and an `iCCP` chunk.
-
-When the `cICP` chunk is present, a PNG decoder SHALL ignore the following chunks:
-- `gAMA`
-- `cHRM` 
-- `sRGB` 
 
 ### iCCN chunk Embedded ICC profile (updated)
 
@@ -78,11 +80,7 @@ If the `iCCN` chunk is present, the image samples conform to the colour space re
 
 ### Decoder
 
-If the image contains a `cICP` chunk and will be rendered to a display or surface that supports `cICP`, then the PNG decoder shall ignore any `gAMA`, `cHRM`, `iCCP`, and `iCCN` chunks and use the `cICP` chunk instead. Otherwise, when a `iCCN` chunk is present, PNG decoders that recognize it and are capable of colour management shall ignore any `gAMA`, `cHRM`, and `cICP` chunks and use the `iCCN` chunk instead and interpret it according to [ICC] or [ICC-2010] as appropriate. PNG decoders that are used in an environment that is incapable of full-fledged colour management shall use the `gAMA` and `cHRM` chunks if present.
-
-#### Codestream
-
-A PNG datastream shall contain at most one embedded profile, whether specified explicitly with an `iCCP` or `iCCN` chunk or implicitly with an `sRGB` chunk.
+The `iCCN` chunk should be interpreted according to [ICC] or [ICC-2010] as appropriate. 
 
 ## References
 
