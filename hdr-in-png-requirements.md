@@ -18,7 +18,7 @@ An existing W3C group note, [BT2100-in-PNG]  specifies an approach which is limi
 
 ## Strawman approach
 
-A PNG may contain multiple chunks with color space information. A PNG viewer should use the highest priority color space chunk, ignoring the others. The priorities are from highest to lowest:
+A PNG may contain multiple chunks with color space information. A PNG viewer should use the highest priority color space chunk that it can honor, ignoring the others. The priorities are from highest to lowest:
 
 * `cICP`
 * `iCCN`
@@ -74,7 +74,7 @@ If the `iCCN` chunk is present, the image samples conform to the colour space re
 
 ### Decoder
 
-The `iCCN` chunk should be interpreted according to [ICC] or [ICC-2010] as appropriate. PNG decoders that are used in an environment that is incapable of full-fledged colour management shall use the `gAMA` and `cHRM` chunks if present.
+The `iCCN` chunk should be interpreted according to [ICC] or [ICC-2010] as appropriate. 
 
 ## References
 
