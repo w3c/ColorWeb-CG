@@ -99,6 +99,18 @@ WebGL's proposed [``drawingBufferStorage``](https://github.com/KhronosGroup/WebG
 
 WebGPU's ``GPUSwapChainDescriptor`` can allow for specifying higher bit depth formats.
 
+### Tone mapping
+
+As illustrated below, the proposal assumes that tone mapping, i.e. the rendering of an image with a given dynamic range onto a
+display with different dynamic range, occurs in different parts of the system depending on the color space of the Canvas element:
+
+* in the case where `rec2100-hlg` or `rec2100-pq` are used, tone mapping is performed by the platform. This is akin to the
+  scenario where the `src` of an `img` element is a PQ or HLG image.
+
+* in the case where `extended-linear-srgb` or `extended-srgb` are used, tone mapping is performed by the web app, using display capabilities provided by the plarform.
+
+![Tone mapping scenarios](./tone-mapping-scenarios.png)
+
 ### Color spaces
 
 #### General
