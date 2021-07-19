@@ -107,7 +107,7 @@ display with different dynamic range, occurs in different parts of the system de
 * in the case where `rec2100-hlg` or `rec2100-pq` are used, tone mapping is performed by the platform. This is akin to the
   scenario where the `src` of an `img` element is a PQ or HLG image.
 
-* in the case where `extended-linear-srgb` or `extended-srgb` are used, tone mapping is performed by the web app, using display capabilities provided by the plarform.
+* in the case where `extended-linear-srgb` or `extended-srgb` are used, tone mapping is performed by the web app, using display capabilities provided by the platform.
 
 ![Tone mapping scenarios](./tone-mapping-scenarios.png)
 
