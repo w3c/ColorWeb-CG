@@ -58,10 +58,6 @@ Add a new `CanvasHighDynamicRangeOptions` dictionary with HDR configuration opti
     // Enables extended luminance while preserving SDR color matching for
     // 'extended-linear-srgb' and 'extended-linear-srgb' color spaces.
     'extended',
-
-    // Passes 'extended-linear-srgb' through to the display device with no
-    // tone mapping applied and no color matching guarantees.
-    'passthrough',
   }
 ```
 
@@ -276,15 +272,6 @@ In this example, a WebGL application enables and HDR default drawing buffer, and
 ```
 
 When composited, this canvas is guaranteed to be the same color as the CSS color `'white'`.
-
-#### WebGL using passthrough mode
-
-If this example were changed to specify the passthrough mode then there would no longer be a guarantee that the canvas would match the CSS color `'white'`.
-
-```javascript
-    var canvas = document.getElementById('MyCanvas');
-    canvas.configureHighDynamicRange({mode:'passthrough'});
-```
 
 ### The `rec2100-hlg` color space
 
