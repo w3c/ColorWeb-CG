@@ -117,12 +117,12 @@ The component signals are mapped to red, green and blue tristimulus values accor
 * Red primary chromaticity: `(0.640, 0.330)`
 * Green primary chromaticity: `(0.300, 0.600)`
 * Blue primary chromaticity: `(0.150, 0.060)`
-* White point chromaticity: `(0.3127, 0.3290)`
+* White point chromaticity (D65): `(0.3127, 0.3290)`
 * Transfer function:
 
 ```
-   E = | E' / 12.92, if abs(E') ≤ 0.04045
-       | ((E' + 0.055) / 1.055)^2.4, otherwise
+   E = | E' / 12.92,                                  if abs(E') ≤ 0.04045
+       | sign(E') * ((abs(E') + 0.055) / 1.055)^2.4,  otherwise
 
        with E' ∈ ℝ
 ```
@@ -136,7 +136,7 @@ The component signals are mapped to red, green and blue tristimulus values accor
 * Red primary chromaticity: `(0.640, 0.330)`
 * Green primary chromaticity: `(0.300, 0.600)`
 * Blue primary chromaticity: `(0.150, 0.060)`
-* White point chromaticity: `(0.3127, 0.3290)`
+* White point chromaticity (D65): `(0.3127, 0.3290)`
 * Transfer function: `E = E', with E' ∈ ℝ` where `E'` is the non-linear colour value and `E` is the linear colour value
 
 #### rec2100-hlg
@@ -166,7 +166,7 @@ These conversions are expressed using a connection color space with the system c
 * Red primary: `(0.708, 0.292)`
 * Green chromaticity: `(0.170, 0.797)`
 * Blue chromaticity: `(0.131, 0.046)`
-* White chromaticity: `(0.3127, 0.3290)`
+* White chromaticity (D65): `(0.3127, 0.3290)`
 
 _Note:_ The system colorimetry specified in Rec. ITU-R BT.2100 is identical to that specified in Rec. ITU-R BT.2020.
 
