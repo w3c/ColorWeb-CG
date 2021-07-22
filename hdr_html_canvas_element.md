@@ -188,9 +188,9 @@ _Note:_ The system colorimetry specified in Rec. ITU-R BT.2100 is identical to t
 The conversion from color space A to color space B is performed according to the following steps:
 
 * apply the inverse transfer function of color space A
-* apply any linear light scaling to correctly map the level of perceived diffuse white level in to color space B
 * convert to the connection space by multiplying by the connection matrix of color space A
 * convert to color space B by multiplying by by the inverse of the connection matrix of color space B
+* apply any linear light scaling to correctly map the level of perceived diffuse white level in to color space B
 * apply the transfer function of color space B
 
 The domain and range of this conversion consist of all real values and the component signals in the connection color space are real numbers.
@@ -238,8 +238,39 @@ _Note:_ The factor of 300 is such that a display luminance of 300 cd/m<sup>2</su
 _Note:_ The domain of `EOTF<sup>-1</sup>` is [0, 10000]
 
 
+#### Example conversions via Color Connection Space
 
+##### Conversion from extended-sRGB to HLG
 
+_Input:_ Full-range non-linear floating-point `extended-srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+_Output:_ Full-range non-linear floating-point `rec2100-hlg` pixel with black at 0.0 and diffuse white at 0.75. Values may exist outside the range 0.0 to 1.0.
+_Process:_
+  1. Linearize using the SRGB EOTF
+  2. Convert from `extended-srgb` color space to `rec2100-hlg` color space
+  3. Scale pixel values - See Note 1
+  4. Apply HLG Inverse EOTF to convert to HLG from Pseudo-Display Light with Lw = 302 cd/m2 - See Note 1
+    * apply HLG Inverse OOTF
+    * apply HLG OETF - See Note 2
+
+_Note 1:_ As `rec2100-hlg` is a relative format, the brightness of the virtual monitor used for mathematical transforms can be chosen to be any level. In this transform it is chosen to be 302 cd/m2 so that the brightness of diffuse white matches the diffuse white of sRGB (80 cd/m2). Using the extended range gamma formula in footnote 2 of BT.2100, this also sets the HLG Inverse OOTF to be unity. The value 0.265 is calculated by taking the inverse OETF of 0.75, the `rec2100-hlg` diffuse white level.
+
+_Note 2:_ See section 5.3 in ITU-R BT.2408-4 relating to negative transfer functions in format conversions.
+
+```python
+    def convertExtendedSRGBtoREC2100HLG(R,G,B):
+      systemGamma = 1.0
+      linearLightScaler = 0.265
+      r1 = srgb_eotf(R)
+      g1 = srgb_eotf(G)
+      b1 = srgb_eotf(B)
+      (r2,g2,b2) = matrixXYZtoBT2020(matrixSRGBtoXYZ(r1,g1,b1))
+      r3 = linearLightScaler * r2
+      g3 = linearLightScaler * g2
+      b3 = linearLightScaler * b2
+      (r4,g4,b4) = hlg_ootf(r3,g3,b3,systemGamma)
+      (r5,g5,b5) = hlg_oetf(r4,g4,b4)
+      return (r5,g5,b5)
+```
 
 ### Compositing the HDR `HTMLCanvasElement`
 
