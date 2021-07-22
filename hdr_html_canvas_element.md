@@ -201,11 +201,15 @@ The domain and range of this conversion consist of all real values and the compo
 
 * Connection matrix: matrix to convert the [sRGB primaries](https://www.w3.org/TR/css-color-4/#valdef-color-srgb) to the primary colours specified in Rec. ITU-R BT.2100
 
+* Linear light scaling: 1.0
+
 #### `extended-srgb`
 
 * Transfer function: See [extended-linear-srgb](#extended-linear-srgb)
 
 * Connection matrix: matrix to convert the [sRGB primaries](https://www.w3.org/TR/css-color-4/#valdef-color-srgb) to the primary colours specified in Rec. ITU-R BT.2100
+
+* Linear light scaling: 1.0
 
 _Note:_ The domain of this transformation function is all real values. Its domain is not restricted to the unit interval [0, 1].
 
