@@ -160,7 +160,7 @@ The component signals are mapped to red, green and blue tristimulus values accor
 
 #### rec2100-pq
 
-The component signals are mapped to red, green and blue tristimulus values according to the PQ system system specified in Rec. ITU-R BT.2100.
+The component signals are mapped to red, green and blue tristimulus values according to the Perceptual Quantizer (PQ) system system specified in Rec. ITU-R BT.2100.
 
 ### Conversion between color spaces
 
@@ -188,6 +188,7 @@ _Note:_ The system colorimetry specified in Rec. ITU-R BT.2100 is identical to t
 The conversion from color space A to color space B is performed according to the following steps:
 
 * apply the inverse transfer function of color space A
+* apply any linear light scaling to correctly map the level of perceived diffuse white level in to color space B
 * convert to the connection space by multiplying by the connection matrix of color space A
 * convert to color space B by multiplying by by the inverse of the connection matrix of color space B
 * apply the transfer function of color space B
@@ -212,11 +213,11 @@ Also see note in the Issues section at the bottom about whether this space shoul
 
 #### `rec2100-hlg`
 
-* Transfer function: HLG Reference OETF specified at Rec. ITU-R BT.2100
-
-_Note:_ The range of the function is [0, 1].
+* Transfer function: HLG Reference EOTF specified at Rec. ITU-R BT.2100 with a System Gamma of Unity
 
 * Connection matrix: Identity
+
+* Linear light scaling: 1.0/0.265
 
 _Note:_ Converting from `rec2100-hlg` to any SDR color space will not result in clipping.
 
@@ -224,11 +225,17 @@ _Note:_ Converting from `rec2100-hlg` to any SDR color space will not result in 
 
 * Transfer function: `EOTF<sup>-1</sup>[F<sub>D</sub>/300]` where `EOTF<sup>-1</sup>` is the inverse of the Reference PQ EOTF specified at Rec. ITU-R BT.2100.
 
+* Connection matrix: Identity
+
+* Linear light scaling: 1.0/0.265
+
 _Note:_ The factor of 300 is such that a display luminance of 300 cd/m<sup>2</sup> results in a linear color value of 1 in the connection color space.
 
 _Note:_ The domain of `EOTF<sup>-1</sup>` is [0, 10000]
 
-* Connection matrix: Identity
+
+
+
 
 ### Compositing the HDR `HTMLCanvasElement`
 
