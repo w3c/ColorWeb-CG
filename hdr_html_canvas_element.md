@@ -238,7 +238,7 @@ _Note:_ The factor of 300 is such that a display luminance of 300 cd/m<sup>2</su
 _Note:_ The domain of `EOTF<sup>-1</sup>` is [0, 10000]
 
 
-#### Example conversions via Color Connection Space
+#### Conversions via Color Connection Space
 
 ##### Conversion from extended-sRGB to HLG
 
@@ -263,6 +263,30 @@ _Note 2:_ See section 5.3 in ITU-R BT.2408-4 relating to negative transfer funct
       r1 = srgb_eotf(R)
       g1 = srgb_eotf(G)
       b1 = srgb_eotf(B)
+      (r2,g2,b2) = matrixXYZtoBT2020(matrixSRGBtoXYZ(r1,g1,b1))
+      r3 = linearLightScaler * r2
+      g3 = linearLightScaler * g2
+      b3 = linearLightScaler * b2
+      (r4,g4,b4) = hlg_ootf(r3,g3,b3,systemGamma)
+      (r5,g5,b5) = hlg_oetf(r4,g4,b4)
+      return (r5,g5,b5)
+```
+
+##### Conversion from extended-linear-sRGB to HLG
+
+_Input:_ Full-range non-linear floating-point `extended-linear-srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+_Output:_ Full-range non-linear floating-point `rec2100-hlg` pixel with black at 0.0 and diffuse white at 0.75. Values may exist outside the range 0.0 to 1.0.
+_Process:_
+  1. Convert from `extended-linear-srgb` color space to `rec2100-hlg` color space
+  2. Scale pixel values - See Note 1
+  3. Apply HLG Inverse EOTF to convert to HLG from Pseudo-Display Light with Lw = 302 cd/m2 - See Note 1
+    * apply HLG Inverse OOTF
+    * apply HLG OETF - See Note 2
+
+```python
+    def convertExtendedLinearSRGBtoREC2100HLG(R,G,B):
+      systemGamma = 1.0
+      linearLightScaler = 0.265
       (r2,g2,b2) = matrixXYZtoBT2020(matrixSRGBtoXYZ(r1,g1,b1))
       r3 = linearLightScaler * r2
       g3 = linearLightScaler * g2
