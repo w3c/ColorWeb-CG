@@ -267,7 +267,7 @@ _Note 2:_ See section 5.3 in ITU-R BT.2408-4 relating to negative transfer funct
       r3 = linearLightScaler * r2
       g3 = linearLightScaler * g2
       b3 = linearLightScaler * b2
-      (r4,g4,b4) = hlg_ootf(r3,g3,b3,systemGamma)
+      (r4,g4,b4) = hlg_inverse_ootf(r3,g3,b3,systemGamma)
       (r5,g5,b5) = hlg_oetf(r4,g4,b4)
       return (r5,g5,b5)
 ```
@@ -291,10 +291,86 @@ _Process:_
       r3 = linearLightScaler * r2
       g3 = linearLightScaler * g2
       b3 = linearLightScaler * b2
-      (r4,g4,b4) = hlg_ootf(r3,g3,b3,systemGamma)
+      (r4,g4,b4) = hlg_inverse_ootf(r3,g3,b3,systemGamma)
       (r5,g5,b5) = hlg_oetf(r4,g4,b4)
       return (r5,g5,b5)
 ```
+
+##### Conversion from extended-sRGB to PQ
+
+_Input:_ Full-range non-linear floating-point `extended-srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+_Output:_ Full-range non-linear floating-point `rec2100-pq` pixel with black at 0.0 and diffuse white at ???. Values may exist outside the range 0.0 to 1.0.
+_Process:_
+
+##### Conversion from extended-sRGB to PQ
+
+_Input:_ Full-range non-linear floating-point `extended-linear-srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+_Output:_ Full-range non-linear floating-point `rec2100-pq` pixel with black at 0.0 and diffuse white at ???. Values may exist outside the range 0.0 to 1.0.
+_Process:_
+
+##### Conversion from HLG to extended-sRGB
+
+_Input:_ Full-range non-linear floating-point `rec2100-hlg` pixel with black at 0.0 and diffuse white at 0.75. Values may exist outside the range 0.0 to 1.0.
+_Output:_ Full-range non-linear floating-point `extended-srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+_Process:_
+  1. Apply HLG EOTF to convert the non-linear `rec2100-hlg` Signal to linear Pseudo-Display Light with Lw = 302 cd/m2 - See Note 1
+    * apply inverse HLG OETF
+    * apply HLG OOTF to derive linear display light
+  2. Scale pixel values
+  3. Convert from ITU BT.2100-1 color space to SRGB color space
+  4. Convert to non-linear SRGB using the SRGB Inverse EOTF
+
+  ```python
+      def convertREC2100HLGtoExtendedSRGB(R,G,B):
+        systemGamma = 1.0
+        linearLightScaler = 1.0 / 0.265
+        (r1,g1,b1) = hlg_inverse_oetf(R,G,B)
+        (r2,g2,b2) = hlg_ootf(r1,g1,b1)
+        r3 = linearLightScaler * r2
+        g3 = linearLightScaler * g2
+        b3 = linearLightScaler * b2
+        (r4,g4,b4) = matrixXYZtoSRGB(matrixBT2020toXYZ(r3,g3,b3))
+        (r5,g5,b5) = srgb_inverse_eotf(r4,g4,b4)
+        return (r5,g5,b5)
+  ```
+
+##### Conversion from HLG to extended-linear-sRGB
+
+  _Input:_ Full-range non-linear floating-point `rec2100-hlg` pixel with black at 0.0 and diffuse white at 0.75. Values may exist outside the range 0.0 to 1.0.
+  _Output:_ Full-range non-linear floating-point `extended-linear-srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+  _Process:_
+    1. Apply HLG EOTF to convert the non-linear `rec2100-hlg` Signal to linear Pseudo-Display Light with Lw = 302 cd/m2 - See Note 1
+      * apply inverse HLG OETF
+      * apply HLG OOTF to derive linear display light
+    2. Scale pixel values
+    3. Convert from ITU BT.2100-1 color space to SRGB color space
+
+    ```python
+        def convertREC2100HLGtoExtendedSRGB(R,G,B):
+          systemGamma = 1.0
+          linearLightScaler = 1.0 / 0.265
+          (r1,g1,b1) = hlg_inverse_oetf(R,G,B)
+          (r2,g2,b2) = hlg_ootf(r1,g1,b1)
+          r3 = linearLightScaler * r2
+          g3 = linearLightScaler * g2
+          b3 = linearLightScaler * b2
+          (r4,g4,b4) = matrixXYZtoSRGB(matrixBT2020toXYZ(r3,g3,b3))
+          return (r4,g4,b4)
+    ```
+
+
+##### Conversion from PQ to extended-sRGB
+
+  _Input:_ Full-range non-linear floating-point `rec2100-pq` pixel with black at 0.0 and diffuse white at ???. Values may exist outside the range 0.0 to 1.0.
+  _Output:_ Full-range non-linear floating-point `extended-srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+  _Process:_
+
+##### Conversion from PQ to extended-linear-sRGB
+
+  _Input:_ Full-range non-linear floating-point `rec2100-pq` pixel with black at 0.0 and diffuse white at ???. Values may exist outside the range 0.0 to 1.0.
+  _Output:_ Full-range non-linear floating-point `extended-linear-srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+  _Process:_
+
 
 ### Compositing the HDR `HTMLCanvasElement`
 
