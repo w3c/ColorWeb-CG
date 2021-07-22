@@ -77,7 +77,7 @@ Add a new `CanvasStorageFormat` enum to allow for higher bit storage formats.
   enum CanvasStorageFormat {
     'unorm-8',
     'unorm-10-10-10-2',
-    'float-16', 
+    'float-16',
   }
 ```
 
@@ -100,8 +100,11 @@ WebGPU's ``GPUSwapChainDescriptor`` can allow for specifying higher bit depth fo
 As illustrated below, the proposal assumes that tone mapping, i.e. the rendering of an image with a given dynamic range onto a
 display with different dynamic range, occurs in different parts of the system depending on the color space of the Canvas element:
 
-* in the case where `rec2100-hlg` or `rec2100-pq` are used, tone mapping is performed by the platform. This is akin to the
-  scenario where the `src` of an `img` element is a PQ or HLG image.
+* in the case where `rec2100-pq` are used, tone mapping is performed by the platform. This is akin to the
+  scenario where the `src` of an `img` element is a PQ image.
+
+* in the case where `rec2100-hlg` are used, tone mapping is performed by the display device. This is akin to the
+  scenario where the `src` of an `img` element is an HLG image.
 
 * in the case where `extended-linear-srgb` or `extended-srgb` are used, tone mapping is performed by the web app, using display capabilities provided by the platform.
 
