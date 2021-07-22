@@ -110,6 +110,32 @@ display with different dynamic range, occurs in different parts of the system de
 
 ![Tone mapping scenarios](./tone-mapping-scenarios.png)
 
+#### Suggested Tone mapping for HDR content on sRGB displays
+Not these are only used to tonemap HDR images at the point of rendering for display when the display is known to be an sRGB display.  They are not used for conversion between colour spaces which is defined in section XXXX.
+
+##### PQ signal
+
+##### HLG signal
+
+_Input:_ Full-range non-linear floating-point `rec2100-hlg` pixel with black at 0.0 and diffuse white at 0.75. Values may exist outside the range 0.0 to 1.0.
+_Output:_ Full-range non-linear floating-point `srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+_Process:_
+  1. Linearize the HLG signal exploiting its backwards compatibility with SDR consumer displays
+  2. Convert from ITU BT.2100 color space to SRGB color space
+  3. Convert to SRGB using the SRGB Inverse EOTF
+
+_Note 3_ This transform utilises the backwards compatibility of ITU-R BT.2100 HLG HDR with consumer electronic displays.
+
+```python
+    def tonemapREC2100HLGtoSRGBdisplay(R,G,B):
+      systemGamma = 2.2
+      (r1,g1,b1) = hlg_ootf(R,G,B,systemGamma)
+      (r2,g2,b2) = matrixXYZtoSRGB(matrixBT2020toXYZ(r1,g1,b1))
+      (r3,g3,b3) = srgb_inverse_eotf(r2,g2,b2)
+      (r4,g4,b4) = clipper_0_1(r3,g3,b3)
+      return (r4,g4,b4)
+```
+
 ### Color spaces
 
 #### General
@@ -325,7 +351,7 @@ _Process:_
         systemGamma = 1.0
         linearLightScaler = 1.0 / 0.265
         (r1,g1,b1) = hlg_inverse_oetf(R,G,B)
-        (r2,g2,b2) = hlg_ootf(r1,g1,b1)
+        (r2,g2,b2) = hlg_ootf(r1,g1,b1,systemGamma)
         r3 = linearLightScaler * r2
         g3 = linearLightScaler * g2
         b3 = linearLightScaler * b2
@@ -350,7 +376,7 @@ _Process:_
           systemGamma = 1.0
           linearLightScaler = 1.0 / 0.265
           (r1,g1,b1) = hlg_inverse_oetf(R,G,B)
-          (r2,g2,b2) = hlg_ootf(r1,g1,b1)
+          (r2,g2,b2) = hlg_ootf(r1,g1,b1,systemGamma)
           r3 = linearLightScaler * r2
           g3 = linearLightScaler * g2
           b3 = linearLightScaler * b2
