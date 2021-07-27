@@ -384,7 +384,9 @@ function convertREC2100HLGtoExtendedSRGB(r, g, b) {
   const b3 = linearLightScaler * b2;
 
   const [r4, g4, b4] = matrixXYZtoSRGB(matrixBT2020toXYZ(r3, g3, b3));
-  const [r5, g5, b5] = srgb_inverse_eotf(r4, g4, b4);
+  const r5 = srgb_inverse_eotf(r4);
+  const g5 = srgb_inverse_eotf(g4);
+  const b5 = srgb_inverse_eotf(b4);
 
   return [r5, g5, b5];
 }
