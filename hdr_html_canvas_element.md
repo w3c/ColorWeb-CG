@@ -128,14 +128,15 @@ _Process:_
 
 _Note 3_ This transform utilises the backwards compatibility of ITU-R BT.2100 HLG HDR with consumer electronic displays.
 
-```python
-    def tonemapREC2100HLGtoSRGBdisplay(R,G,B):
-      systemGamma = 2.2
-      (r1,g1,b1) = hlg_ootf(R,G,B,systemGamma)
-      (r2,g2,b2) = matrixXYZtoSRGB(matrixBT2020toXYZ(r1,g1,b1))
-      (r3,g3,b3) = srgb_inverse_eotf(r2,g2,b2)
-      (r4,g4,b4) = clipper_0_1(r3,g3,b3)
-      return (r4,g4,b4)
+```javascript
+function tonemapREC2100HLGtoSRGBdisplay(r, g, b) {
+  const systemGamma = 2.2;
+  const [r1, g1, b1] = hlg_ootf(r, g, b, systemGamma);
+  const [r2, g2, b2] = matrixXYZtoSRGB(matrixBT2020toXYZ(r1, g1, b1));
+  const [r3, g3, b3] = srgb_inverse_eotf(r2, g2, b2);
+  const [r4, g4, b4] = clipper_0_1(r3, g3, b3);
+  return [r4, g4, b4];
+}
 ```
 
 ### Color spaces
@@ -286,20 +287,26 @@ _Note 1:_ As `rec2100-hlg` is a relative format, the brightness of the virtual m
 
 _Note 2:_ See section 5.3 in ITU-R BT.2408-4 relating to negative transfer functions in format conversions.
 
-```python
-    def convertExtendedSRGBtoREC2100HLG(R,G,B):
-      systemGamma = 1.0
-      linearLightScaler = 0.265
-      r1 = srgb_eotf(R)
-      g1 = srgb_eotf(G)
-      b1 = srgb_eotf(B)
-      (r2,g2,b2) = matrixXYZtoBT2020(matrixSRGBtoXYZ(r1,g1,b1))
-      r3 = linearLightScaler * r2
-      g3 = linearLightScaler * g2
-      b3 = linearLightScaler * b2
-      (r4,g4,b4) = hlg_inverse_ootf(r3,g3,b3,systemGamma)
-      (r5,g5,b5) = hlg_oetf(r4,g4,b4)
-      return (r5,g5,b5)
+```javascript
+function convertExtendedSRGBtoREC2100HLG(r, g, b) {
+  const systemGamma = 1.0;
+  const linearLightScaler = 0.265;
+
+  const r1 = srgb_eotf(r);
+  const g1 = srgb_eotf(g);
+  const b1 = srgb_eotf(b);
+
+  const [r2, g2, b2] = matrixXYZtoBT2020(matrixSRGBtoXYZ(r1,g1,b1));
+
+  const r3 = linearLightScaler * r2;
+  const g3 = linearLightScaler * g2;
+  const b3 = linearLightScaler * b2;
+
+  const [r4, g4, b4] = hlg_inverse_ootf(r3, g3, b3, systemGamma);
+  const [r5, g5, b5] = hlg_oetf(r4, g4, b4);
+
+  return [r5, g5, b5]
+}
 ```
 
 ##### Conversion from extended-linear-sRGB to HLG
@@ -315,17 +322,22 @@ _Process:_
  * apply HLG Inverse OOTF
  * apply HLG OETF - See Note 2
 
-```python
-    def convertExtendedLinearSRGBtoREC2100HLG(R,G,B):
-      systemGamma = 1.0
-      linearLightScaler = 0.265
-      (r2,g2,b2) = matrixXYZtoBT2020(matrixSRGBtoXYZ(r1,g1,b1))
-      r3 = linearLightScaler * r2
-      g3 = linearLightScaler * g2
-      b3 = linearLightScaler * b2
-      (r4,g4,b4) = hlg_inverse_ootf(r3,g3,b3,systemGamma)
-      (r5,g5,b5) = hlg_oetf(r4,g4,b4)
-      return (r5,g5,b5)
+```javascript
+function convertExtendedLinearSRGBtoREC2100HLG(r, g, b) {
+  const systemGamma = 1.0;
+  const linearLightScaler = 0.265;
+
+  const [r2, g2, b2] = matrixXYZtoBT2020(matrixSRGBtoXYZ(r1, g1, b1));
+
+  const r3 = linearLightScaler * r2;
+  const g3 = linearLightScaler * g2;
+  const b3 = linearLightScaler * b2;
+  
+  const [r4, g4, b4] = hlg_inverse_ootf(r3, g3, b3, systemGamma);
+  const [r5, g5, b5] = hlg_oetf(r4, g4, b4);
+  
+  return [r5, g5, b5];
+}
 ```
 
 ##### Conversion from extended-sRGB to PQ
@@ -358,19 +370,25 @@ _Process:_
 3. Convert from ITU BT.2100-1 color space to SRGB color space
 4. Convert to non-linear SRGB using the SRGB Inverse EOTF
 
-  ```python
-      def convertREC2100HLGtoExtendedSRGB(R,G,B):
-        systemGamma = 1.0
-        linearLightScaler = 1.0 / 0.265
-        (r1,g1,b1) = hlg_inverse_oetf(R,G,B)
-        (r2,g2,b2) = hlg_ootf(r1,g1,b1,systemGamma)
-        r3 = linearLightScaler * r2
-        g3 = linearLightScaler * g2
-        b3 = linearLightScaler * b2
-        (r4,g4,b4) = matrixXYZtoSRGB(matrixBT2020toXYZ(r3,g3,b3))
-        (r5,g5,b5) = srgb_inverse_eotf(r4,g4,b4)
-        return (r5,g5,b5)
-  ```
+
+```javascript
+function convertREC2100HLGtoExtendedSRGB(r, g, b) {
+  const systemGamma = 1.0;
+  const linearLightScaler = 1.0 / 0.265;
+
+  const [r1, g1, b1] = hlg_inverse_oetf(r, g, b);
+  const [r2, g2, b2] = hlg_ootf(r1, g1, b1, systemGamma);
+
+  const r3 = linearLightScaler * r2;
+  const g3 = linearLightScaler * g2;
+  const b3 = linearLightScaler * b2;
+
+  const [r4, g4, b4] = matrixXYZtoSRGB(matrixBT2020toXYZ(r3, g3, b3));
+  const [r5, g5, b5] = srgb_inverse_eotf(r4, g4, b4);
+
+  return [r5, g5, b5];
+}
+```
 
 ##### Conversion from HLG to extended-linear-sRGB
 
@@ -385,18 +403,23 @@ _Process:_
   2. Scale pixel values
   3. Convert from ITU BT.2100-1 color space to SRGB color space
 
-  ```python
-      def convertREC2100HLGtoExtendedSRGB(R,G,B):
-        systemGamma = 1.0
-        linearLightScaler = 1.0 / 0.265
-        (r1,g1,b1) = hlg_inverse_oetf(R,G,B)
-        (r2,g2,b2) = hlg_ootf(r1,g1,b1,systemGamma)
-        r3 = linearLightScaler * r2
-        g3 = linearLightScaler * g2
-        b3 = linearLightScaler * b2
-        (r4,g4,b4) = matrixXYZtoSRGB(matrixBT2020toXYZ(r3,g3,b3))
-        return (r4,g4,b4)
-  ```
+```javascript
+function convertREC2100HLGtoExtendedLinearSRGB(r, g, b) {
+  const systemGamma = 1.0;
+  const linearLightScaler = 1.0 / 0.265;
+
+  const [r1, g1, b1] = hlg_inverse_oetf(r, g, b);
+  const [r2, g2, b2] = hlg_ootf(r1, g1, b1, systemGamma);
+
+  const r3 = linearLightScaler * r2;
+  const g3 = linearLightScaler * g2;
+  const b3 = linearLightScaler * b2;
+
+  const [r4, g4, b4] = matrixXYZtoSRGB(matrixBT2020toXYZ(r3, g3, b3));
+
+  return [r4, g4, b4];
+}
+```
 
 
 ##### Conversion from PQ to extended-sRGB
