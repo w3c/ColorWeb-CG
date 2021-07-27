@@ -275,12 +275,12 @@ _Input:_ Full-range non-linear floating-point `extended-srgb` pixel with black a
 _Output:_ Full-range non-linear floating-point `rec2100-hlg` pixel with black at 0.0 and diffuse white at 0.75. Values may exist outside the range 0.0 to 1.0.
 
 _Process:_
-  1. Linearize using the SRGB EOTF
-  2. Convert from `extended-srgb` color space to `rec2100-hlg` color space
-  3. Scale pixel values - See Note 1
-  4. Apply HLG Inverse EOTF to convert to HLG from Pseudo-Display Light with Lw = 302 cd/m2 - See Note 1
-    * apply HLG Inverse OOTF
-    * apply HLG OETF - See Note 2
+ 1. Linearize using the SRGB EOTF
+ 2. Convert from `extended-srgb` color space to `rec2100-hlg` color space
+ 3. Scale pixel values - See Note 1
+ 4. Apply HLG Inverse EOTF to convert to HLG from Pseudo-Display Light with Lw = 302 cd/m2 - See Note 1
+  * apply HLG Inverse OOTF
+  * apply HLG OETF - See Note 2
 
 _Note 1:_ As `rec2100-hlg` is a relative format, the brightness of the virtual monitor used for mathematical transforms can be chosen to be any level. In this transform it is chosen to be 302 cd/m2 so that the brightness of diffuse white matches the diffuse white of sRGB (80 cd/m2). Using the extended range gamma formula in footnote 2 of BT.2100, this also sets the HLG Inverse OOTF to be unity. The value 0.265 is calculated by taking the inverse OETF of 0.75, the `rec2100-hlg` diffuse white level.
 
@@ -309,11 +309,11 @@ _Input:_ Full-range non-linear floating-point `extended-linear-srgb` pixel with 
 _Output:_ Full-range non-linear floating-point `rec2100-hlg` pixel with black at 0.0 and diffuse white at 0.75. Values may exist outside the range 0.0 to 1.0.
 
 _Process:_
-  1. Convert from `extended-linear-srgb` color space to `rec2100-hlg` color space
-  2. Scale pixel values - See Note 1
-  3. Apply HLG Inverse EOTF to convert to HLG from Pseudo-Display Light with Lw = 302 cd/m2 - See Note 1
-    * apply HLG Inverse OOTF
-    * apply HLG OETF - See Note 2
+1. Convert from `extended-linear-srgb` color space to `rec2100-hlg` color space
+2. Scale pixel values - See Note 1
+3. Apply HLG Inverse EOTF to convert to HLG from Pseudo-Display Light with Lw = 302 cd/m2 - See Note 1
+ * apply HLG Inverse OOTF
+ * apply HLG OETF - See Note 2
 
 ```python
     def convertExtendedLinearSRGBtoREC2100HLG(R,G,B):
@@ -351,12 +351,12 @@ _Input:_ Full-range non-linear floating-point `rec2100-hlg` pixel with black at 
 _Output:_ Full-range non-linear floating-point `extended-srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
 
 _Process:_
-  1. Apply HLG EOTF to convert the non-linear `rec2100-hlg` Signal to linear Pseudo-Display Light with Lw = 302 cd/m2 - See Note 1
-    * apply inverse HLG OETF
-    * apply HLG OOTF to derive linear display light
-  2. Scale pixel values
-  3. Convert from ITU BT.2100-1 color space to SRGB color space
-  4. Convert to non-linear SRGB using the SRGB Inverse EOTF
+1. Apply HLG EOTF to convert the non-linear `rec2100-hlg` Signal to linear Pseudo-Display Light with Lw = 302 cd/m2 - See Note 1
+ * apply inverse HLG OETF
+ * apply HLG OOTF to derive linear display light
+2. Scale pixel values
+3. Convert from ITU BT.2100-1 color space to SRGB color space
+4. Convert to non-linear SRGB using the SRGB Inverse EOTF
 
   ```python
       def convertREC2100HLGtoExtendedSRGB(R,G,B):
@@ -379,11 +379,11 @@ _Process:_
   _Output:_ Full-range non-linear floating-point `extended-linear-srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
 
   _Process:_
-    1. Apply HLG EOTF to convert the non-linear `rec2100-hlg` Signal to linear Pseudo-Display Light with Lw = 302 cd/m2 - See Note 1
-      * apply inverse HLG OETF
-      * apply HLG OOTF to derive linear display light
-    2. Scale pixel values
-    3. Convert from ITU BT.2100-1 color space to SRGB color space
+  1. Apply HLG EOTF to convert the non-linear `rec2100-hlg` Signal to linear Pseudo-Display Light with Lw = 302 cd/m2 - See Note 1
+   * apply inverse HLG OETF
+   * apply HLG OOTF to derive linear display light
+  2. Scale pixel values
+  3. Convert from ITU BT.2100-1 color space to SRGB color space
 
   ```python
       def convertREC2100HLGtoExtendedSRGB(R,G,B):
