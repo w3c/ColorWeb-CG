@@ -153,7 +153,7 @@ There already exist defined color spaces `srgb` and `display-p3`.
 
 Note that the transfer function for these spaces [is already defined](https://www.w3.org/TR/css-color-4/#predefined) on all real numbers (not just the unit interval), as:
 
-```
+```javascript
   function electroOpticalTransferFunction(c) {
     let sign = c < 0? -1 : 1;
     let abs = Math.abs(c);
@@ -170,7 +170,7 @@ Note that the transfer function for these spaces [is already defined](https://ww
 
 This color space uses the same primaries as `srgb`, but with the identity function as the transfer function.
 
-```
+```javascript
   function electroOpticalTransferFunction(c) {
     return c;
   }
@@ -236,7 +236,21 @@ Also see note in the Issues section at the bottom about whether this space shoul
 
 * Transfer function: HLG Reference OETF specified at Rec. ITU-R BT.2100
 
-_Note:_ The range of the function is [0, 1].
+```javascript
+  function connectionTransferFunction(x) {
+    const a = 0.17883277;
+    const b = 1 - 4*a;
+    const c = 0.5 - a * Math.log(4 * a);
+    if (x < 0) {
+      return 0;
+    } else if (x <= 0.5) {
+      return x * x / 3;
+    } else if (x <= 1) {
+      return (Math.exp((v - c) / a) + b) / 12;
+    } else {
+      return 1;
+    }
+```
 
 * Connection matrix: Identity
 
@@ -244,7 +258,24 @@ _Note:_ Converting from `rec2100-hlg` to any SDR color space will not result in 
 
 #### `rec2100-pq`
 
-* Transfer function: `EOTF<sup>-1</sup>[F<sub>D</sub>/300]` where `EOTF<sup>-1</sup>` is the inverse of the Reference PQ EOTF specified at Rec. ITU-R BT.2100.
+* Transfer function: The inverse of the Reference PQ EOTF specified at Rec. ITU-R BT.2100.
+
+```javascript
+  function connectionTransferFunction(x) {
+    const c1 =  107 / 128;
+    const c2 = 2413 / 128;
+    const c3 = 2392 / 128;
+    const m1 = 1305 / 8192;
+    const m2 = 2523 / 32;
+    if (x < 0) {
+      return 0;
+    } else if (x <= 1) {
+      const p = Math.pow(x, 1 / m2);
+      return (10000 / 300) * Math.pow((p - c1) / (c2 - c3 * p), 1 / m1);
+    } else {
+      return (10000 / 300);
+    }
+```
 
 _Note:_ The factor of 300 is such that a display luminance of 300 cd/m<sup>2</sup> results in a linear color value of 1 in the connection color space.
 
