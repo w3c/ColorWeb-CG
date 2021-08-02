@@ -203,7 +203,7 @@ These conversions are expressed using a connection color space with the system c
 * Red primary: `(0.708, 0.292)`
 * Green chromaticity: `(0.170, 0.797)`
 * Blue chromaticity: `(0.131, 0.046)`
-* White chromaticity: `(0.3127, 0.3290)`
+* White chromaticity (D65): `(0.3127, 0.3290)`
 
 _Note:_ The system colorimetry specified in Rec. ITU-R BT.2100 is identical to that specified in Rec. ITU-R BT.2020.
 
