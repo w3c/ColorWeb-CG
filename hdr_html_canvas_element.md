@@ -281,14 +281,6 @@ Performing appropriate tone mapping is the responsibility of the browser, the op
 If the `configureHighDynamicRange` method is called with `CanvasHighDynamicRangeOptions` that specify a maximum luminance that is greater than the display's luminance, then tone mapping will be applied to prevent clipping of luminance values below to the specified maximum luminance.
 Note that the tone mapping algorithm may not alter any SDR color values (otherwise the SDR color matching guarantee would be violated).
 
-#### Passthrough mode
-
-If the canvas' color space is `'srgb-linear'`, then the canvas will be passed to the display device with no additional processing.
-
-This mode does not make any guarantees about color matching with SDR content.
-
-No tone mapping will be applied by the browser, operating system, or display device.
-
 ## Privacy considerations
 
 The precise capabilities of the output display, such as the exact color gamut and the precise maximum luminance values, are fingerprinting vectors, and should not be exposed to the application without user permission.
