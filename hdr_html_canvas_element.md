@@ -14,31 +14,58 @@ There are four main classes of HDR use that inform this proposal. They are:
 * To display PQ encoded HDR images and video in a canvas.
   * Such that PQ images drawn in the canvas will appear exactly the same as they would if displayed via an `<img>` or `<video>` tag.
 
-### Constraints
-
-There exist the following constraints.
-
-* The exact maximum luminance of the output display is not known and not knowable.
-  * The [CSS Media Queries Level 5 Specification](https://www.w3.org/TR/mediaqueries-5/#valdef-media-dynamic-range-high) allows the application to query the ``'dynamic-range'``. The resulting values are ``'standard'`` and ``'high'``.
-  * The value changes over time.
-  * The exact value is a fingerprinting vector.
-* The exact number of nits of SDR content is also not known and not knowable.
-  * On macOS, it is always 100.
-  * On Windows, it depends on a user slider setting.
-  * The exact value is a fingerprinting vector (again).
-
-Because these values are not known, it is not possible for the application provide quantities related to display light.
-
 ### Proposed solution overview
 
 The solution that we propose is to:
 
+* Add attributes to the `ScreenAdvanced` interface to expose screen parameters relevant to high dynamic range and wide color gamut.
 * Introduce new color spaces and precisions that are useful for HDR.
 * Clearly define invertible and context-independent transformations between these spaces.
 * Introduce the ability use more than 8 bits per pixel for a canvas element.
 * Introduce the ability for an `HTMLCanvasElement` to configure HDR.
 
 ## Proposal
+
+### Querying screen high dynamic range parameters
+
+Add a new attribute to `ScreenAdvanced` to indicate the HDR headroom currently available on the screen.
+
+```idl
+  partial interface ScreenAdvanced {
+    // The maximum luminance that the screen is capable of displaying across
+    // the full area of the screen, as a multiple of the luminance of SDR white.
+    // This will have a value of 1.0 for screens that are not HDR capable.
+    readonly attribute double highDynamicRangeHeadroom;
+  }
+```
+
+The high dynamic range headroom of a display is computed as:
+
+```math
+   HDR headroom = (HDR max luminance) / (SDR max luminance)
+```
+
+For a display device that is not HDR capable, this will have the value `1.0`.
+
+### Querying screen wide color gamut parameters
+
+Add new attributes to `ScreenAdvanced` to indicate the gamut and white point of the screen.
+
+```idl
+  partial interface ScreenAdvanced {
+    // The color primaries and white point of the screen, in CIE 1931 xy
+    // coordinates. These define the color gamut that the screen is capable of
+    // displaying.
+    readonly attribute double redPrimaryX;
+    readonly attribute double redPrimaryY;
+    readonly attribute double greenPrimaryX;
+    readonly attribute double greenPrimaryY;
+    readonly attribute double bluePrimaryX;
+    readonly attribute double bluePrimaryY;
+    readonly attribute double whitePointX;
+    readonly attribute double whitePointY;
+  }
+```
 
 ### Enabling HDR on a canvas element
 
@@ -94,6 +121,18 @@ Add a `CanvasStorageFormat` entry to `CanvasRenderingContext2DSettings` to allow
 WebGL's proposed [``drawingBufferStorage``](https://github.com/KhronosGroup/WebGL/pull/3222) function allows for specifying higher bit depth formats.
 
 WebGPU's ``GPUSwapChainDescriptor`` can allow for specifying higher bit depth formats.
+
+### Tone mapping
+
+As illustrated below, the proposal assumes that tone mapping, i.e. the rendering of an image with a given dynamic range onto a
+display with different dynamic range, occurs in different parts of the system depending on the color space of the Canvas element:
+
+* in the case where `rec2100-hlg` or `rec2100-pq` are used, tone mapping is performed by the platform. This is akin to the
+  scenario where the `src` of an `img` element is a PQ or HLG image.
+
+* in the case where `extended-linear-srgb` or `extended-srgb` are used, tone mapping is performed by the web app, using display capabilities provided by the platform.
+
+![Tone mapping scenarios](./tone-mapping-scenarios.png)
 
 ### Color spaces
 
@@ -252,7 +291,29 @@ This mode does not make any guarantees about color matching with SDR content.
 
 No tone mapping will be applied by the browser, operating system, or display device.
 
+## Privacy considerations
+
+The precise capabilities of the output display, such as the exact color gamut and the precise maximum luminance values, are fingerprinting vectors, and should not be exposed to the application without user permission.
+
+Access to these values is protected behind the same permission prompt that protects other screen capability fingerprinting vectors in the [window placement proposal](https://github.com/webscreens/window-placement/blob/main/EXPLAINER.md).
+
 ## Example Applications
+
+### Detecting HDR capabilities
+
+The `getScreens` method will prompt the user for permission to reveal fingerprintable information.
+
+```javascript
+  let screens = await window.getScreens();
+  console.log('HDR headroom: ' + currentScreen.highDynamicRangeHeadroom);
+```
+
+If `getScreens` is denied, then media queries may be used to determine the screen's capabilities, at a high level.
+
+```javascript
+  let hasHighDynamicRange = window.matchMedia('(dynamic-range: high)').matches;
+  console.log('HDR capable: ' + hasHighDynamicRange);
+```
 
 ### The `extended-linear-srgb` color space
 
