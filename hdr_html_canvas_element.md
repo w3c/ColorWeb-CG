@@ -252,6 +252,8 @@ Also see note in the Issues section at the bottom about whether this space shoul
     }
 ```
 
+_Note:_ The range of the function is [0, 1].
+
 * Connection matrix: Identity
 
 _Note:_ Converting from `rec2100-hlg` to any SDR color space will not result in clipping.
@@ -278,8 +280,6 @@ _Note:_ Converting from `rec2100-hlg` to any SDR color space will not result in 
 ```
 
 _Note:_ The factor of 300 is such that a display luminance of 300 cd/m<sup>2</sup> results in a linear color value of 1 in the connection color space.
-
-_Note:_ The domain of `EOTF<sup>-1</sup>` is [0, 10000]
 
 * Connection matrix: Identity
 
