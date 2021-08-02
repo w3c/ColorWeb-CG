@@ -14,19 +14,6 @@ There are four main classes of HDR use that inform this proposal. They are:
 * To display PQ encoded HDR images and video in a canvas.
   * Such that PQ images drawn in the canvas will appear exactly the same as they would if displayed via an `<img>` or `<video>` tag.
 
-### Constraints
-
-There exist the following constraints.
-
-* The exact maximum luminance of the output display is not knowable without user permission.
-  * The [CSS Media Queries Level 5 Specification](https://www.w3.org/TR/mediaqueries-5/#valdef-media-dynamic-range-high) allows the application to query the ``'dynamic-range'``. The resulting values are ``'standard'`` and ``'high'``.
-  * The value changes over time.
-  * The exact value is a fingerprinting vector.
-* The exact number of nits of SDR content is also not knowable without user permission.
-  * On macOS, it is always 100.
-  * On Windows, it depends on a user slider setting.
-  * The exact value is a fingerprinting vector (again).
-
 ### Proposed solution overview
 
 The solution that we propose is to:
@@ -45,19 +32,20 @@ Add a new attribute to `ScreenAdvanced` to indicate the HDR headroom currently a
 
 ```idl
   partial interface ScreenAdvanced {
-    // The maximum luminance that the screen is capable of displaying, as a
-    // multiple of the luminance of SDR white.
-    float highDynamicRangeHeadroom = 0.0;
+    // The maximum luminance that the screen is capable of displaying across
+    // the full area of the screen, as a multiple of the luminance of SDR white.
+    // This will have a value of 1.0 for screens that are not HDR capable.
+    readonly attribute double highDynamicRangeHeadroom;
   }
 ```
 
 The high dynamic range headroom of a display is computed as:
 
 ```math
-   HDR headroom = (HDR max luminance - SDR max luminance) / (SDR max luminance)
+   HDR headroom = (HDR max luminance) / (SDR max luminance)
 ```
 
-For a display device that is not HDR capable, this will have the value `0.0`.
+For a display device that is not HDR capable, this will have the value `1.0`.
 
 ### Querying screen wide color gamut parameters
 
@@ -68,10 +56,14 @@ Add new attributes to `ScreenAdvanced` to indicate the gamut and white point of 
     // The color primaries and white point of the screen, in CIE 1931 xy
     // coordinates. These define the color gamut that the screen is capable of
     // displaying.
-    float redPrimary[];
-    float greenPrimary[];
-    float bluePrimary[];
-    float whitePoint[];
+    readonly attribute double redPrimaryX;
+    readonly attribute double redPrimaryY;
+    readonly attribute double greenPrimaryX;
+    readonly attribute double greenPrimaryY;
+    readonly attribute double bluePrimaryX;
+    readonly attribute double bluePrimaryY;
+    readonly attribute double whitePointX;
+    readonly attribute double whitePointY;
   }
 ```
 
@@ -287,6 +279,12 @@ This mode does not make any guarantees about color matching with SDR content.
 
 No tone mapping will be applied by the browser, operating system, or display device.
 
+## Privacy considerations
+
+The precise capabilities of the output display, such as the exact color gamut and the precise maximum luminance values, are fingerprinting vectors, and should not be exposed to the application without user permission.
+
+Access to these values is protected behind the same permission prompt that protects other screen capability fingerprinting vectors in the [window placement proposal](https://github.com/webscreens/window-placement/blob/main/EXPLAINER.md).
+
 ## Example Applications
 
 ### Detecting HDR capabilities
@@ -462,63 +460,3 @@ Arguably, the HDR configuration data could be attached to the `CanvasRenderingCo
 
 The HDR configuration data should travel with an `ImageBitmap` when displayed in an `ImageBitmapRenderingContext`.
 That may inform where we should put this.
-
-### Are the new `ScreenAdvanced` attributes a fingerprinting vector?
-
-The [window placement proposal](https://github.com/webscreens/window-placement/blob/main/EXPLAINER.md) adds a mechanism through which detailed screen parameters may be queried, and changes in those parameters may be listened for.
-These parameters are a fingerprinting vector, and, as such, they are protected behind a permission prompt.
-
-### Should `ScreenAdvanced` expose HDR headroom or nit values?
-
-In this proposal, we expose a `highDynamicRangeHeadroom` parameter. One could imagine a different proposal with such information as:
-
-```idl
-  partial interface ScreenAdvanced {
-    // Minimum luminance that the screen can display, in nits.
-    float minLuminance;
-
-    // Maximum luminance that the screen can display, in nits.
-    float maxLuminanceHighDynamicRange;
-
-    // The maximum luminance that SDR content on the screen can display,
-    // in nits.
-    float maxLuminanceStandardDynamicRange;
-  }
-```
-
-This information is not available on all platforms.
-
-If we expose `highDynamicRangeHeadroom`, we could then later expose `maxLuminanceHighDynamicRange` and `maxLuminanceStandardDynamicRange` and stipulate that `highDynamicRangeHeadroom` is to be derived from them.
-
-The menu of options we have is to:
-
-* Leave these out entirely for now (current position)
-* Add them as optional attributes (only populated on Windows, for now)
-* Add them and specify how values should be fabricated when unavailable on the platform.
-
-The remaining subsections provide links to the relevant APIs on the various platforms.
-
-#### Windows
-
-The [DXGI_OUTPUT_DESC1](https://docs.microsoft.com/en-us/windows/win32/api/dxgi1_6/ns-dxgi1_6-dxgi_output_desc1) structure includes `MinLuminance`, `MaxLuminance`, and `MaxFullFrameLuminance`, which are in nits.
-
-The (undocumented) [DISPLAYCONFIG_SDR_WHITE_LEVEL](https://source.chromium.org/chromium/chromium/src/+/main:ui/display/win/screen_win.cc;l=133;drc=b61359cb40f16b0fc72bac686a00384059aa2758) includes `SDRWhiteLevel` which is in in 1000/80ths of a nit.
-
-From this information, a `maxLuminanceHighDynamicRange` and `maxLuminanceStandardDynamicRange` may be computed.
-
-#### macOS and iOS
-
-The [NSScreen](https://developer.apple.com/documentation/appkit/nsscreen?language=objc) provides a `maximumExtendedDynamicRangeColorComponentValue`, which is effectively `highDynamicRangeHeadroom - 1.0`.
-
-The precise number of nits of the display's SDR and HDR capabilities is not exposed.
-We would need to fabricate values for all of the attributes.
-
-On macOS and iOS, the most platform-consistent value to fabricate for `maxLuminanceStandardDynamicRange` is 100, and then `maxLuminanceHighDynamicRange` can be computed from that and `maximumExtendedDynamicRangeColorComponentValue`.
-The best fabricated value for `minLuminance` is not obvious.
-
-#### Android
-
-The [HdrCapabilities](https://developer.android.com/reference/android/view/Display.HdrCapabilities) on Android provides `getDesiredMaxAverageLuminance`, `getDesiredMaxLuminance`, and `getDesiredMinLuminance`.
-
-The interaction between HDR and SDR content is currently undefined.
-
