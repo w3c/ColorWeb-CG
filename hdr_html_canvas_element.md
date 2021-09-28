@@ -14,31 +14,58 @@ There are four main classes of High Dynamic Range (HDR) use that inform this pro
 * To display IUT-R BT.2100 Perceptual Quantiser (PQ) encoded HDR images and video in a canvas.
   * Such that PQ images drawn in the canvas will appear exactly the same as they would if displayed via an `<img>` or `<video>` tag.
 
-### Constraints
-
-There exist the following constraints.
-
-* The exact maximum luminance of the output display is not known and not knowable.
-  * The [CSS Media Queries Level 5 Specification](https://www.w3.org/TR/mediaqueries-5/#valdef-media-dynamic-range-high) allows the application to query the ``'dynamic-range'``. The resulting values are ``'standard'`` and ``'high'``.
-  * The value changes over time.
-  * The exact value is a fingerprinting vector.
-* The exact number of nits of SDR content is also not known and not knowable.
-  * On macOS, it is always 100.
-  * On Windows, it depends on a user slider setting.
-  * The exact value is a fingerprinting vector (again).
-
-Because these values are not known, it is not possible for the application provide quantities related to display light.
-
 ### Proposed solution overview
 
 The solution that we propose is to:
 
+* Add attributes to the `ScreenAdvanced` interface to expose screen parameters relevant to high dynamic range and wide color gamut.
 * Introduce new color spaces and precisions that are useful for HDR.
 * Clearly define invertible and context-independent transformations between these spaces.
 * Introduce the ability use more than 8 bits per pixel for a canvas element.
 * Introduce the ability for an `HTMLCanvasElement` to configure HDR.
 
 ## Proposal
+
+### Querying screen high dynamic range parameters
+
+Add a new attribute to `ScreenAdvanced` to indicate the HDR headroom currently available on the screen.
+
+```idl
+  partial interface ScreenAdvanced {
+    // The maximum luminance that the screen is capable of displaying across
+    // the full area of the screen, as a multiple of the luminance of SDR white.
+    // This will have a value of 1.0 for screens that are not HDR capable.
+    readonly attribute double highDynamicRangeHeadroom;
+  }
+```
+
+The high dynamic range headroom of a display is computed as:
+
+```math
+   HDR headroom = (HDR max luminance) / (SDR max luminance)
+```
+
+For a display device that is not HDR capable, this will have the value `1.0`.
+
+### Querying screen wide color gamut parameters
+
+Add new attributes to `ScreenAdvanced` to indicate the gamut and white point of the screen.
+
+```idl
+  partial interface ScreenAdvanced {
+    // The color primaries and white point of the screen, in CIE 1931 xy
+    // coordinates. These define the color gamut that the screen is capable of
+    // displaying.
+    readonly attribute double redPrimaryX;
+    readonly attribute double redPrimaryY;
+    readonly attribute double greenPrimaryX;
+    readonly attribute double greenPrimaryY;
+    readonly attribute double bluePrimaryX;
+    readonly attribute double bluePrimaryY;
+    readonly attribute double whitePointX;
+    readonly attribute double whitePointY;
+  }
+```
 
 ### Enabling HDR on a canvas element
 
@@ -55,8 +82,7 @@ Add a new `CanvasHighDynamicRangeOptions` dictionary with HDR configuration opti
     // color spaces only.
     'default',
 
-    // Enables extended luminance while preserving SDR color matching for
-    // 'extended-linear-srgb' and 'extended-linear-srgb' color spaces.
+    // Enables extended luminance while preserving SDR color matching.
     'extended',
   }
 ```
@@ -106,7 +132,7 @@ display with different dynamic range, occurs in different parts of the system de
 * in the case where `rec2100-hlg` are used, tone mapping is performed by the display device. This is akin to the
   scenario where the `src` of an `img` element is an HLG image.
 
-* in the case where `extended-linear-srgb` or `extended-srgb` are used, tone mapping is performed by the web app, using display capabilities provided by the platform.
+* in the case where any other color space is used (e.g, `srgb` or `srgb-linear`) tone mapping is performed by the web app, using display capabilities provided by the platform.
 
 ![Tone mapping scenarios](./tone-mapping-scenarios.png)
 
@@ -177,41 +203,40 @@ Update `PredefinedColorSpace` to include the following color spaces.
 
 ```idl
   partial enum PredefinedColorSpace {
-    'extended-linear-srgb',
-    'extended-srgb',
+    'srgb-linear',
     'rec2100-hlg',
     'rec2100-pq',
   }
 ```
 
-#### extended-srgb
+#### srgb and display-p3
 
-The component signals are mapped to red, green and blue tristimulus values according to the following:
+There already exist defined color spaces `srgb` and `display-p3`.
 
-* Red primary chromaticity: `(0.640, 0.330)`
-* Green primary chromaticity: `(0.300, 0.600)`
-* Blue primary chromaticity: `(0.150, 0.060)`
-* White point chromaticity: `(0.3127, 0.3290)`
-* Transfer function:
+Note that the transfer function for these spaces [is already defined](https://www.w3.org/TR/css-color-4/#predefined) on all real numbers (not just the unit interval), as:
 
 ```
-   E = | E' / 12.92, if abs(E') ≤ 0.04045
-       | ((E' + 0.055) / 1.055)^2.4, otherwise
-
-       with E' ∈ ℝ
+  function electroOpticalTransferFunction(c) {
+    let sign = c < 0? -1 : 1;
+    let abs = Math.abs(c);
+    if (abs <= 0.04045) {
+      return = c / 12.92;
+    }
+    else {
+      return = sign * (Math.pow((abs + 0.055) / 1.055, 2.4));
+    }
+  }
 ```
 
-where `E'` is the non-linear colour value and `E` is the linear colour value
+#### srgb-linear
 
-#### extended-linear-srgb
+This color space uses the same primaries as `srgb`, but with the identity function as the transfer function.
 
-The component signals are mapped to red, green and blue tristimulus values according to the following:
-
-* Red primary chromaticity: `(0.640, 0.330)`
-* Green primary chromaticity: `(0.300, 0.600)`
-* Blue primary chromaticity: `(0.150, 0.060)`
-* White point chromaticity: `(0.3127, 0.3290)`
-* Transfer function: `E = E', with E' ∈ ℝ` where `E'` is the non-linear colour value and `E` is the linear colour value
+```
+  function electroOpticalTransferFunction(c) {
+    return c;
+  }
+```
 
 #### rec2100-hlg
 
@@ -240,7 +265,7 @@ These conversions are expressed using a connection color space with the system c
 * Red primary: `(0.708, 0.292)`
 * Green chromaticity: `(0.170, 0.797)`
 * Blue chromaticity: `(0.131, 0.046)`
-* White chromaticity: `(0.3127, 0.3290)`
+* White chromaticity (D65): `(0.3127, 0.3290)`
 
 _Note:_ The system colorimetry specified in Rec. ITU-R BT.2100 is identical to that specified in Rec. ITU-R BT.2020.
 
@@ -254,7 +279,7 @@ The conversion from color space A to color space B is performed according to the
 
 The domain and range of this conversion consist of all real values and the component signals in the connection color space are real numbers.
 
-#### `extended-linear-srgb`
+#### `srgb-linear`
 
 * Transfer function: identity
 
@@ -262,9 +287,9 @@ The domain and range of this conversion consist of all real values and the compo
 
 * Linear light scaling: 1.0
 
-#### `extended-srgb`
+#### `srgb`
 
-* Transfer function: See [extended-linear-srgb](#extended-linear-srgb)
+* Transfer function: See [srgb-linear](#srgb-linear)
 
 * Connection matrix: matrix to convert the [sRGB primaries](https://www.w3.org/TR/css-color-4/#valdef-color-srgb) to the primary colours specified in Rec. ITU-R BT.2100
 
@@ -484,33 +509,47 @@ In this mode, the `HTMLCanvasElement` will be composited exactly as an `<img>` o
 
 This means that if the canvas' color space is `'rec2100-hlg'` or `'rec2100-pq'`, then the canvas will be composited using high dynamic range, where available.
 
-Note that if the canvas' color space is `'extend-srgb-linear'` or `'extended-srgb'`, then the canvas will not be composited using high dynamic range. Pixel values outside of the [0, 1] interval will extend the displayed gamut beyond sRGB, but not the displayed luminance beyond the maximum SDR luminance.
+Note that if the canvas' color space is `'srgb-linear'` or `'srgb'`, then the canvas will not be composited using high dynamic range. Pixel values outside of the [0, 1] interval will extend the displayed gamut beyond sRGB, but not the displayed luminance beyond the maximum SDR luminance.
 
 Performing appropriate tone mapping is the responsibility of the browser, the operating system, and the display device.
 If the `configureHighDynamicRange` method is called with `CanvasHighDynamicRangeOptions` that specify metadata and the canvas' color space is `'rec2100-pq'`, then this metadata will be interpreted during compositing in the same way that it would be interpreted if included in a source displayed via an `<img>` or `<video>` element.
 
 #### Extended mode
 
-If the canvas' color space is `'extend-srgb-linear'` or `'extended-srgb'`, then pixels values outside of the [0, 1] interval will extend the displayed luminance beyond the maximum SDR luminance.
+If the canvas' color space is `'srgb-linear'` or `'srgb'`, then pixels values outside of the [0, 1] interval will extend the displayed luminance beyond the maximum SDR luminance.
 
 It is guaranteed that SDR colors in this mode exactly match SDR colors in non-HDR content on the page.
-For example, a canvas pixel value of `'(1,0,0)'` in `'extended-srgb'` is guaranteed to match the CSS color `'red'`.
+For example, a canvas pixel value of `'(1,0,0)'` in `'srgb'` is guaranteed to match the CSS color `'red'`.
 
 Performing appropriate tone mapping is the responsibility of the browser, the operating system, and the display device.
 If the `configureHighDynamicRange` method is called with `CanvasHighDynamicRangeOptions` that specify a maximum luminance that is greater than the display's luminance, then tone mapping will be applied to prevent clipping of luminance values below to the specified maximum luminance.
 Note that the tone mapping algorithm may not alter any SDR color values (otherwise the SDR color matching guarantee would be violated).
 
-#### Passthrough mode
+## Privacy considerations
 
-If the canvas' color space is `'extended-srgb-linear'`, then the canvas will be passed to the display device with no additional processing.
+The precise capabilities of the output display, such as the exact color gamut and the precise maximum luminance values, are fingerprinting vectors, and should not be exposed to the application without user permission.
 
-This mode does not make any guarantees about color matching with SDR content.
-
-No tone mapping will be applied by the browser, operating system, or display device.
+Access to these values is protected behind the same permission prompt that protects other screen capability fingerprinting vectors in the [window placement proposal](https://github.com/webscreens/window-placement/blob/main/EXPLAINER.md).
 
 ## Example Applications
 
-### The `extended-linear-srgb` color space
+### Detecting HDR capabilities
+
+The `getScreens` method will prompt the user for permission to reveal fingerprintable information.
+
+```javascript
+  let screens = await window.getScreens();
+  console.log('HDR headroom: ' + currentScreen.highDynamicRangeHeadroom);
+```
+
+If `getScreens` is denied, then media queries may be used to determine the screen's capabilities, at a high level.
+
+```javascript
+  let hasHighDynamicRange = window.matchMedia('(dynamic-range: high)').matches;
+  console.log('HDR capable: ' + hasHighDynamicRange);
+```
+
+### The `srgb-linear` color space
 
 #### WebGL using extended mode
 
@@ -522,7 +561,7 @@ In this example, a WebGL application enables and HDR default drawing buffer, and
 
     var gl = canvas.getContext('webgl2');
     gl.drawingBufferStorage(gl.RGBA16F, canvas.width, canvas.height);
-    gl.colorSpace = 'extended-linear-srgb';
+    gl.colorSpace = 'srgb-linear';
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 ```
@@ -594,10 +633,10 @@ Suppose we wish to change the above example to draw subtitles at a brightness th
     image.src = url;
 ```
 
-Note that this is identical to specifying the subtitle color in `'extended-linear-srgb'`.
+Note that this is identical to specifying the subtitle color in `'srgb-linear'`.
 
 ```javascript
-    context.fillStyle = 'color(extended-linear-srgb 0.265  0.265 0.265)';
+    context.fillStyle = 'color(srgb-linear 0.265  0.265 0.265)';
 ```
 
 ### The `rec2100-pq` color space
@@ -631,13 +670,6 @@ There does not exist any API for extracting this metadata from an `Image` object
 
 The above is a simplified version of the API that was proposed earlier.
 
-### Should we bother with the `extended` color spaces
-
-Perhaps we shouldn't have an explicit ```'extended-srgb'``` color space.
-The alternative is to define ```'srgb'``` to be extended by default (along with ```'display-p3'```, and ```'a98-rgb'```, and all the rest, presumably).
-
-This was discussed earlier, but I don't remember where where the discussion landed.
-
 ### HDR compositing independent of color space
 
 In the existing API, there is no way to have a linear space working space for an HLG or PQ canvas
@@ -649,7 +681,7 @@ In that case, the code to work in a linearized HLG space would be:
 ```javascript
     canvas.configureHighDynamicRange({mode:'hlg'});
     var context = canvas.getContext('2d',
-        {colorSpace:'extended-linear-srgb', storageFormat:'float-16'});
+        {colorSpace:'srgb-linear', storageFormat:'float-16'});
 ```
 
 ### ImageBitmap conversion options
