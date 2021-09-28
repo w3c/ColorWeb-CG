@@ -4,14 +4,14 @@
 
 ### Use cases
 
-There are four main classes of HDR use that inform this proposal. They are:
+There are four main classes of High Dynamic Range (HDR) use that inform this proposal. They are:
 
 * To draw HDR content with the minimum performance overhead.
-* To draw HDR content in a way that will color match SDR content.
+* To draw HDR content in a way that will color match Standard Dynamic Range (SDR) content.
   * Such that SDR images drawn in the canvas will appear exactly as they would if display in an `<img>` tag.
-* To display HLG encoded HDR images and video in a canvas.
+* To display IUT-R BT.2100 Hybrid Log-Gamma (HLG) encoded HDR images and video in a canvas.
   * Such that HLG images drawn in the canvas will appear exactly the same as they would if displayed via an `<img>` or `<video>` tag.
-* To display PQ encoded HDR images and video in a canvas.
+* To display IUT-R BT.2100 Perceptual Quantiser (PQ) encoded HDR images and video in a canvas.
   * Such that PQ images drawn in the canvas will appear exactly the same as they would if displayed via an `<img>` or `<video>` tag.
 
 ### Constraints
@@ -122,21 +122,51 @@ _Input:_ Full-range non-linear floating-point `rec2100-hlg` pixel with black at 
 _Output:_ Full-range non-linear floating-point `srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
 
 _Process:_
-  1. Linearize the HLG signal exploiting its backwards compatibility with SDR consumer displays
-  2. Convert from ITU BT.2100 color space to SRGB color space
-  3. Convert to SRGB using the SRGB Inverse EOTF
+  1. Pseudo-linearize the HLG signal exploiting its backwards compatibility with SDR consumer displays
+  2. Convert from ITU BT.2100 color space to sRGB color space
+  3. Convert back to non-linear using a reciprocal transform
 
-_Note 3_ This transform utilises the backwards compatibility of ITU-R BT.2100 HLG HDR with consumer electronic displays.
+_Note 3_ This transform utilises the backwards compatibility of ITU-R BT.2100 HLG HDR with consumer electronic displays.  Prior to display, the gamut may need to be limited to the range 0-1.  The simplest method is to clip values but other gamut reduction techniques may provide better output images.
 
 ```javascript
+
+function simpleTransform(value, systemGamma) { 
+  if (value < 1.0) { 
+    return -1.0 * Math.pow(-1.0 * value, systemGamma); 
+  } else { 
+    return Math.pow(value, systemGamma); 
+  } 
+}
+
+function simpleInverseTransform(value, systemGamma) { 
+  if (value < 1.0) { 
+    return -1.0 * Math.pow(-1.0 * value, 1.0 / systemGamma); 
+  } else { 
+    return Math.pow(value, 1.0 / systemGamma); 
+  } 
+} 
+
 function tonemapREC2100HLGtoSRGBdisplay(r, g, b) {
   const systemGamma = 2.2;
-  const [r1, g1, b1] = hlg_ootf(r, g, b, systemGamma);
+  const r1 = simpleTransform(r, systemGamma);
+  const g1 = simpleTransform(g, systemGamma);
+  const b1 = simpleTransform(b, systemGamma);
   const [r2, g2, b2] = matrixXYZtoSRGB(matrixBT2020toXYZ(r1, g1, b1));
-  const [r3, g3, b3] = srgb_inverse_eotf(r2, g2, b2);
-  const [r4, g4, b4] = clipper_0_1(r3, g3, b3);
+  const r3 = simpleInverseTransform(r2, systemGamma);      
+  const g3 = simpleInverseTransform(g2, systemGamma); 
+  const b3 = simpleInverseTransform(b2, systemGamma); 
+  const [r4, g4, b4] = limitTosRGBGamut(r3, g3, b3);
   return [r4, g4, b4];
 }
+```
+
+##### extended sRGB signal
+
+Extended sRGB contains information that is outside of the capabilities of an sRGB monitor.  For this reason, the extended sRGB must first be converted for display.  
+The extended sRGB signal can be converted for display on an sRGB monitor by first converting to HLG or PQ and then applying the relevant tonemapping to sRGB for displays.  For example:
+```javascript
+const [r_display, g_display, b_display] = tonemapREC2100HLGtoSRGBdisplay(
+       convertExtendedSRGBtoREC2100HLG(r_extended_srgb, g_extended_srgb, b_extended_srgb));
 ```
 
 ### Color spaces
@@ -250,7 +280,7 @@ Also see note in the Issues section at the bottom about whether this space shoul
 
 * Connection matrix: Identity
 
-* Linear light scaling: 1.0/0.265
+* Linear light scaling: 1.0/0.26496256042100724
 
 _Note:_ Converting from `rec2100-hlg` to any SDR color space will not result in clipping.
 
@@ -260,7 +290,7 @@ _Note:_ Converting from `rec2100-hlg` to any SDR color space will not result in 
 
 * Connection matrix: Identity
 
-* Linear light scaling: 1.0/0.265
+* Linear light scaling: 1.0/0.26496256042100724
 
 _Note:_ The factor of 300 is such that a display luminance of 300 cd/m<sup>2</sup> results in a linear color value of 1 in the connection color space.
 
@@ -290,7 +320,7 @@ _Note 2:_ See section 5.3 in ITU-R BT.2408-4 relating to negative transfer funct
 ```javascript
 function convertExtendedSRGBtoREC2100HLG(r, g, b) {
   const systemGamma = 1.0;
-  const linearLightScaler = 0.265;
+  const linearLightScaler = 0.26496256042100724;
 
   const r1 = srgb_eotf(r);
   const g1 = srgb_eotf(g);
@@ -325,7 +355,7 @@ _Process:_
 ```javascript
 function convertExtendedLinearSRGBtoREC2100HLG(r, g, b) {
   const systemGamma = 1.0;
-  const linearLightScaler = 0.265;
+  const linearLightScaler = 0.26496256042100724;
 
   const [r2, g2, b2] = matrixXYZtoBT2020(matrixSRGBtoXYZ(r1, g1, b1));
 
@@ -374,7 +404,7 @@ _Process:_
 ```javascript
 function convertREC2100HLGtoExtendedSRGB(r, g, b) {
   const systemGamma = 1.0;
-  const linearLightScaler = 1.0 / 0.265;
+  const linearLightScaler = 1.0 / 0.26496256042100724;
 
   const [r1, g1, b1] = hlg_inverse_oetf(r, g, b);
   const [r2, g2, b2] = hlg_ootf(r1, g1, b1, systemGamma);
@@ -408,7 +438,7 @@ function convertREC2100HLGtoExtendedSRGB(r, g, b) {
 ```javascript
 function convertREC2100HLGtoExtendedLinearSRGB(r, g, b) {
   const systemGamma = 1.0;
-  const linearLightScaler = 1.0 / 0.265;
+  const linearLightScaler = 1.0 / 0.26496256042100724;
 
   const [r1, g1, b1] = hlg_inverse_oetf(r, g, b);
   const [r2, g2, b2] = hlg_ootf(r1, g1, b1, systemGamma);
