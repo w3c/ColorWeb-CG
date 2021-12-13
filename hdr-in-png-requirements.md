@@ -26,10 +26,9 @@ A PNG may contain multiple chunks with color space information. A PNG viewer sho
 
 * `cICP`
 * `iCCN`
-* `iCCP`
-* `gAMA`
-* `cHRM`
 * `sRGB`
+* `iCCP`
+* `gAMA` & `cHRM`
 
 ### cICP chunk
 
