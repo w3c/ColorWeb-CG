@@ -4,14 +4,14 @@
 
 ### Use cases
 
-There are four main classes of HDR use that inform this proposal. They are:
+There are four main classes of High Dynamic Range (HDR) use that inform this proposal. They are:
 
 * To draw HDR content with the minimum performance overhead.
-* To draw HDR content in a way that will color match SDR content.
+* To draw HDR content in a way that will color match Standard Dynamic Range (SDR) content.
   * Such that SDR images drawn in the canvas will appear exactly as they would if display in an `<img>` tag.
-* To display HLG encoded HDR images and video in a canvas.
+* To display IUT-R BT.2100 Hybrid Log-Gamma (HLG) encoded HDR images and video in a canvas.
   * Such that HLG images drawn in the canvas will appear exactly the same as they would if displayed via an `<img>` or `<video>` tag.
-* To display PQ encoded HDR images and video in a canvas.
+* To display IUT-R BT.2100 Perceptual Quantiser (PQ) encoded HDR images and video in a canvas.
   * Such that PQ images drawn in the canvas will appear exactly the same as they would if displayed via an `<img>` or `<video>` tag.
 
 ### Proposed solution overview
@@ -103,7 +103,7 @@ Add a new `CanvasStorageFormat` enum to allow for higher bit storage formats.
   enum CanvasStorageFormat {
     'unorm-8',
     'unorm-10-10-10-2',
-    'float-16', 
+    'float-16',
   }
 ```
 
@@ -126,12 +126,74 @@ WebGPU's ``GPUSwapChainDescriptor`` can allow for specifying higher bit depth fo
 As illustrated below, the proposal assumes that tone mapping, i.e. the rendering of an image with a given dynamic range onto a
 display with different dynamic range, occurs in different parts of the system depending on the color space of the Canvas element:
 
-* in the case where `rec2100-hlg` or `rec2100-pq` are used, tone mapping is performed by the platform. This is akin to the
-  scenario where the `src` of an `img` element is a PQ or HLG image.
+* in the case where `rec2100-pq` are used, tone mapping is performed by the platform. This is akin to the
+  scenario where the `src` of an `img` element is a PQ image.
+
+* in the case where `rec2100-hlg` are used, tone mapping is performed by the display device. This is akin to the
+  scenario where the `src` of an `img` element is an HLG image.
 
 * in the case where any other color space is used (e.g, `srgb` or `srgb-linear`) tone mapping is performed by the web app, using display capabilities provided by the platform.
 
 ![Tone mapping scenarios](./tone-mapping-scenarios.png)
+
+#### Suggested Tone mapping for HDR content on sRGB displays
+Not these are only used to tonemap HDR images at the point of rendering for display when the display is known to be an sRGB display.  They are not used for conversion between colour spaces which is defined in section XXXX.
+
+##### PQ signal
+
+##### HLG signal
+
+_Input:_ Full-range non-linear floating-point `rec2100-hlg` pixel with black at 0.0 and diffuse white at 0.75. Values may exist outside the range 0.0 to 1.0.
+
+_Output:_ Full-range non-linear floating-point `srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+
+_Process:_
+  1. Pseudo-linearize the HLG signal exploiting its backwards compatibility with SDR consumer displays
+  2. Convert from ITU BT.2100 color space to sRGB color space
+  3. Convert back to non-linear using a reciprocal transform
+
+_Note 3_ This transform utilises the backwards compatibility of ITU-R BT.2100 HLG HDR with consumer electronic displays.  Prior to display, the gamut may need to be limited to the range 0-1.  The simplest method is to clip values but other gamut reduction techniques may provide better output images.
+
+```javascript
+
+function simpleTransform(value, systemGamma) { 
+  if (value < 1.0) { 
+    return -1.0 * Math.pow(-1.0 * value, systemGamma); 
+  } else { 
+    return Math.pow(value, systemGamma); 
+  } 
+}
+
+function simpleInverseTransform(value, systemGamma) { 
+  if (value < 1.0) { 
+    return -1.0 * Math.pow(-1.0 * value, 1.0 / systemGamma); 
+  } else { 
+    return Math.pow(value, 1.0 / systemGamma); 
+  } 
+} 
+
+function tonemapREC2100HLGtoSRGBdisplay(r, g, b) {
+  const systemGamma = 2.2;
+  const r1 = simpleTransform(r, systemGamma);
+  const g1 = simpleTransform(g, systemGamma);
+  const b1 = simpleTransform(b, systemGamma);
+  const [r2, g2, b2] = matrixXYZtoSRGB(matrixBT2020toXYZ(r1, g1, b1));
+  const r3 = simpleInverseTransform(r2, systemGamma);      
+  const g3 = simpleInverseTransform(g2, systemGamma); 
+  const b3 = simpleInverseTransform(b2, systemGamma); 
+  const [r4, g4, b4] = limitTosRGBGamut(r3, g3, b3);
+  return [r4, g4, b4];
+}
+```
+
+##### extended sRGB signal
+
+Extended sRGB contains information that is outside of the capabilities of an sRGB monitor.  For this reason, the extended sRGB must first be converted for display.  
+The extended sRGB signal can be converted for display on an sRGB monitor by first converting to HLG or PQ and then applying the relevant tonemapping to sRGB for displays.  For example:
+```javascript
+const [r_display, g_display, b_display] = tonemapREC2100HLGtoSRGBdisplay(
+       convertExtendedSRGBtoREC2100HLG(r_extended_srgb, g_extended_srgb, b_extended_srgb));
+```
 
 ### Color spaces
 
@@ -182,7 +244,7 @@ The component signals are mapped to red, green and blue tristimulus values accor
 
 #### rec2100-pq
 
-The component signals are mapped to red, green and blue tristimulus values according to the PQ system system specified in Rec. ITU-R BT.2100.
+The component signals are mapped to red, green and blue tristimulus values according to the Perceptual Quantizer (PQ) system system specified in Rec. ITU-R BT.2100.
 
 ### Conversion between color spaces
 
@@ -212,6 +274,7 @@ The conversion from color space A to color space B is performed according to the
 * apply the inverse transfer function of color space A
 * convert to the connection space by multiplying by the connection matrix of color space A
 * convert to color space B by multiplying by by the inverse of the connection matrix of color space B
+* apply any linear light scaling to correctly map the level of perceived diffuse white level in to color space B
 * apply the transfer function of color space B
 
 The domain and range of this conversion consist of all real values and the component signals in the connection color space are real numbers.
@@ -222,17 +285,22 @@ The domain and range of this conversion consist of all real values and the compo
 
 * Connection matrix: matrix to convert the [sRGB primaries](https://www.w3.org/TR/css-color-4/#valdef-color-srgb) to the primary colours specified in Rec. ITU-R BT.2100
 
+* Linear light scaling: 1.0
+
 #### `srgb`
 
 * Transfer function: See [srgb-linear](#srgb-linear)
 
 * Connection matrix: matrix to convert the [sRGB primaries](https://www.w3.org/TR/css-color-4/#valdef-color-srgb) to the primary colours specified in Rec. ITU-R BT.2100
 
+* Linear light scaling: 1.0
+
 _Note:_ The domain of this transformation function is all real values. Its domain is not restricted to the unit interval [0, 1].
 
 Also see note in the Issues section at the bottom about whether this space should be distinct from the existing `'srgb'` space.
 
 #### `rec2100-hlg`
+
 
 * Transfer function: HLG Reference OETF specified at Rec. ITU-R BT.2100
 
@@ -255,6 +323,8 @@ Also see note in the Issues section at the bottom about whether this space shoul
 _Note:_ The range of the function is [0, 1].
 
 * Connection matrix: Identity
+
+* Linear light scaling: 1.0/0.26496256042100724
 
 _Note:_ Converting from `rec2100-hlg` to any SDR color space will not result in clipping.
 
@@ -281,7 +351,180 @@ _Note:_ Converting from `rec2100-hlg` to any SDR color space will not result in 
 
 _Note:_ The factor of 300 is such that a display luminance of 300 cd/m<sup>2</sup> results in a linear color value of 1 in the connection color space.
 
-* Connection matrix: Identity
+
+#### Conversions via Color Connection Space
+
+##### Conversion from extended-sRGB to HLG
+
+_Input:_ Full-range non-linear floating-point `extended-srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+
+_Output:_ Full-range non-linear floating-point `rec2100-hlg` pixel with black at 0.0 and diffuse white at 0.75. Values may exist outside the range 0.0 to 1.0.
+
+_Process:_
+ 1. Linearize using the SRGB EOTF
+ 2. Convert from `extended-srgb` color space to `rec2100-hlg` color space
+ 3. Scale pixel values - See Note 1
+ 4. Apply HLG Inverse EOTF to convert to HLG from Pseudo-Display Light with Lw = 302 cd/m2 - See Note 1
+  * apply HLG Inverse OOTF
+  * apply HLG OETF - See Note 2
+
+_Note 1:_ As `rec2100-hlg` is a relative format, the brightness of the virtual monitor used for mathematical transforms can be chosen to be any level. In this transform it is chosen to be 302 cd/m2 so that the brightness of diffuse white matches the diffuse white of sRGB (80 cd/m2). Using the extended range gamma formula in footnote 2 of BT.2100, this also sets the HLG Inverse OOTF to be unity. The value 0.265 is calculated by taking the inverse OETF of 0.75, the `rec2100-hlg` diffuse white level.
+
+_Note 2:_ See section 5.3 in ITU-R BT.2408-4 relating to negative transfer functions in format conversions.
+
+```javascript
+function convertExtendedSRGBtoREC2100HLG(r, g, b) {
+  const systemGamma = 1.0;
+  const linearLightScaler = 0.26496256042100724;
+
+  const r1 = srgb_eotf(r);
+  const g1 = srgb_eotf(g);
+  const b1 = srgb_eotf(b);
+
+  const [r2, g2, b2] = matrixXYZtoBT2020(matrixSRGBtoXYZ(r1,g1,b1));
+
+  const r3 = linearLightScaler * r2;
+  const g3 = linearLightScaler * g2;
+  const b3 = linearLightScaler * b2;
+
+  const [r4, g4, b4] = hlg_inverse_ootf(r3, g3, b3, systemGamma);
+  const [r5, g5, b5] = hlg_oetf(r4, g4, b4);
+
+  return [r5, g5, b5]
+}
+```
+
+##### Conversion from extended-linear-sRGB to HLG
+
+_Input:_ Full-range non-linear floating-point `extended-linear-srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+
+_Output:_ Full-range non-linear floating-point `rec2100-hlg` pixel with black at 0.0 and diffuse white at 0.75. Values may exist outside the range 0.0 to 1.0.
+
+_Process:_
+1. Convert from `extended-linear-srgb` color space to `rec2100-hlg` color space
+2. Scale pixel values - See Note 1
+3. Apply HLG Inverse EOTF to convert to HLG from Pseudo-Display Light with Lw = 302 cd/m2 - See Note 1
+ * apply HLG Inverse OOTF
+ * apply HLG OETF - See Note 2
+
+```javascript
+function convertExtendedLinearSRGBtoREC2100HLG(r, g, b) {
+  const systemGamma = 1.0;
+  const linearLightScaler = 0.26496256042100724;
+
+  const [r2, g2, b2] = matrixXYZtoBT2020(matrixSRGBtoXYZ(r1, g1, b1));
+
+  const r3 = linearLightScaler * r2;
+  const g3 = linearLightScaler * g2;
+  const b3 = linearLightScaler * b2;
+  
+  const [r4, g4, b4] = hlg_inverse_ootf(r3, g3, b3, systemGamma);
+  const [r5, g5, b5] = hlg_oetf(r4, g4, b4);
+  
+  return [r5, g5, b5];
+}
+```
+
+##### Conversion from extended-sRGB to PQ
+
+_Input:_ Full-range non-linear floating-point `extended-srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+
+_Output:_ Full-range non-linear floating-point `rec2100-pq` pixel with black at 0.0 and diffuse white at ???. Values may exist outside the range 0.0 to 1.0.
+
+_Process:_
+
+##### Conversion from extended-sRGB to PQ
+
+_Input:_ Full-range non-linear floating-point `extended-linear-srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+
+_Output:_ Full-range non-linear floating-point `rec2100-pq` pixel with black at 0.0 and diffuse white at ???. Values may exist outside the range 0.0 to 1.0.
+
+_Process:_
+
+##### Conversion from HLG to extended-sRGB
+
+_Input:_ Full-range non-linear floating-point `rec2100-hlg` pixel with black at 0.0 and diffuse white at 0.75. Values may exist outside the range 0.0 to 1.0.
+
+_Output:_ Full-range non-linear floating-point `extended-srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+
+_Process:_
+1. Apply HLG EOTF to convert the non-linear `rec2100-hlg` Signal to linear Pseudo-Display Light with Lw = 302 cd/m2 - See Note 1
+ * apply inverse HLG OETF
+ * apply HLG OOTF to derive linear display light
+2. Scale pixel values
+3. Convert from ITU BT.2100-1 color space to SRGB color space
+4. Convert to non-linear SRGB using the SRGB Inverse EOTF
+
+
+```javascript
+function convertREC2100HLGtoExtendedSRGB(r, g, b) {
+  const systemGamma = 1.0;
+  const linearLightScaler = 1.0 / 0.26496256042100724;
+
+  const [r1, g1, b1] = hlg_inverse_oetf(r, g, b);
+  const [r2, g2, b2] = hlg_ootf(r1, g1, b1, systemGamma);
+
+  const r3 = linearLightScaler * r2;
+  const g3 = linearLightScaler * g2;
+  const b3 = linearLightScaler * b2;
+
+  const [r4, g4, b4] = matrixXYZtoSRGB(matrixBT2020toXYZ(r3, g3, b3));
+  const r5 = srgb_inverse_eotf(r4);
+  const g5 = srgb_inverse_eotf(g4);
+  const b5 = srgb_inverse_eotf(b4);
+
+  return [r5, g5, b5];
+}
+```
+
+##### Conversion from HLG to extended-linear-sRGB
+
+  _Input:_ Full-range non-linear floating-point `rec2100-hlg` pixel with black at 0.0 and diffuse white at 0.75. Values may exist outside the range 0.0 to 1.0.
+
+  _Output:_ Full-range non-linear floating-point `extended-linear-srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+
+  _Process:_
+  1. Apply HLG EOTF to convert the non-linear `rec2100-hlg` Signal to linear Pseudo-Display Light with Lw = 302 cd/m2 - See Note 1
+   * apply inverse HLG OETF
+   * apply HLG OOTF to derive linear display light
+  2. Scale pixel values
+  3. Convert from ITU BT.2100-1 color space to SRGB color space
+
+```javascript
+function convertREC2100HLGtoExtendedLinearSRGB(r, g, b) {
+  const systemGamma = 1.0;
+  const linearLightScaler = 1.0 / 0.26496256042100724;
+
+  const [r1, g1, b1] = hlg_inverse_oetf(r, g, b);
+  const [r2, g2, b2] = hlg_ootf(r1, g1, b1, systemGamma);
+
+  const r3 = linearLightScaler * r2;
+  const g3 = linearLightScaler * g2;
+  const b3 = linearLightScaler * b2;
+
+  const [r4, g4, b4] = matrixXYZtoSRGB(matrixBT2020toXYZ(r3, g3, b3));
+
+  return [r4, g4, b4];
+}
+```
+
+
+##### Conversion from PQ to extended-sRGB
+
+  _Input:_ Full-range non-linear floating-point `rec2100-pq` pixel with black at 0.0 and diffuse white at ???. Values may exist outside the range 0.0 to 1.0.
+
+  _Output:_ Full-range non-linear floating-point `extended-srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+
+  _Process:_
+
+##### Conversion from PQ to extended-linear-sRGB
+
+  _Input:_ Full-range non-linear floating-point `rec2100-pq` pixel with black at 0.0 and diffuse white at ???. Values may exist outside the range 0.0 to 1.0.
+
+  _Output:_ Full-range non-linear floating-point `extended-linear-srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+
+  _Process:_
+
 
 ### Compositing the HDR `HTMLCanvasElement`
 
