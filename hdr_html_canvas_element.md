@@ -302,35 +302,32 @@ Also see note in the Issues section at the bottom about whether this space shoul
 #### `rec2100-hlg`
 
 
-* Transfer function: HLG Reference OETF specified at Rec. ITU-R BT.2100
+* Transfer function: The HLG Reference inverse OETF specified at Rec. ITU-R BT.2100, scaled
 
 ```javascript
   function connectionTransferFunction(x) {
     const a = 0.17883277;
     const b = 1 - 4*a;
     const c = 0.5 - a * Math.log(4 * a);
+    const k = (Math.exp((0.75 - c) / a) + b) / 12;
     if (x < 0) {
       return 0;
     } else if (x <= 0.5) {
-      return x * x / 3;
+      return x * x / (3 * k);
     } else if (x <= 1) {
-      return (Math.exp((v - c) / a) + b) / 12;
+      return (Math.exp((v - c) / a) + b) / (12 *  k);
     } else {
-      return 1;
+      return 1 / scale;
     }
 ```
 
-_Note:_ The range of the function is [0, 1].
+_Note:_ the factor `k` is selected such that a signal of `0.75` results in a linear color value of 1 in the connection color space.
 
 * Connection matrix: Identity
 
-* Linear light scaling: 1.0/0.26496256042100724
-
-_Note:_ Converting from `rec2100-hlg` to any SDR color space will not result in clipping.
-
 #### `rec2100-pq`
 
-* Transfer function: The inverse of the Reference PQ EOTF specified at Rec. ITU-R BT.2100.
+* Transfer function: The inverse of the Reference PQ EOTF specified at Rec. ITU-R BT.2100, scaled
 
 ```javascript
   function connectionTransferFunction(x) {
@@ -339,17 +336,18 @@ _Note:_ Converting from `rec2100-hlg` to any SDR color space will not result in 
     const c3 = 2392 / 128;
     const m1 = 1305 / 8192;
     const m2 = 2523 / 32;
+    const k = 203;
     if (x < 0) {
       return 0;
     } else if (x <= 1) {
       const p = Math.pow(x, 1 / m2);
-      return (10000 / 300) * Math.pow((p - c1) / (c2 - c3 * p), 1 / m1);
+      return (10000 / k) * Math.pow((p - c1) / (c2 - c3 * p), 1 / m1);
     } else {
-      return (10000 / 300);
+      return (10000 / k);
     }
 ```
 
-_Note:_ The factor of 300 is such that a display luminance of 300 cd/m<sup>2</sup> results in a linear color value of 1 in the connection color space.
+_Note:_ The factor `k` is selected such that a display luminance of 203 cd/m<sup>2</sup> results in a linear color value of 1 in the connection color space.
 
 
 #### Conversions via Color Connection Space
