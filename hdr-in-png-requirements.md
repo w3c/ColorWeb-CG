@@ -30,6 +30,8 @@ A PNG may contain multiple chunks with color space information. A PNG viewer sho
 * `iCCP`
 * `gAMA` & `cHRM`
 
+Note: If the PNG decoder knows the display / surface cannot use the cICP code point, it should ignore the cICP chunk and continue down the priority list.
+
 ### cICP chunk
 
 This chunk SHALL come before the `IDAT` chunk.
