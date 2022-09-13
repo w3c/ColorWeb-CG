@@ -96,8 +96,8 @@ Add a new `CanvasHighDynamicRangeOptions` dictionary with HDR configuration opti
     required float bluePrimaryY;
     required float whitePointX;
     required float whitePointY;
-    required float luminanceMin;
-    required float luminanceMax;
+    required float minLuminance;
+    required float maxLuminance;
   }
 ```
 
