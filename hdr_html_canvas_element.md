@@ -74,7 +74,7 @@ Add a new `CanvasHighDynamicRangeOptions` dictionary with HDR configuration opti
 ```idl
   dictionary CanvasHighDynamicRangeOptions {
     CanvasHighDynamicRangeMode mode = 'default';
-    // TODO for v2: Add metadata parameters.
+    CanvasSmpteSt2086Metadata smpteSt2086Metadata;
   }
 
   enum CanvasHighDynamicRangeMode {
@@ -84,6 +84,20 @@ Add a new `CanvasHighDynamicRangeOptions` dictionary with HDR configuration opti
 
     // Enables extended luminance while preserving SDR color matching.
     'extended',
+  }
+
+  // SMPTE ST 2086 color volume metadata.
+  dictionary CanvasSmpteSt2086Metadata {
+    required float redPrimaryX;
+    required float redPrimaryY;
+    required float greenPrimaryX;
+    required float greenPrimaryY;
+    required float bluePrimaryX;
+    required float bluePrimaryY;
+    required float whitePointX;
+    required float whitePointY;
+    required float luminanceMin;
+    required float luminanceMax;
   }
 ```
 
