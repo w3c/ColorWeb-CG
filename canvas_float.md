@@ -4,8 +4,6 @@
 
 This proposal introduces the ability to use floating-point pixels formats `CanvasRenderingContext2D`, `OffscreenCanvasRenderingContext2D`, and `ImageData`.
 
-It also introduces the ability to query the precise color volume of a screen via new entries to `ScreenDetailed`, and the ability to specify `"srgb-linear"` as a `PredefinedColorSpace`.
-
 ## Background
 
 ## Current capabilities
@@ -16,35 +14,13 @@ Many implementations use a 8 bits per channel RGB or RGBA pixel format for this 
 
 An `ImageData` has a `data` member, which is a `Uint8ClampedArray`, making its format 8 bits per channel RGBA.
 
-The color gamut of a screen may be queried using the `color-gamut` CSS media query.
-This provides resolution of `"srgb"`, `"p3"`, and `"rec2020"`.
-
-The `PredefinedColorSpace` enum currently only includes `"srgb"` and `"display-p3"`.
-
 ## Use Cases and Motivation
-
-### Floating-point precision
 
 High dynamic range and wide color gamut content content often requires more than 8 bits per channel to avoid banding artifacts.
 
 Medical applications (e.g, radiography) demand higher than 8 bits per channel resolution.
 
 Modern high end displays are capable of displaying more than 8 bits per channel.
-
-### The `"srgb-linear"` color space
-
-Physically based rendering applications often wish to operate in a color space with linear light values.
-
-This color space was not included when `PredefinedColorSpace` was introduced because 8 bits per color was insufficient precision for representing this color space (both in rendering contexts and in `ImageData`).
-Now that floating-point color types are available, this color space can be used without unacceptable precision loss.
-
-### Color volume query
-
-Graphics applications wish to control the precise way in which their content is mapped to the capabilities of the output screen.
-This requires knowledge of the color volume that the screen.
-
-Prior to the addition of floating-point color types, these applications were unable to perform meaningful mapping without losing significant precision.
-Now that floating-point color types are available, this is a meaningful capability.
 
 ## Proposed changes
 
@@ -109,46 +85,6 @@ The type of an `ImageData`'s `data` member is determined at creation time by the
 * If `colorType` is `"uint8Clamped"` then `data` is of type `Uint8ClampedArray`.
 * If `colorType` is `"float32"` then `data` is of type `Float32Array`.
 
-### Changes to `PredefinedColorSpace`
-
-Add to `PredefinedColorSpace` the value of `"srgb-linear"`.
-
-```idl
-  partial enum PredefinedColorSpace {
-    "srgb-linear",
-  };
-```
-
-This value corresponds to the definition of `"srgb-linear"` in CSS Color Level 4.
-
-### Changes to `ScreenDetailed`
-
-Add the new dictionary `ColorVolume` to store color primary and white point information for a screen.
-
-```idl
-  // The color primaries and white point defining a color volume, in CIE 1931 xy
-  // coordinates.
-  dictionary ColorVolume {
-      required float redPrimaryX;
-      required float redPrimaryY;
-      required float greenPrimaryX;
-      required float greenPrimaryY;
-      required float bluePrimaryX;
-      required float bluePrimaryY;
-      required float whitePointX;
-      required float whitePointY;
-  };
-```
-
-To `ScreenDetailed`, add a `ColorVolume` member, to specify the color volume of the screen.
-
-```idl
-  partial interface ScreenDetailed {
-    // The color volume that the screen is capable of displaying.
-    ColorVolume colorVolume;
-  };
-```
-
 ## Related specifications
 
 ### WebGPU
@@ -182,15 +118,3 @@ The ability to texture from and render to 16 bit floating-point is universal amo
 An alternative would be to use the value `"uint8"` for both `ImageDataColorType` and `CanvasColorType`.
 The alternative may be simpler to reason about, or it may be a source of confusion.
 
-### The `ColorVolume` type
-
-Future HDR video and canvas APIs will need to specify and query SMPTE ST 2086 HDR metadata.
-It would be possible to reuse this `ColorVolume` dictionary in such a structure. E.g,
-
-```idl
-  dictionary SmpteSt2086Metadata {
-    required ColorVolume colorVolume;
-    required float minimumLuminance;
-    required float maximumLuminance;
-  }
-```
