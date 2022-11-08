@@ -23,7 +23,7 @@ The `PredefinedColorSpace` enum currently only includes `"srgb"` and `"display-p
 
 ## Use Cases and Motivation
 
-### Use cases and motivation for floating-point precision
+### Floating-point precision
 
 High dynamic range and wide color gamut content content often requires more than 8 bits per channel to avoid banding artifacts.
 
@@ -31,14 +31,14 @@ Medical applications (e.g, radiography) demand higher than 8 bits per channel re
 
 Modern high end displays are capable of displaying more than 8 bits per channel.
 
-### Use case and motivation for including `"srgb-linear"` color space
+### The `"srgb-linear"` color space
 
 Physically based rendering applications often wish to operate in a color space with linear light values.
 
 This color space was not included when `PredefinedColorSpace` was introduced because 8 bits per color was insufficient precision for representing this color space (both in rendering contexts and in `ImageData`).
 Now that floating-point color types are available, this color space can be used without unacceptable precision loss.
 
-### Use cases and motivation for color volume query
+### Color volume query
 
 Graphics applications wish to control the precise way in which their content is mapped to the capabilities of the output screen.
 This requires knowledge of the color volume that the screen.
@@ -46,11 +46,11 @@ This requires knowledge of the color volume that the screen.
 Prior to the addition of floating-point color types, these applications were unable to perform meaningful mapping without losing significant precision.
 Now that floating-point color types are available, this is a meaningful capability.
 
-## Proposed changs
+## Proposed changes
 
 ### Changes to `CanvasRenderingContext2DSettings`
 
-Create the new enum `CanvasColorType` to specify the type of the color channels for the output bitmap of a `CanvasRenderingContext2D` and `OffscreenCanvasRenderingContext2D`.
+Create the new enum `CanvasColorType` to specify the type for the color channels of the output bitmap of a `CanvasRenderingContext2D` and `OffscreenCanvasRenderingContext2D`.
 
 ```idl
   enum CanvasColorType {
@@ -67,17 +67,17 @@ Add to `CanvasRenderingContext2DSettings` a `CanvasColorType` member, to specify
   };
 ```
 
-The value specified in `colorType` will determine the type of the color channels of the output bitmap.
+The value specified in `colorType` will determine the type for the color channels of the output bitmap.
 
 When a canvas has a color type of `"float16"` color values may be outside of the range `[0, 1]`.
 Such values may be used to specify colors outside of the gamut determined by the canvas' color space's primaries.
 
-When rendering `"float16"` color values an output device, color values will be converted to the output device's color space using relative colorimetric intent.
+When rendering `"float16"` color values to an output device, color values will be converted to the output device's color space using relative colorimetric intent.
 Colors values that specify a brightness outside of the standard dynamic range will have their brightness limited to the standard dynamic range of the output device, unless the canvas is explicitly indicated to be high dynamic range (and this proposal intentionally does not include this mechanism).
 
 ### Changes to `ImageData`
 
-Create a new enum `ImageDataColorType` to specify the type of the color channels for an `ImageData`.
+Create a new enum `ImageDataColorType` to specify the type for the color channels of an `ImageData`.
 
 ```idl
   enum ImageDataColorType {
@@ -94,7 +94,7 @@ Add to `ImageDataSettings` a `ImageDataColorType` member, to specify this color 
   };
 ```
 
-Change `ImageData` to allow the `data` member to be either `Uint8ClampedArray` or `Float32Array`.
+Change `ImageData` to allow the `data` member to be either `Uint8ClampedArray` or `Float32Array` via a union type `ImageDataArray`.
 
 ```idl
   typedef (Uint8ClampedArray or Float32Array) ImageDataArray;
@@ -173,7 +173,11 @@ This functionality was separated off from the Canvas High Dynamic Range proposal
 This proposal uses the term "color type" instead of "pixel format" intentionally to indicate just the precision of the color channels of the format, and not their layout.
 For example, a user agent may choose BGRA or RGBA as the representation of an 8 bit per channel canvas, and this implementation detail is hidden.
 
-### The name `"uint8Clamped"` and `"unorm8"`
+### Choice of `"float16"` for `CanvasColorType`
+
+The ability to texture from and render to 16 bit floating-point is universal among modern GPUs.
+
+### The names `"uint8Clamped"` and `"unorm8"`
 
 An alternative would be to use the value `"uint8"` for both `ImageDataColorType` and `CanvasColorType`.
 The alternative may be simpler to reason about, or it may be a source of confusion.
