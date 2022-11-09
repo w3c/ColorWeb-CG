@@ -10,13 +10,13 @@ This proposal introduces the ability to use floating-point pixels formats `Canva
 
 Both `CanvasRenderingContext2D` and `OffscreenCanvasRenderingContext2D` have an output bitmap that they render to.
 The pixel format of this output bitmap is currently unspecified.
-Many implementations use a 8 bits per channel RGB or RGBA pixel format for this bitmap (this is likely the case for all implementations, but the author has not examined all implementations).
+Many implementations use an 8 bits per channel RGB or RGBA pixel format for this bitmap (this is likely the case for all implementations, but the author has not examined all implementations).
 
 An `ImageData` has a `data` member, which is a `Uint8ClampedArray`, making its format 8 bits per channel RGBA.
 
 ## Use Cases and Motivation
 
-High dynamic range and wide color gamut content content often requires more than 8 bits per channel to avoid banding artifacts.
+High dynamic range and wide color gamut content often requires more than 8 bits per channel to avoid banding artifacts.
 
 Medical applications (e.g, radiography) demand higher than 8 bits per channel resolution.
 
@@ -26,7 +26,7 @@ Modern high end displays are capable of displaying more than 8 bits per channel.
 
 ### Changes to `CanvasRenderingContext2DSettings`
 
-Create the new enum `CanvasColorType` to specify the type for the color channels of the output bitmap of a `CanvasRenderingContext2D` and `OffscreenCanvasRenderingContext2D`.
+Create a new `CanvasColorType` enum to specify the type for the color channels of the output bitmap of a `CanvasRenderingContext2D` and `OffscreenCanvasRenderingContext2D`.
 
 ```idl
   enum CanvasColorType {
@@ -49,20 +49,20 @@ When a canvas has a color type of `"float16"` color values may be outside of the
 Such values may be used to specify colors outside of the gamut determined by the canvas' color space's primaries.
 
 When rendering `"float16"` color values to an output device, color values will be converted to the output device's color space using relative colorimetric intent.
-Colors values that specify a brightness outside of the standard dynamic range will have their brightness limited to the standard dynamic range of the output device, unless the canvas is explicitly indicated to be high dynamic range (and this proposal intentionally does not include this mechanism).
+Color values that specify a brightness outside of the standard dynamic range will have their brightness limited to the standard dynamic range of the output device, unless the canvas is explicitly indicated to be high dynamic range (and this proposal intentionally does not include this mechanism).
 
 ### Changes to `ImageData`
 
-Create a new enum `ImageDataColorType` to specify the type for the color channels of an `ImageData`.
+Create a new `ImageDataColorType` enum to specify the type for the color channels of an `ImageData`.
 
 ```idl
   enum ImageDataColorType {
-    "unorm8",
+    "uint8Clamped",
     "float32",
   };
 ```
 
-Add to `ImageDataSettings` a `ImageDataColorType` member, to specify this color type.
+Add to `ImageDataSettings` an `ImageDataColorType` member, to specify this color type.
 
 ```idl
   partial dictionary ImageDataSettings {
@@ -117,4 +117,3 @@ The ability to texture from and render to 16 bit floating-point is universal amo
 
 An alternative would be to use the value `"uint8"` for both `ImageDataColorType` and `CanvasColorType`.
 The alternative may be simpler to reason about, or it may be a source of confusion.
-
