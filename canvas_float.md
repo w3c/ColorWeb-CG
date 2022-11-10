@@ -2,13 +2,13 @@
 
 ## Introduction
 
-This proposal introduces the ability to use floating-point pixels formats `CanvasRenderingContext2D`, `OffscreenCanvasRenderingContext2D`, and `ImageData`.
+This proposal introduces the ability to use floating-point pixel formats in `CanvasRenderingContext2D`, `OffscreenCanvasRenderingContext2D`, and `ImageData`.
 
 ## Background
 
 ## Current capabilities
 
-Both `CanvasRenderingContext2D` and `OffscreenCanvasRenderingContext2D` have an output bitmap that they render to.
+Both `CanvasRenderingContext2D` and `OffscreenCanvasRenderingContext2D` contain an output bitmap that they render to.
 The pixel format of this output bitmap is currently unspecified.
 Many implementations use a 8 bits per channel RGB or RGBA pixel format for this bitmap (this is likely the case for all implementations, but the author has not examined all implementations).
 
@@ -16,7 +16,7 @@ An `ImageData` has a `data` member, which is a `Uint8ClampedArray`, making its f
 
 ## Use Cases and Motivation
 
-High dynamic range and wide color gamut content content often requires more than 8 bits per channel to avoid banding artifacts.
+High dynamic range and wide color gamut content content often require more than 8 bits per channel to avoid banding artifacts.
 
 Medical applications (e.g, radiography) demand higher than 8 bits per channel resolution.
 
