@@ -35,9 +35,11 @@ Add a new attribute to `ScreenAdvanced` to indicate the HDR headroom currently a
     // The maximum luminance that the screen is capable of displaying across
     // the full area of the screen, as a multiple of the luminance of SDR white.
     // This will have a value of 1.0 for screens that are not HDR capable.
-    readonly attribute double hdrToSdrRatio;
+    readonly attribute double highDynamicRangeHeadroom;
   }
 ```
+
+See the below discussion of the display of floating point color values for more details.
 
 ### Querying screen wide color gamut parameters
 
@@ -126,6 +128,18 @@ Canvas 2D's proposed [Canvas Floating Point Color Values](https://github.com/w3c
 WebGL's proposed [``drawingBufferStorage``](https://github.com/KhronosGroup/WebGL/pull/3222) function allows for specifying higher bit depth formats.
 
 WebGPU's ``GPUCanvasConfiguration`` can allow for specifying higher bit depth formats.
+
+### Display of floating point color values
+
+Define a screen's native linear color space to be the color space with color primaries and white point set to the screen's `ScreenDetailed`'s `colorVolume` and the identity as its transfer function.
+
+A color is said to be within a screen's default range if, when that color is converted to the screen's native linear color space (using relative colorimetric intent), all of its color components are within the `[0, 1]` interval.
+When displaying content produced by a rendering context with `CanvasHighDynamicRangeMode` set to `'default'`, all colors that are within the screen's default range must be displayed without any clamping or roll-offs (neither in chrominance nor luminance).
+
+A color is said to be within a screen's extended range if, when that color is converted to the screen's native linear color space (using relative colorimetric intent), all of its color components are within the `[0, highDynamicRangeHeadroom]` interval.
+When displaying content produced by a rendering context with `CanvasHighDynamicRangeMode` set to `'extended'`, all colors that are within the screen's extended range must be displayed without any clamping or roll-offs (neither in chrominance nor luminance).
+
+Colors that do not fall under this guarantee should be clamped to the indicated range during display, but may be subject to screen-specific behavior.
 
 ### Tone mapping
 
@@ -573,7 +587,7 @@ The `getScreens` method will prompt the user for permission to reveal fingerprin
 
 ```javascript
   let screens = await window.getScreens();
-  console.log('HDR to SDR ratio: ' + currentScreen.hdrToSdrRatio);
+  console.log('HDR headroom: ' + currentScreen.highDynamicRangeHeadroom);
 ```
 
 If `getScreens` is denied, then media queries may be used to determine the screen's capabilities, at a high level.
