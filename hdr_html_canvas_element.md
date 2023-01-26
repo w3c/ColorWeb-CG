@@ -39,7 +39,7 @@ Add a new attribute to `ScreenAdvanced` to indicate the HDR headroom currently a
   }
 ```
 
-See the below discussion of the display of floating point color values for more details.
+See below for more details on the display of floating point color values.
 
 ### Querying screen wide color gamut parameters
 
@@ -93,8 +93,8 @@ Add a new `CanvasColorMetadata` dictionary with HDR configuration options.
   // SMPTE ST 2086 color volume metadata.
   dictionary CanvasSmpteSt2086Metadata {
     ColorVolume colorVolume;
-    required float minimumLuminance;
-    required float maximumLuminance;
+    required float minimumLuminanceNits;
+    required float maximumLuminanceNits;
   }
 ```
 
