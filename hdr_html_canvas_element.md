@@ -22,7 +22,7 @@ The solution that we propose is to:
 * Introduce new color spaces and precisions that are useful for HDR.
 * Clearly define invertible and context-independent transformations between these spaces.
 * Introduce the ability use more than 8 bits per pixel for a canvas element.
-* Introduce the ability for an `HTMLCanvasElement` to configure HDR.
+* Introduce the ability for an `HTMLCanvasElement`'s rendering context to configure HDR metadata.
 
 ## Proposal
 
@@ -39,40 +39,44 @@ Add a new attribute to `ScreenAdvanced` to indicate the HDR headroom currently a
   }
 ```
 
-The high dynamic range headroom of a display is computed as:
-
-```math
-   HDR headroom = (HDR max luminance) / (SDR max luminance)
-```
-
-For a display device that is not HDR capable, this will have the value `1.0`.
+See below for more details on the display of floating point color values.
 
 ### Querying screen wide color gamut parameters
 
-Add new attributes to `ScreenAdvanced` to indicate the gamut and white point of the screen.
+Add new attributes to `ScreenDetailed` to indicate the gamut and white point of the screen.
 
 ```idl
-  partial interface ScreenAdvanced {
-    // The color primaries and white point of the screen, in CIE 1931 xy
-    // coordinates. These define the color gamut that the screen is capable of
-    // displaying.
-    readonly attribute double redPrimaryX;
-    readonly attribute double redPrimaryY;
-    readonly attribute double greenPrimaryX;
-    readonly attribute double greenPrimaryY;
-    readonly attribute double bluePrimaryX;
-    readonly attribute double bluePrimaryY;
-    readonly attribute double whitePointX;
-    readonly attribute double whitePointY;
+  partial interface ScreenDetailed {
+    // The color volume that the screen is capable of displaying.
+    readonly attribute ColorVolume colorVolume;
   }
 ```
 
-### Enabling HDR on a canvas element
+### Color volume structure
 
-Add a new `CanvasHighDynamicRangeOptions` dictionary with HDR configuration options.
+Add a new color volume structure for use in several places.
 
 ```idl
-  dictionary CanvasHighDynamicRangeOptions {
+  dictionary ColorVolume {
+    // The color primaries and white point of a color volume, in CIE 1931 xy
+    // coordinates. 
+    required double redPrimaryX;
+    required double redPrimaryY;
+    required double greenPrimaryX;
+    required double greenPrimaryY;
+    required double bluePrimaryX;
+    required double bluePrimaryY;
+    required double whitePointX;
+    required double whitePointY;
+  }
+```
+
+### Enabling HDR on a canvas element's rendering context
+
+Add a new `CanvasColorMetadata` dictionary with HDR configuration options.
+
+```idl
+  dictionary CanvasColorMetadata {
     CanvasHighDynamicRangeMode mode = 'default';
     CanvasSmpteSt2086Metadata smpteSt2086Metadata;
   }
@@ -88,52 +92,54 @@ Add a new `CanvasHighDynamicRangeOptions` dictionary with HDR configuration opti
 
   // SMPTE ST 2086 color volume metadata.
   dictionary CanvasSmpteSt2086Metadata {
-    required float redPrimaryX;
-    required float redPrimaryY;
-    required float greenPrimaryX;
-    required float greenPrimaryY;
-    required float bluePrimaryX;
-    required float bluePrimaryY;
-    required float whitePointX;
-    required float whitePointY;
-    required float minimumLuminance;
-    required float maximumLuminance;
+    ColorVolume colorVolume;
+    required float minimumLuminanceNits;
+    required float maximumLuminanceNits;
   }
 ```
 
-Add a new method to `HTMLCanvasElement` to allow configuring HDR.
+Add a mechanism for specifying this on `CanvasRenderingContext2D`, `OffscreenCanvasRenderingContext2D`, ``WebGLRenderingContextBase`, and `GPUCanvasContext`.
 
+For 2D canvas this would be:
 ```idl
-  partial interface HTMLCanvasElement {
-    bool configureHighDynamicRange(CanvasHighDynamicRangeOptions options);
+  partial interface CanvasRenderingContext2D/OffscreenCanvasRenderingContext2D {
+    attribute CanvasColorMetadata colorMetadata;
   }
 ```
 
-### Higher bit storage formats for 2D contexts
-
-Add a new `CanvasStorageFormat` enum to allow for higher bit storage formats.
-
+For WebGL this would be:
 ```idl
-  enum CanvasStorageFormat {
-    'unorm-8',
-    'unorm-10-10-10-2',
-    'float-16',
+  partial interface WebGLRenderingContextBase {
+    attribute CanvasColorMetadata drawingBufferColorMetadata;
   }
 ```
 
-Add a `CanvasStorageFormat` entry to `CanvasRenderingContext2DSettings` to allow 2D rendering contexts to specify their buffer format.
-
+For WebGPU this would be:
 ```idl
-  partial dictionary CanvasRenderingContext2DSettings {
-    CanvasStorageFormat storageFormat = "unorm-8";
+  partial interface GPUCanvasContext {
+    attribute CanvasColorMetadata colorMetadata;
   }
 ```
 
-### Higher bit storage formats for WebGL and WebGPU
+### Higher bit storage formats for 2D Canvas, WebGL and WebGPU
+
+Canvas 2D's proposed [Canvas Floating Point Color Values](https://github.com/w3c/ColorWeb-CG/blob/main/canvas_float.md) allows for specifying higher bit depth canvas and ImageData.
 
 WebGL's proposed [``drawingBufferStorage``](https://github.com/KhronosGroup/WebGL/pull/3222) function allows for specifying higher bit depth formats.
 
-WebGPU's ``GPUSwapChainDescriptor`` can allow for specifying higher bit depth formats.
+WebGPU's ``GPUCanvasConfiguration`` can allow for specifying higher bit depth formats.
+
+### Display of floating point color values
+
+Define a screen's native linear color space to be the color space with color primaries and white point set to the screen's `ScreenDetailed`'s `colorVolume` and the identity as its transfer function.
+
+A color is said to be within a screen's default range if, when that color is converted to the screen's native linear color space (using relative colorimetric intent), all of its color components are within the `[0, 1]` interval.
+When displaying content produced by a rendering context with `CanvasHighDynamicRangeMode` set to `'default'`, all colors that are within the screen's default range must be displayed without any clamping or roll-offs (neither in chrominance nor luminance).
+
+A color is said to be within a screen's extended range if, when that color is converted to the screen's native linear color space (using relative colorimetric intent), all of its color components are within the `[0, highDynamicRangeHeadroom]` interval.
+When displaying content produced by a rendering context with `CanvasHighDynamicRangeMode` set to `'extended'`, all colors that are within the screen's extended range must be displayed without any clamping or roll-offs (neither in chrominance nor luminance).
+
+Colors that do not fall under this guarantee should be clamped to the indicated range during display, but may be subject to screen-specific behavior.
 
 ### Tone mapping
 
@@ -540,12 +546,12 @@ function convertREC2100HLGtoExtendedLinearSRGB(r, g, b) {
 
 ### Compositing the HDR `HTMLCanvasElement`
 
-The compositing behavior of an `HTMLCanvasElement` may be specified using the `configureHighDynamicRange` method.
+The compositing behavior of an `HTMLCanvasElement` may be specified via the `CanvasColorMetadata` attribute of its rendering context.
 
 #### Default behavior
 
 This section describes the default compositing behavior for canvas element.
-This is the behavior that happens if `configureHighDynamicRange` is not called, or if is called specifying `'default'` as the mode.
+This is the behavior that happens if the `CanvasColorMetadata` is not set, or if is called specifying `'default'` as the mode.
 
 In this mode, the `HTMLCanvasElement` will be composited exactly as an `<img>` or `<video>` element with a source in the canvas' color space would be composited.
 
@@ -554,7 +560,7 @@ This means that if the canvas' color space is `'rec2100-hlg'` or `'rec2100-pq'`,
 Note that if the canvas' color space is `'srgb-linear'` or `'srgb'`, then the canvas will not be composited using high dynamic range. Pixel values outside of the [0, 1] interval will extend the displayed gamut beyond sRGB, but not the displayed luminance beyond the maximum SDR luminance.
 
 Performing appropriate tone mapping is the responsibility of the browser, the operating system, and the display device.
-If the `configureHighDynamicRange` method is called with `CanvasHighDynamicRangeOptions` that specify metadata and the canvas' color space is `'rec2100-pq'`, then this metadata will be interpreted during compositing in the same way that it would be interpreted if included in a source displayed via an `<img>` or `<video>` element.
+If the `CanvasColorMetadata` is set to specify metadata and the canvas' color space is `'rec2100-pq'`, then this metadata will be interpreted during compositing in the same way that it would be interpreted if included in a source displayed via an `<img>` or `<video>` element.
 
 #### Extended mode
 
@@ -564,7 +570,7 @@ It is guaranteed that SDR colors in this mode exactly match SDR colors in non-HD
 For example, a canvas pixel value of `'(1,0,0)'` in `'srgb'` is guaranteed to match the CSS color `'red'`.
 
 Performing appropriate tone mapping is the responsibility of the browser, the operating system, and the display device.
-If the `configureHighDynamicRange` method is called with `CanvasHighDynamicRangeOptions` that specify a maximum luminance that is greater than the display's luminance, then tone mapping will be applied to prevent clipping of luminance values below to the specified maximum luminance.
+If the `CanvasColorMetadata` specifies a maximum luminance that is greater than the display's luminance, then tone mapping will be applied to prevent clipping of luminance values below to the specified maximum luminance.
 Note that the tone mapping algorithm may not alter any SDR color values (otherwise the SDR color matching guarantee would be violated).
 
 ## Privacy considerations
@@ -599,10 +605,10 @@ In this example, a WebGL application enables and HDR default drawing buffer, and
 
 ```javascript
     var canvas = document.getElementById('MyCanvas');
-    canvas.configureHighDynamicRange({mode:'extended'});
 
     var gl = canvas.getContext('webgl2');
     gl.drawingBufferStorage(gl.RGBA16F, canvas.width, canvas.height);
+    gl.drawingBufferColorMetadata = {mode:'extended'};
     gl.colorSpace = 'srgb-linear';
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -721,9 +727,9 @@ The fix for this that I propose is to allow a `'hlg'` and `'pq'` `CanvasHighDyna
 In that case, the code to work in a linearized HLG space would be:
 
 ```javascript
-    canvas.configureHighDynamicRange({mode:'hlg'});
     var context = canvas.getContext('2d',
         {colorSpace:'srgb-linear', storageFormat:'float-16'});
+    context.colorMetadata = {mode:'hlg'};
 ```
 
 ### ImageBitmap conversion options
