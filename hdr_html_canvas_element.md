@@ -298,39 +298,60 @@ _Note 2:_ See section 5.3 in ITU-R BT.2408-4 relating to negative transfer funct
 
 ##### `srgb-linear` to `rec2100-pq`
 
-_Input:_ Full-range non-linear floating-point `srgb-linear` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+_Input:_ Full-range non-linear floating-point `srgb-linear` pixel. Values may exist outside the range 0.0 to 1.0.
 
-_Output:_ Full-range non-linear floating-point `rec2100-pq` pixel with black at 0.0 and diffuse white at ???. Values may exist outside the range 0.0 to 1.0.
+_Output:_ Full-range non-linear floating-point `rec2100-pq` pixel in the range 0.0 to 1.0.
 
 _Process:_
+
+1. Convert from sRGB color to Rec. ITU-R BT.2020 color
+2. Apply PQ Inverse EOTF, mapping such that a luminance of 203 cd/m<sup>2</sup> results in a value 1.0 in `srgb-linear`.
 
 ```javascript
-  function connectionTransferFunction(x) {
-    const c1 =  107 / 128;
-    const c2 = 2413 / 128;
-    const c3 = 2392 / 128;
-    const m1 = 1305 / 8192;
-    const m2 = 2523 / 32;
-    const k = 203;
-    if (x < 0) {
-      return 0;
-    } else if (x <= 1) {
-      const p = Math.pow(x, 1 / m2);
-      return (10000 / k) * Math.pow((p - c1) / (c2 - c3 * p), 1 / m1);
-    } else {
-      return (10000 / k);
-    }
+function convertLinearSRGBtoREC2100PQ(r, g, b) {
+
+  const p2 = matrixXYZtoBT2020(matrixSRGBtoXYZ(r, g, b));
+
+  const k = 203;
+
+  let p3 = []
+  for (let i = 0; i < 3; i++) {
+
+    if (p2[i] < 0)
+      p3[i] = 0;
+    else if (p2[i] <= 10000/k) {
+      p3[i] = pqInverseEOTF(k * p2[i]);
+    else
+      p3[i] = 1.0;
+  }
+
+  return p3;
+}
 ```
 
-_Note:_ The factor `k` is selected such that a display luminance of 203 cd/m<sup>2</sup> results in a linear color value of 1 in `srgb-linear`.
+##### `rec2100-pq` to `srgb-linear`
 
-##### `srgb-linear` to `rec2100-pq`
+_Input:_ Full-range non-linear floating-point `rec2100-pq` pixel in the range 0.0 to 1.0.
 
-_Input:_ Full-range non-linear floating-point `extended-srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
-
-_Output:_ Full-range non-linear floating-point `rec2100-pq` pixel with black at 0.0 and diffuse white at ???. Values may exist outside the range 0.0 to 1.0.
+_Output:_ Full-range non-linear floating-point `srgb-linear` pixel. Values may exist outside the range 0.0 to 1.0.
 
 _Process:_
+
+1. Apply PQ Inverse EOTF, mapping such that a luminance of 203 cd/m<sup>2</sup> results in a value 1.0 in `srgb-linear`.
+2. Convert from Rec. ITU-R BT.2020 color to sRGB color
+
+```javascript
+function convertREC2100PQToLinearSRGB(r, g, b) {
+
+  const k = 203;
+
+  const r3 = pqEOTF(r) / k;
+  const g3 = pqEOTF(g) / k;
+  const b3 = pqEOTF(b) / k;
+
+  return matrixXYZtoSRGB(matrixBT2020toXYZ(r3, g3, b3));
+}
+```
 
 #### Between SDR and HDR color spaces
 
