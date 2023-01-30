@@ -213,6 +213,10 @@ canvas](https://html.spec.whatwg.org/multipage/canvas.html#dom-context-2d-getima
 between predefined SDR color spaces are defined at <https://www.w3.org/TR/css-color-4/>, and this proposal similarly defines
 conversions for HDR color spaces.
 
+The following illustrates the conversions that are explicitly specified:
+
+![Color space conversions](./color-space-conversions.png)
+
 These conversions fall into two broad categories:
 
 * conversion between HDR color spaces
