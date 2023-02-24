@@ -1,35 +1,52 @@
-# High Dynamic Range (HDR) HTML Canvas
+# Adding support High Dynamic Range (HDR) imagery to HTML Canvas
+
+## Introduction
+
+Today [HTML
+Canvas](https://html.spec.whatwg.org/multipage/canvas.html#imagedata) supports
+only 8 bit per color channel and two `PredefinedColorSpace` color spaces (`srgb`
+and `display-p3`).
+
+This is insufficient for High-Dynamic Range (HDR) imagery, which is in
+widespread use today:
+
+* As detailed, for example, at [Ultra HD Blu-ray Format Video Characteristics
+](https://ieeexplore.ieee.org/document/7514362), 8-bit quantization (bit depth)
+results in contouring and banding, even for traditional standard dynamic range
+(SDR) imagery, like sRGB, which covers a typical luminance range between 0 and
+100 cd/m<sup>2</sup>. These quantization artifacts become unacceptable with
+High-Dynamic Range (HDR) imagery, supports luminance ranges between 0 and up to
+10,000 cd/m<sup>2</sup>.
+
+* As specified at [Rec. ITU-R BT.2100](https://www.itu.int/rec/R-REC-BT.2100),
+two color spaces tailored for HDR imagery have developed: BT.2100 PQ and BT.2100
+HLG.
+
+* To render HDR imagery, it is useful to have information on the luminance range
+and color gamut that (a) are supported by the display and (b) were used when
+authoring the image.
+
+Accordingly, the following API modifications are needed to manipulate HDR images
+in HTML Canvas:
+
+1. add the ability to query the luminance range and color gamut of the display
+2. add BT.2100 PQ and BT.2100 HLG color spaces to `PredefinedColorSpace`
+3. add higher bit depth capabilities to `CanvasRenderingContext2DSettings`
+4. add higher bit depth capabilities to `ImageDataSettings`
+5. add luminance and color gamut information to `ImageDataSettings` and
+   `CanvasRenderingContext2DSettings`
 
 ## Scope
 
-We propose to extend the HTML Canvas API to support High Dynamic Range (HDR) imagery.
+We propose to extend the Web Platform to allow the HTML Canvas API to manipulate
+High Dynamic Range (HDR) images.
 
-## Primary requirements
-
-* Minimum performance overhead
-* Draw SDR content in an HDR canvas with the result being identical  the same SDR content had been drawn in an SDR canvas
-* Draw Standard Dynamic Range (SDR) images such that these images appear as they would if displayed in an `<img>` tag
-* Draw IUT-R BT.2100 Hybrid Log-Gamma (HLG) encoded (HDR) images such that these images appear as they would if displayed via an
-  `<img>` or `<video>` tag
-* Draw IUT-R BT.2100 Perceptual Quantiser (PQ) encoded (HDR) images such that these images appear as they would if displayed via an
-  `<img>` or `<video>` tag
-
-## Summary
-
-We propose to introduce:
-
-* two new color spaces: `rec2100-hlg`, `rec2100-pq`
-* define new HDR semantics for existing `PredefinedColorSpace` color spaces
-* color metadata relevant to HDR rendering to the `HTMLCanvasElement`'s rendering context.
-* screen parameters relevant to HDR rendering using the `ScreenAdvanced` interface
-* fallback reference conversions between HDR color spaces
-* fallback reference conversion between SDR and HDR color spaces
-
-## Proposal
+## Add the ability to query the luminance range and color gamut of the display
 
 ### Querying screen HDR parameters
 
-Add a new attribute to `ScreenAdvanced` to indicate the HDR headroom currently available on the screen.
+Add a new attribute to `ScreenAdvanced` to indicate the HDR headroom currently
+available on the screen.
 
 ```idl
   partial interface ScreenAdvanced {
@@ -40,11 +57,10 @@ Add a new attribute to `ScreenAdvanced` to indicate the HDR headroom currently a
   }
 ```
 
-See below for more details on the display of floating point color values.
-
 ### Querying screen wide color gamut parameters
 
-Add new attributes to `ScreenDetailed` to indicate the gamut and white point of the screen.
+Add new attributes to `ScreenDetailed` to indicate the gamut and white point of
+the screen.
 
 ```idl
   partial interface ScreenDetailed {
@@ -53,14 +69,10 @@ Add new attributes to `ScreenDetailed` to indicate the gamut and white point of 
   }
 ```
 
-### Color volume structure
-
-Add a new color volume structure for use in several places.
-
 ```idl
   dictionary ColorVolume {
     // The color primaries and white point of a color volume, in CIE 1931 xy
-    // coordinates. 
+    // coordinates.
     required double redPrimaryX;
     required double redPrimaryY;
     required double greenPrimaryX;
@@ -72,22 +84,104 @@ Add a new color volume structure for use in several places.
   }
 ```
 
-### Enabling HDR on a canvas element's rendering context
+## Add color spaces intended for use with HDR imagery
 
-Add a new `CanvasColorMetadata` dictionary with HDR configuration options.
+### General
+
+Extend `PredefinedColorSpace` to include the following color spaces.
 
 ```idl
+  partial enum PredefinedColorSpace {
+    'rec2100-hlg',
+    'rec2100-pq',
+    'linear-srgb'
+  }
+```
+
+As illustrated below, the tone mapping of `rec2100-pq` and `rec2100-hlg` images,
+i.e. the rendering of an image with a given dynamic range onto a display with
+different dynamic range, is performed by the platform. This is akin to the
+scenario where the `src` of an `img` element is a PQ or HLG image.
+
+![Tone mapping scenarios](./tone-mapping-scenarios.png)
+
+Conversions to and from `rec2100-pq` and `rec2100-hlg` are detailed in Annex A
+below.
+
+Extending `PredefinedColorSpace` automatically extends
+`CanvasRenderingContext2DSettings` and `ImageDataSettings`.
+
+### rec2100-hlg
+
+The component signals are mapped to red, green and blue tristimulus values
+according to the Hybrid Log-Gamma (HLG) system specified in Rec. ITU-R BT.2100.
+
+### rec2100-pq
+
+The component signals are mapped to red, green and blue tristimulus values
+according to the Perceptual Quantizer (PQ) system system specified in Rec. ITU-R
+BT.2100.
+
+### linear-srgb
+
+`linear-srgb` is specified in CSS Color 4 and is useful for physics-based
+rendering of HDR scenes.
+
+### Extend `CanvasRenderingContext2DSettings` to support higher bit depths
+
+Add to `CanvasRenderingContext2DSettings` a `CanvasColorType` member that
+specifies the representation of each pixel of the _output bitmap_ of a
+`CanvasRenderingContext2D` and `OffscreenCanvasRenderingContext2D`.
+
+```idl
+  partial dictionary CanvasRenderingContext2DSettings {
+    CanvasColorType colorType = "unorm8";
+  };
+```
+
+```idl
+  enum CanvasColorType {
+    "unorm8",
+    "float16",
+  };
+```
+
+`colorType = "unorm8"` corresponds to HTML Canvas as it exists today.
+
+### Extend `ImageDataSettings` to support higher bit depths
+
+Add to `ImageDataSettings` a `ImageDataColorType` member that specifies the type
+of the `data` member of `ImageData`.
+
+```idl
+  partial dictionary ImageDataSettings {
+    ImageDataColorType colorType = "Uint8ClampedArray";
+  };
+```
+
+```idl
+  enum ImageDataColorType {
+    "Uint8ClampedArray",
+    "Float16Array",
+    "Float32Array"
+    // and potentially others
+  };
+```
+
+## Add luminance and color gamut information to `ImageDataSettings` and `CanvasRenderingContext2DSettings`
+
+Add a new CanvasColorMetadata dictionary:
+
   dictionary CanvasColorMetadata {
     CanvasHighDynamicRangeMode mode = 'default';
     CanvasSmpteSt2086Metadata smpteSt2086Metadata;
   }
 
   enum CanvasHighDynamicRangeMode {
-    // The default behavior. Enables HDR for 'rec2100-hlg' and 'rec2100-pq'
-    // color spaces only.
+    // The default behavior.
+    // HDR is enabled for 'rec2100-hlg' and 'rec2100-pq' color spaces only.
     'default',
-
-    // Enables extended luminance while preserving SDR color matching.
+    // HDR is enabled for all color spaces
     'extended',
   }
 
@@ -97,101 +191,56 @@ Add a new `CanvasColorMetadata` dictionary with HDR configuration options.
     required float minimumLuminanceNits;
     required float maximumLuminanceNits;
   }
-```
 
-Add a mechanism for specifying this on `CanvasRenderingContext2D`, `OffscreenCanvasRenderingContext2D`, `WebGLRenderingContextBase`, and `GPUCanvasContext`.
+Add a mechanism for specifying this on `CanvasRenderingContext2D` and
+`OffscreenCanvasRenderingContext2D`.
 
-For 2D canvas this would be:
-```idl
   partial interface CanvasRenderingContext2D/OffscreenCanvasRenderingContext2D {
     attribute CanvasColorMetadata colorMetadata;
   }
-```
 
-For WebGL this would be:
-```idl
-  partial interface WebGLRenderingContextBase {
-    attribute CanvasColorMetadata drawingBufferColorMetadata;
-  }
-```
+The semantics of `CanvasHighDynamicRangeMode` are as follows:
 
-For WebGPU this would be:
-```idl
-  partial interface GPUCanvasContext {
-    attribute CanvasColorMetadata colorMetadata;
-  }
-```
+* Define a *screen's native linear color space* to be the color space with color
+primaries and white point set to the screen's `ScreenDetailed`'s `colorVolume`
+and the identity as its transfer function.
 
-### Pixel bit depths greater than 8 bits for Canvas, WebGL and WebGPU
-
-As implied by its names, HDR imagery benefits from more then 8 bits per component. Proposals to extend the HTML Canvas API and WebGL
-APIs are covered in other documents:
-
-* Canvas 2D's proposed [Canvas Floating Point Color Values](https://github.com/w3c/ColorWeb-CG/blob/main/canvas_float.md) allows for
-  specifying higher bit depth canvas and ImageData.
-* WebGL's proposed [``drawingBufferStorage``](https://github.com/KhronosGroup/WebGL/pull/3222) function allows for specifying higher
-  bit depth formats.
-
-[The WebGPU ``GPUCanvasConfiguration``](https://www.w3.org/TR/webgpu/#canvas-configuration) already allows 16-bit float values and
-can be further extended if needs be.
-
-### Extend existing `PredefinedColorSpace` color spaces for HDR imagery
-
-Define a *screen's native linear color space* to be the color space with color primaries and white point set to the screen's
-`ScreenDetailed`'s `colorVolume` and the identity as its transfer function.
-
-A color is said to be within a *screen's default range* if, when that color is converted to the *screen's native linear color
-space*, all of its color components are within the `[0, 1]` interval. When displaying content produced by a rendering context with
-`CanvasHighDynamicRangeMode` set to `'default'`, all colors that are within the *screen's default range* must not be gamut-mapped;
+* A color is said to be within a *screen's default range* if, when that color is
+converted to the *screen's native linear color space*, all of its color
+components are within the `[0, 1]` interval. When displaying content produced by
+a rendering context with `CanvasHighDynamicRangeMode` set to `'default'`, all
+colors that are within the *screen's default range* must not be gamut-mapped;
 other colors may be clipped or subject to screen-specific behavior.
 
-A color is said to be within a screen's *extended range* if, when that color is converted to the *screen's native linear color
-space*, all of its color components are within the `[0, highDynamicRangeHeadroom]` interval. When displaying content produced by a
-rendering context with `CanvasHighDynamicRangeMode` set to `'extended'`, all colors that are within the *screen's extended range*
-must not be gamut-mapped; other colors may be clipped or subject to screen-specific behavior.
+* A color is said to be within a screen's *extended range* if, when that color
+is converted to the *screen's native linear color space*, all of its color
+components are within the `[0, highDynamicRangeHeadroom]` interval. When
+displaying content produced by a rendering context with
+`CanvasHighDynamicRangeMode` set to `'extended'`, all colors that are within the
+*screen's extended range* must not be gamut-mapped; other colors may be clipped
+or subject to screen-specific behavior.
 
-### New HDR-specific color spaces
+## Annex A: Color space conversions
 
-#### General
+### Background
 
-Update `PredefinedColorSpace` to include the following color spaces.
+In general, application should avoid conversions between color spaces and
+maintain imagery in its original color space: conversions between color spaces
+are not necessarily reversible and do not necessarily result in the same image
+appearance. In particular, conversion of an HDR image to an SDR will result in a
+signification loss of information and an SDR image that is different from the
+SDR image that would have been mastered from the same source material. From that
+perspective, converting from HDR to SDR imagery is similar to converting RGBA
+images to 16-color pallette images.
 
-```idl
-  partial enum PredefinedColorSpace {
-    'rec2100-hlg',
-    'rec2100-pq',
-  }
-```
-
-As illustrated below, the tone mapping of `rec2100-pq` and `rec2100-hlg` images, i.e. the rendering of an image with a given dynamic
-range onto a display with different dynamic range, is performed by the platform. This is akin to the scenario where the `src` of an
-`img` element is a PQ or HLG image.
-
-![Tone mapping scenarios](./tone-mapping-scenarios.png)
-
-#### rec2100-hlg
-
-The component signals are mapped to red, green and blue tristimulus values according to the Hybrid Log-Gamma (HLG) system specified in Rec. ITU-R BT.2100.
-
-#### rec2100-pq
-
-The component signals are mapped to red, green and blue tristimulus values according to the Perceptual Quantizer (PQ) system system specified in Rec. ITU-R BT.2100.
-
-### Color space conversions
-
-#### Background
-
-In general, application should avoid conversions between color spaces and maintain imagery in its original color space: conversions
-between color spaces are not necessarily reversible and do not necessarily result in the same image appearance. In particular,
-conversion of an HDR image to an SDR will result in a signification loss of information and an SDR image that is different from the
-SDR image that would have been mastered from the same source material. From that perspective, converting from HDR to SDR imagery is
-similar to converting RGBA images to 16-color pallette images.
-
-Nevertheless, the HTML specification allows color space conversion in several scenarios, e.g., when [drawing images to a
-canvas](https://html.spec.whatwg.org/multipage/canvas.html#colour-spaces-and-colour-correction), [retrieving image data from a
-canvas](https://html.spec.whatwg.org/multipage/canvas.html#dom-context-2d-getimagedata), among others being added). The conversions
-between predefined SDR color spaces are defined at <https://www.w3.org/TR/css-color-4/>, and this proposal similarly defines
-conversions for HDR color spaces.
+Nevertheless, the HTML specification allows color space conversion in several
+scenarios, e.g., when [drawing images to a
+canvas](https://html.spec.whatwg.org/multipage/canvas.html#colour-spaces-and-colour-correction),
+[retrieving image data from a
+canvas](https://html.spec.whatwg.org/multipage/canvas.html#dom-context-2d-getimagedata),
+among others being added). The conversions between predefined SDR color spaces
+are defined at <https://www.w3.org/TR/css-color-4/>, and this proposal similarly
+defines conversions for HDR color spaces.
 
 The following illustrates the conversions that are explicitly specified:
 
@@ -202,32 +251,40 @@ These conversions fall into two broad categories:
 * conversion between HDR color spaces
 * conversion between an HDR and an SDR color space (tone mapping)
 
-#### Between HDR color spaces
+### Between HDR color spaces
 
-The conversion between `rec2100-pq` and `rec2100-hlg` is specified at [Report ITU-R BT.2408-5, Clause 6](https://www.itu.int/pub/R-REP-BT.2408),
+The conversion between `rec2100-pq` and `rec2100-hlg` is specified at [Report
+ITU-R BT.2408-5, Clause 6](https://www.itu.int/pub/R-REP-BT.2408),
 
-#### Between SDR and HDR color spaces
+### Between SDR and HDR color spaces
 
-##### General
+#### General
 
 Conversions to and from `srgb` are provided for `rec2100-pq` and `rec2100-hlg` color spaces.
 
-##### `rec2100-pq` to `srgb`
+#### `rec2100-pq` to `srgb`
 
-Tone mapping from `rec2100-pq` to `srgb` is specified at [SMPTE ST 2094-10, Annex B](https://ieeexplore.ieee.org/document/7513370).
+Tone mapping from `rec2100-pq` to `srgb` is specified at [SMPTE ST 2094-10,
+Annex B](https://ieeexplore.ieee.org/document/7513370).
 
-##### `rec2100-hlg` to `srgb`
+#### `rec2100-hlg` to `srgb`
 
-_Input:_ Full-range non-linear floating-point `rec2100-hlg` pixel with black at 0.0 and diffuse white at 0.75. Values may exist outside the range 0.0 to 1.0.
+_Input:_ Full-range non-linear floating-point `rec2100-hlg` pixel with black at
+0.0 and diffuse white at 0.75. Values may exist outside the range 0.0 to 1.0.
 
-_Output:_ Full-range non-linear floating-point `srgb` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
+_Output:_ Full-range non-linear floating-point `srgb` pixel with black at 0.0
+and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
 
 _Process:_
-  1. Pseudo-linearize the HLG signal exploiting its backwards compatibility with SDR consumer displays
+  1. Pseudo-linearize the HLG signal exploiting its backwards compatibility with
+     SDR consumer displays
   2. Convert from ITU BT.2100 color space to sRGB color space
   3. Convert back to non-linear using a reciprocal transform
 
-_Note 3_ This transform utilises the backwards compatibility of ITU-R BT.2100 HLG HDR with consumer electronic displays.  Prior to display, the gamut may need to be limited to the range 0-1.  The simplest method is to clip values but other gamut reduction techniques may provide better output images.
+_Note 3_ This transform utilises the backwards compatibility of ITU-R BT.2100
+HLG HDR with consumer electronic displays.  Prior to display, the gamut may need
+to be limited to the range 0-1.  The simplest method is to clip values but other
+gamut reduction techniques may provide better output images.
 
 ```javascript
 
@@ -261,224 +318,59 @@ function tonemapREC2100HLGtoSRGBdisplay(r, g, b) {
 }
 ```
 
-##### `srgb` to `rec2100-hlg`
+#### `srgb` to `rec2100-hlg`
 
-See [TTML 2, Annex Q.2, steps 1-8](https://www.w3.org/TR/ttml2/#hlg-hdr) with `tts:luminanceGain = 203/80`.
+See [TTML 2, Annex Q.2, steps 1-8](https://www.w3.org/TR/ttml2/#hlg-hdr) with
+`tts:luminanceGain = 203/80`.
 
-##### `srgb` to `rec2100-pq`
+#### `srgb` to `rec2100-pq`
 
 See [TTML 2, Annex Q.1, steps 1-8](https://www.w3.org/TR/ttml2/#hdr-compositing).
 
-### Compositing the HDR `HTMLCanvasElement`
+## Annex B: Compositing the HDR `HTMLCanvasElement`
 
-The compositing behavior of an `HTMLCanvasElement` may be specified via the `CanvasColorMetadata` attribute of its rendering context.
+The compositing behavior of an `HTMLCanvasElement` may be specified via the
+`CanvasColorMetadata` attribute of its rendering context.
 
-#### Default behavior
+### Default behavior
 
-This section describes the default compositing behavior for canvas element.
-This is the behavior that happens if the `CanvasColorMetadata` is not set, or if is called specifying `'default'` as the mode.
+This section describes the default compositing behavior for canvas element. This
+is the behavior that happens if the `CanvasColorMetadata` is not set, or if is
+called specifying `'default'` as the mode.
 
-In this mode, the `HTMLCanvasElement` will be composited exactly as an `<img>` or `<video>` element with a source in the canvas'
-color space would be composited.
+In this mode, the `HTMLCanvasElement` will be composited exactly as an `<img>`
+or `<video>` element with a source in the canvas' color space would be
+composited.
 
-This means that if the canvas' color space is `'rec2100-hlg'` or `'rec2100-pq'`, then the canvas will be composited using high
-dynamic range, where available.
+This means that if the canvas' color space is `'rec2100-hlg'` or `'rec2100-pq'`,
+then the canvas will be composited using high dynamic range, where available.
 
-Otherwise, e.g. if the canvas' color space is `'srgb-linear'` or `'srgb'`, the canvas will not be composited using high dynamic
-range. Pixel values outside of the [0, 1] interval will extend the displayed gamut beyond sRGB, but not the displayed luminance
-beyond the maximum SDR luminance.
-
-Performing appropriate tone mapping is the responsibility of the browser, the operating system, and the display device. If the
-`CanvasColorMetadata` is set to specify metadata and the canvas' color space is `'rec2100-pq'`, then this metadata will be
-interpreted during compositing in the same way that it would be interpreted if included in a source displayed via an `<img>` or
-`<video>` element.
-
-#### Extended mode
-
-If the canvas' color space is `'srgb-linear'` or `'srgb'`, then pixels values outside of the [0, 1] interval will extend the
+Otherwise, e.g. if the canvas' color space is `'srgb-linear'` or `'srgb'`, the
+canvas will not be composited using high dynamic range. Pixel values outside of
+the [0, 1] interval will extend the displayed gamut beyond sRGB, but not the
 displayed luminance beyond the maximum SDR luminance.
 
-It is guaranteed that SDR colors in this mode exactly match SDR colors in non-HDR content on the page. For example, a canvas pixel
-value of `'(1,0,0)'` in `'srgb'` is guaranteed to match the CSS color `'red'`.
+Performing appropriate tone mapping is the responsibility of the browser, the
+operating system, and the display device. If the `CanvasColorMetadata` is set to
+specify metadata and the canvas' color space is `'rec2100-pq'`, then this
+metadata will be interpreted during compositing in the same way that it would be
+interpreted if included in a source displayed via an `<img>` or `<video>`
+element.
 
-Performing appropriate tone mapping is the responsibility of the browser, the operating system, and the display device. If the
-`CanvasColorMetadata` specifies a maximum luminance that is greater than the display's luminance, then tone mapping will be applied
-to prevent clipping of luminance values below to the specified maximum luminance. Note that the tone mapping algorithm may not alter
-any SDR color values (otherwise the SDR color matching guarantee would be violated).
+### Extended mode
 
-## Privacy considerations
+If the canvas' color space is `'srgb-linear'` or `'srgb'`, then pixels values
+outside of the [0, 1] interval will extend the displayed luminance beyond the
+maximum SDR luminance.
 
-The precise capabilities of the output display, such as the exact color gamut and the precise maximum luminance values, are
-fingerprinting vectors, and should not be exposed to the application without user permission.
+It is guaranteed that SDR colors in this mode exactly match SDR colors in
+non-HDR content on the page. For example, a canvas pixel value of `'(1,0,0)'` in
+`'srgb'` is guaranteed to match the CSS color `'red'`.
 
-Access to these values is protected behind the same permission prompt that protects other screen capability fingerprinting vectors
-in the [window placement proposal](https://github.com/webscreens/window-placement/blob/main/EXPLAINER.md).
-
-## Example Applications
-
-### Detecting HDR capabilities
-
-The `getScreens` method will prompt the user for permission to reveal fingerprintable information.
-
-```javascript
-  let screens = await window.getScreens();
-  console.log('HDR headroom: ' + currentScreen.highDynamicRangeHeadroom);
-```
-
-If `getScreens` is denied, then media queries may be used to determine the screen's capabilities, at a high level.
-
-```javascript
-  let hasHighDynamicRange = window.matchMedia('(dynamic-range: high)').matches;
-  console.log('HDR capable: ' + hasHighDynamicRange);
-```
-
-### The `srgb-linear` color space
-
-#### WebGL using extended mode
-
-In this example, a WebGL application enables and HDR default drawing buffer, and clears it to the pixel value `(1,1,1,1)`.
-
-```javascript
-    var canvas = document.getElementById('MyCanvas');
-
-    var gl = canvas.getContext('webgl2');
-    gl.drawingBufferStorage(gl.RGBA16F, canvas.width, canvas.height);
-    gl.drawingBufferColorMetadata = {mode:'extended'};
-    gl.colorSpace = 'srgb-linear';
-    gl.clearColor(1.0, 1.0, 1.0, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-```
-
-When composited, this canvas is guaranteed to be the same color as the CSS color `'white'`.
-
-### The `rec2100-hlg` color space
-
-#### Displaying an HLG image in an SDR 2D canvas
-
-In this example, we use an SDR 2D canvas to display a HLG image.
-This image will map into the SDR range without clipping.
-
-```javascript
-    var canvas = document.getElementById('MyCanvas');
-    var context = canvas.getContext('2d');
-
-    var image = new Image();
-    image.onload = function() {
-      context.drawImage(image, 0, 0, image.width, image.height);
-    }
-    var url = 'https://storage.googleapis.com/dalecurtis/cosmos_hlg.avif';
-    image.src = url;
-```
-
-#### Displaying an HLG image in an HLG 2D canvas
-
-In this example, we use an HLG 2D canvas to display a HLG image.
-
-```javascript
-    var canvas = document.getElementById('MyCanvas');
-    var context = canvas.getContext('2d',
-        {colorSpace:'rec2100-hlg', storageFormat:'unorm-10-10-10-2'});
-
-    // Load and draw the image to the canvas.
-    var image = new Image();
-    image.onload = function() {
-      context.drawImage(image, 0, 0, image.width, image.height);
-    }
-    var url = 'https://storage.googleapis.com/dalecurtis/cosmos_hlg.avif';
-    image.src = url;
-```
-
-This canvas, when composited, will always be identical to displaying the image an ordinary `<img>` element.
-
-```xml
-  <img src='https://storage.googleapis.com/dalecurtis/cosmos_hlg.avif'/>
-```
-
-#### Adding subtitles to an HLG image
-
-Suppose we wish to change the above example to draw subtitles at a brightness that corresponds to an HLG signal value of 0.75.
-
-```javascript
-    var canvas = document.getElementById('MyCanvas');
-    var context = canvas.getContext('2d',
-        {colorSpace:'rec2100-hlg', storageFormat:'unorm-10-10-10-2'});
-
-    // Load and draw the image to the canvas.
-    var image = new Image();
-    image.onload = function() {
-      context.drawImage(image, 0, 0, image.width, image.height);
-
-      // Draw a subtitle!
-      context.fillStyle = 'color(rec2100-hlg 0.75  0.75 0.75)';
-      context.fillText('Hello, I am a subtitle!');
-    }
-    var url = 'https://storage.googleapis.com/dalecurtis/cosmos_hlg.avif';
-    image.src = url;
-```
-
-Note that this is identical to specifying the subtitle color in `'srgb-linear'`.
-
-```javascript
-    context.fillStyle = 'color(srgb-linear 0.265  0.265 0.265)';
-```
-
-### The `rec2100-pq` color space
-
-In this example, we use a PQ 2D canvas to display a PQ image.
-
-```javascript
-    var canvas = document.getElementById('MyCanvas');
-    var context = canvas.getContext('2d',
-        {colorSpace:'rec2100-pq', storageFormat:'unorm-10-10-10-2'});
-
-    // Load and draw the image to the canvas.
-    var image = new Image();
-    image.onload = function() {
-      context.drawImage(image, 0, 0, image.width, image.height);
-    }
-    var url = 'https://storage.googleapis.com/dalecurtis/cosmos_1000_pq_hdr.avif';
-    image.src = url;
-```
-
-There is no guarantee that this canvas, when composited, will be equivalent to displaying the image an ordinary `<img>` element.
-
-```xml
-  <img src='https://storage.googleapis.com/dalecurtis/cosmos_hlg.avif'/>
-```
-
-The reason this guarantee cannot be made is that the `<img>` element may do custom tonemapping based on embedded metadata.
-There does not exist any API for extracting this metadata from an `Image` object, and thus this metadata cannot be passed on to the `HTMLCanvasElement`.
-
-## Issues
-
-The above is a simplified version of the API that was proposed earlier.
-
-### HDR compositing independent of color space
-
-In the existing API, there is no way to have a linear space working space for an HLG or PQ canvas
-
-The fix for this that I propose is to allow a `'hlg'` and `'pq'` `CanvasHighDynamicRangeMode`.
-
-In that case, the code to work in a linearized HLG space would be:
-
-```javascript
-    var context = canvas.getContext('2d',
-        {colorSpace:'srgb-linear', storageFormat:'float-16'});
-    context.colorMetadata = {mode:'hlg'};
-```
-
-### ImageBitmap conversion options
-
-The `ImageBitmapOptions` structure already has `colorSpace` and `colorSpaceConversion` members.
-
-The `colorSpaceConversion` has `default`, which is relative colorimetric intent, and `none`, which is to simply reinterpret values directly.
-
-We could consider adding a `perceptual` option for `colorSpaceConversion`, which would perform some sort of tonemapping. We could also add a `bt2408` option.
-
-### Appropriate location for HDR configuration
-
-In this proposal, the HDR configuration data has been attached to the `HTMLCanvasElement`.
-Arguably, the HDR configuration data could be attached to the `CanvasRenderingContext2D` and `WebGLRenderingContextBase`.
-
-The HDR configuration data should travel with an `ImageBitmap` when displayed in an `ImageBitmapRenderingContext`.
-That may inform where we should put this.
+Performing appropriate tone mapping is the responsibility of the browser, the
+operating system, and the display device. If the `CanvasColorMetadata` specifies
+a maximum luminance that is greater than the display's luminance, then tone
+mapping will be applied to prevent clipping of luminance values below to the
+specified maximum luminance. Note that the tone mapping algorithm may not alter
+any SDR color values (otherwise the SDR color matching guarantee would be
+violated).
