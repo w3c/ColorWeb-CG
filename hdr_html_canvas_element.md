@@ -7,7 +7,8 @@ We propose to extend the HTML Canvas API to support High Dynamic Range (HDR) ima
 ## Primary requirements
 
 * Minimum performance overhead
-* Draw Standard Dynamic Range (SDR) images such that these images appear as they would if display in an `<img>` tag
+* Draw SDR content in an HDR canvas with the result being identical  the same SDR content had been drawn in an SDR canvas
+* Draw Standard Dynamic Range (SDR) images such that these images appear as they would if displayed in an `<img>` tag
 * Draw IUT-R BT.2100 Hybrid Log-Gamma (HLG) encoded (HDR) images such that these images appear as they would if displayed via an
   `<img>` or `<video>` tag
 * Draw IUT-R BT.2100 Perceptual Quantiser (PQ) encoded (HDR) images such that these images appear as they would if displayed via an
@@ -17,10 +18,9 @@ We propose to extend the HTML Canvas API to support High Dynamic Range (HDR) ima
 
 We propose to introduce:
 
-* three new HDR-specific color spaces: `srgb-linear`, `rec2100-hlg`, `rec2100-pq`
-* an HDR mode for the existing `srgb` color space
-* pixel bit depths greater than 8 bits
-* image parameters relevant to HDR rendering to the `HTMLCanvasElement`'s rendering context.
+* two new color spaces: `rec2100-hlg`, `rec2100-pq`
+* define new HDR semantics for existing `PredefinedColorSpace` color spaces
+* color metadata relevant to HDR rendering to the `HTMLCanvasElement`'s rendering context.
 * screen parameters relevant to HDR rendering using the `ScreenAdvanced` interface
 * fallback reference conversions between HDR color spaces
 * fallback reference conversion between SDR and HDR color spaces
@@ -124,7 +124,8 @@ For WebGPU this would be:
 
 ### Pixel bit depths greater than 8 bits for Canvas, WebGL and WebGPU
 
-As implied by its names, HDR imagery requires more then 8 bits per component. Proposals to extend the HTML Canvas API and WebGL APIs are covered in other documents:
+As implied by its names, HDR imagery benefits from more then 8 bits per component. Proposals to extend the HTML Canvas API and WebGL
+APIs are covered in other documents:
 
 * Canvas 2D's proposed [Canvas Floating Point Color Values](https://github.com/w3c/ColorWeb-CG/blob/main/canvas_float.md) allows for
   specifying higher bit depth canvas and ImageData.
@@ -134,22 +135,20 @@ As implied by its names, HDR imagery requires more then 8 bits per component. Pr
 [The WebGPU ``GPUCanvasConfiguration``](https://www.w3.org/TR/webgpu/#canvas-configuration) already allows 16-bit float values and
 can be further extended if needs be.
 
-### Extend the existing `srgb` color space for HDR imagery
+### Extend existing `PredefinedColorSpace` color spaces for HDR imagery
 
 Define a *screen's native linear color space* to be the color space with color primaries and white point set to the screen's
 `ScreenDetailed`'s `colorVolume` and the identity as its transfer function.
 
-A color is said to be within a screen's *default* range if, when that color is converted to the screen's native linear color space
-(using relative colorimetric intent), all of its color components are within the `[0, 1]` interval. When displaying content produced
-by a rendering context with `CanvasHighDynamicRangeMode` set to `'default'`, all colors that are within the screen's default range
-must be displayed without any clamping or roll-offs (neither in chrominance nor luminance).
+A color is said to be within a *screen's default range* if, when that color is converted to the *screen's native linear color
+space*, all of its color components are within the `[0, 1]` interval. When displaying content produced by a rendering context with
+`CanvasHighDynamicRangeMode` set to `'default'`, all colors that are within the *screen's default range* must not be gamut-mapped;
+other colors may be clipped or subject to screen-specific behavior.
 
-A color is said to be within a screen's *extended* range if, when that color is converted to the screen's native linear color space
-(using relative colorimetric intent), all of its color components are within the `[0, highDynamicRangeHeadroom]` interval. When
-displaying content produced by a rendering context with `CanvasHighDynamicRangeMode` set to `'extended'`, all colors that are within
-the screen's extended range must be displayed without any clamping or roll-offs (neither in chrominance nor luminance).
-
-Colors that do not fall under this guarantee should be clamped to the indicated range during display, but may be subject to screen-specific behavior.
+A color is said to be within a screen's *extended range* if, when that color is converted to the *screen's native linear color
+space*, all of its color components are within the `[0, highDynamicRangeHeadroom]` interval. When displaying content produced by a
+rendering context with `CanvasHighDynamicRangeMode` set to `'extended'`, all colors that are within the *screen's extended range*
+must not be gamut-mapped; other colors may be clipped or subject to screen-specific behavior.
 
 ### New HDR-specific color spaces
 
@@ -159,35 +158,16 @@ Update `PredefinedColorSpace` to include the following color spaces.
 
 ```idl
   partial enum PredefinedColorSpace {
-    'srgb-linear',
     'rec2100-hlg',
     'rec2100-pq',
   }
 ```
 
-As illustrated below, the proposal assumes that tone mapping, i.e. the rendering of an image with a given dynamic range onto a
-display with different dynamic range, occurs in different parts of the system depending on the color space of the Canvas element:
-
-* in the case where `rec2100-pq` are used, tone mapping is performed by the platform. This is akin to the scenario where the `src`
-  of an `img` element is a PQ image.
-
-* in the case where `rec2100-hlg` are used, tone mapping is performed by the display device. This is akin to the scenario where the
-  `src` of an `img` element is an HLG image.
-
-* in the case where any other color space is used (e.g, `srgb` or `srgb-linear`) tone mapping is performed by the web app, using
-  display capabilities provided by the platform.
+As illustrated below, the tone mapping of `rec2100-pq` and `rec2100-hlg` images, i.e. the rendering of an image with a given dynamic
+range onto a display with different dynamic range, is performed by the platform. This is akin to the scenario where the `src` of an
+`img` element is a PQ or HLG image.
 
 ![Tone mapping scenarios](./tone-mapping-scenarios.png)
-
-#### srgb-linear
-
-This color space uses the same primaries and white point as `srgb`, but with the identity function as the transfer function.
-
-```javascript
-  function electroOpticalTransferFunction(c) {
-    return c;
-  }
-```
 
 #### rec2100-hlg
 
@@ -205,7 +185,7 @@ In general, application should avoid conversions between color spaces and mainta
 between color spaces are not necessarily reversible and do not necessarily result in the same image appearance. In particular,
 conversion of an HDR image to an SDR will result in a signification loss of information and an SDR image that is different from the
 SDR image that would have been mastered from the same source material. From that perspective, converting from HDR to SDR imagery is
-no different than converting RGBA images to 16-color pallette images.
+similar to converting RGBA images to 16-color pallette images.
 
 Nevertheless, the HTML specification allows color space conversion in several scenarios, e.g., when [drawing images to a
 canvas](https://html.spec.whatwg.org/multipage/canvas.html#colour-spaces-and-colour-correction), [retrieving image data from a
@@ -224,150 +204,17 @@ These conversions fall into two broad categories:
 
 #### Between HDR color spaces
 
-##### General
-
-Conversions to and from extended `srgb` are not included since extended `srgb` is trivially converted to and from `srgb-linear`.
-
-Conversions between `rec2100-hlg` and `rec2100-pq` are implicitly specified through conversions to and from `srgb-linear`.
-
-The domain and range of the conversions consist of all real values.
-
-##### `rec2100-hlg` to `srgb-linear`
-
-_Input:_ Full-range non-linear floating-point `rec2100-hlg` pixel with black at 0.0 and diffuse white at 0.75. Values may exist outside the range 0.0 to 1.0.
-
-_Output:_ Full-range non-linear floating-point `srgb-linear` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
-
-_Process:_
-
-1. Apply HLG EOTF to convert the non-linear `rec2100-hlg` Signal to linear Pseudo-Display Light with Lw = 302 cd/m2 - See Note 1
-    * apply inverse HLG OETF
-    * apply HLG OOTF to derive linear display light
-2. Scale pixel values
-3. Convert from ITU BT.2100-1 color to SRGB color
-
-```javascript
-function convertREC2100HLGtoLinearSRGB(r, g, b) {
-  const systemGamma = 1.0;
-  const linearLightScaler = 1.0 / 0.26496256042100724;
-
-  const [r1, g1, b1] = hlg_inverse_oetf(r, g, b);
-  const [r2, g2, b2] = hlg_ootf(r1, g1, b1, systemGamma);
-
-  const r3 = linearLightScaler * r2;
-  const g3 = linearLightScaler * g2;
-  const b3 = linearLightScaler * b2;
-
-  const [r4, g4, b4] = matrixXYZtoSRGB(matrixBT2020toXYZ(r3, g3, b3));
-
-  return [r4, g4, b4];
-}
-```
-
-##### `srgb-linear` to `rec2100-hlg`
-
-_Input:_ Full-range non-linear floating-point `srgb-linear` pixel with black at 0.0 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
-
-_Output:_ Full-range non-linear floating-point `rec2100-hlg` pixel with black at 0.0 and diffuse white at 0.75. Values may exist outside the range 0.0 to 1.0.
-
-_Process:_
-
-1. Convert from `extended-srgb-linear` color to `rec2100-hlg` color
-2. Scale pixel values - See Note 1
-3. Apply HLG Inverse EOTF to convert to HLG from Pseudo-Display Light with Lw = 302 cd/m2 - See Note 1
-    * apply HLG Inverse OOTF
-    * apply HLG OETF - See Note 2
-
-```javascript
-function convertLinearSRGBtoREC2100HLG(r, g, b) {
-  const systemGamma = 1.0;
-  const linearLightScaler = 0.26496256042100724;
-
-  const [r2, g2, b2] = matrixXYZtoBT2020(matrixSRGBtoXYZ(r1, g1, b1));
-
-  const r3 = linearLightScaler * r2;
-  const g3 = linearLightScaler * g2;
-  const b3 = linearLightScaler * b2;
-
-  const [r4, g4, b4] = hlg_inverse_ootf(r3, g3, b3, systemGamma);
-  const [r5, g5, b5] = hlg_oetf(r4, g4, b4);
-
-  return [r5, g5, b5];
-}
-```
-
-_Note 1:_ As `rec2100-hlg` is a relative format, the brightness of the virtual monitor used for mathematical transforms can be chosen to be any level. In this transform it is chosen to be 302 cd/m2 so that the brightness of diffuse white matches the diffuse white of sRGB (80 cd/m2). Using the extended range gamma formula in footnote 2 of BT.2100, this also sets the HLG Inverse OOTF to be unity. The value 0.265 is calculated by taking the inverse OETF of 0.75, the `rec2100-hlg` diffuse white level.
-
-_Note 2:_ See section 5.3 in ITU-R BT.2408-4 relating to negative transfer functions in format conversions.
-
-##### `srgb-linear` to `rec2100-pq`
-
-_Input:_ Full-range non-linear floating-point `srgb-linear` pixel. Values may exist outside the range 0.0 to 1.0.
-
-_Output:_ Full-range non-linear floating-point `rec2100-pq` pixel in the range 0.0 to 1.0.
-
-_Process:_
-
-1. Convert from sRGB color to Rec. ITU-R BT.2020 color
-2. Apply PQ Inverse EOTF, mapping such that a luminance of 203 cd/m<sup>2</sup> results in a value 1.0 in `srgb-linear`.
-
-```javascript
-function convertLinearSRGBtoREC2100PQ(r, g, b) {
-
-  const p2 = matrixXYZtoBT2020(matrixSRGBtoXYZ(r, g, b));
-
-  const k = 203;
-
-  let p3 = []
-  for (let i = 0; i < 3; i++) {
-
-    if (p2[i] < 0)
-      p3[i] = 0;
-    else if (p2[i] <= 10000/k) {
-      p3[i] = pqInverseEOTF(k * p2[i]);
-    else
-      p3[i] = 1.0;
-  }
-
-  return p3;
-}
-```
-
-##### `rec2100-pq` to `srgb-linear`
-
-_Input:_ Full-range non-linear floating-point `rec2100-pq` pixel in the range 0.0 to 1.0.
-
-_Output:_ Full-range non-linear floating-point `srgb-linear` pixel. Values may exist outside the range 0.0 to 1.0.
-
-_Process:_
-
-1. Apply PQ Inverse EOTF, mapping such that a luminance of 203 cd/m<sup>2</sup> results in a value 1.0 in `srgb-linear`.
-2. Convert from Rec. ITU-R BT.2020 color to sRGB color
-
-```javascript
-function convertREC2100PQToLinearSRGB(r, g, b) {
-
-  const k = 203;
-
-  const r3 = pqEOTF(r) / k;
-  const g3 = pqEOTF(g) / k;
-  const b3 = pqEOTF(b) / k;
-
-  return matrixXYZtoSRGB(matrixBT2020toXYZ(r3, g3, b3));
-}
-```
+The conversion between `rec2100-pq` and `rec2100-hlg` is specified at [Report ITU-R BT.2408-5, Clause 6](https://www.itu.int/pub/R-REP-BT.2408),
 
 #### Between SDR and HDR color spaces
 
 ##### General
 
-Conversions to and from `srgb` are provided for `rec2100-pq` and `rec2100-hlg` color spaces. Extended `srgb` images can be converted
-for display on an sRGB monitor by first converting to `rec2100-pq` and `rec2100-hlg` first and then applying the relevant conversion
-to `srgb`.
+Conversions to and from `srgb` are provided for `rec2100-pq` and `rec2100-hlg` color spaces.
 
 ##### `rec2100-pq` to `srgb`
 
-See Annex B at SMPTE ST 2094-10.
+Tone mapping from `rec2100-pq` to `srgb` is specified at [SMPTE ST 2094-10, Annex B](https://ieeexplore.ieee.org/document/7513370).
 
 ##### `rec2100-hlg` to `srgb`
 
@@ -384,21 +231,21 @@ _Note 3_ This transform utilises the backwards compatibility of ITU-R BT.2100 HL
 
 ```javascript
 
-function simpleTransform(value, systemGamma) { 
-  if (value < 1.0) { 
-    return -1.0 * Math.pow(-1.0 * value, systemGamma); 
-  } else { 
-    return Math.pow(value, systemGamma); 
+function simpleTransform(value, systemGamma) {
+  if (value < 1.0) {
+    return -1.0 * Math.pow(-1.0 * value, systemGamma);
+  } else {
+    return Math.pow(value, systemGamma);
   } 
 }
 
-function simpleInverseTransform(value, systemGamma) { 
-  if (value < 1.0) { 
-    return -1.0 * Math.pow(-1.0 * value, 1.0 / systemGamma); 
-  } else { 
-    return Math.pow(value, 1.0 / systemGamma); 
-  } 
-} 
+function simpleInverseTransform(value, systemGamma) {
+  if (value < 1.0) {
+    return -1.0 * Math.pow(-1.0 * value, 1.0 / systemGamma);
+  } else {
+    return Math.pow(value, 1.0 / systemGamma);
+  }
+}
 
 function tonemapREC2100HLGtoSRGBdisplay(r, g, b) {
   const systemGamma = 2.2;
@@ -406,9 +253,9 @@ function tonemapREC2100HLGtoSRGBdisplay(r, g, b) {
   const g1 = simpleTransform(g, systemGamma);
   const b1 = simpleTransform(b, systemGamma);
   const [r2, g2, b2] = matrixXYZtoSRGB(matrixBT2020toXYZ(r1, g1, b1));
-  const r3 = simpleInverseTransform(r2, systemGamma);      
-  const g3 = simpleInverseTransform(g2, systemGamma); 
-  const b3 = simpleInverseTransform(b2, systemGamma); 
+  const r3 = simpleInverseTransform(r2, systemGamma);
+  const g3 = simpleInverseTransform(g2, systemGamma);
+  const b3 = simpleInverseTransform(b2, systemGamma);
   const [r4, g4, b4] = limitTosRGBGamut(r3, g3, b3);
   return [r4, g4, b4];
 }
@@ -431,31 +278,41 @@ The compositing behavior of an `HTMLCanvasElement` may be specified via the `Can
 This section describes the default compositing behavior for canvas element.
 This is the behavior that happens if the `CanvasColorMetadata` is not set, or if is called specifying `'default'` as the mode.
 
-In this mode, the `HTMLCanvasElement` will be composited exactly as an `<img>` or `<video>` element with a source in the canvas' color space would be composited.
+In this mode, the `HTMLCanvasElement` will be composited exactly as an `<img>` or `<video>` element with a source in the canvas'
+color space would be composited.
 
-This means that if the canvas' color space is `'rec2100-hlg'` or `'rec2100-pq'`, then the canvas will be composited using high dynamic range, where available.
+This means that if the canvas' color space is `'rec2100-hlg'` or `'rec2100-pq'`, then the canvas will be composited using high
+dynamic range, where available.
 
-Note that if the canvas' color space is `'srgb-linear'` or `'srgb'`, then the canvas will not be composited using high dynamic range. Pixel values outside of the [0, 1] interval will extend the displayed gamut beyond sRGB, but not the displayed luminance beyond the maximum SDR luminance.
+Otherwise, e.g. if the canvas' color space is `'srgb-linear'` or `'srgb'`, the canvas will not be composited using high dynamic
+range. Pixel values outside of the [0, 1] interval will extend the displayed gamut beyond sRGB, but not the displayed luminance
+beyond the maximum SDR luminance.
 
-Performing appropriate tone mapping is the responsibility of the browser, the operating system, and the display device.
-If the `CanvasColorMetadata` is set to specify metadata and the canvas' color space is `'rec2100-pq'`, then this metadata will be interpreted during compositing in the same way that it would be interpreted if included in a source displayed via an `<img>` or `<video>` element.
+Performing appropriate tone mapping is the responsibility of the browser, the operating system, and the display device. If the
+`CanvasColorMetadata` is set to specify metadata and the canvas' color space is `'rec2100-pq'`, then this metadata will be
+interpreted during compositing in the same way that it would be interpreted if included in a source displayed via an `<img>` or
+`<video>` element.
 
 #### Extended mode
 
-If the canvas' color space is `'srgb-linear'` or `'srgb'`, then pixels values outside of the [0, 1] interval will extend the displayed luminance beyond the maximum SDR luminance.
+If the canvas' color space is `'srgb-linear'` or `'srgb'`, then pixels values outside of the [0, 1] interval will extend the
+displayed luminance beyond the maximum SDR luminance.
 
-It is guaranteed that SDR colors in this mode exactly match SDR colors in non-HDR content on the page.
-For example, a canvas pixel value of `'(1,0,0)'` in `'srgb'` is guaranteed to match the CSS color `'red'`.
+It is guaranteed that SDR colors in this mode exactly match SDR colors in non-HDR content on the page. For example, a canvas pixel
+value of `'(1,0,0)'` in `'srgb'` is guaranteed to match the CSS color `'red'`.
 
-Performing appropriate tone mapping is the responsibility of the browser, the operating system, and the display device.
-If the `CanvasColorMetadata` specifies a maximum luminance that is greater than the display's luminance, then tone mapping will be applied to prevent clipping of luminance values below to the specified maximum luminance.
-Note that the tone mapping algorithm may not alter any SDR color values (otherwise the SDR color matching guarantee would be violated).
+Performing appropriate tone mapping is the responsibility of the browser, the operating system, and the display device. If the
+`CanvasColorMetadata` specifies a maximum luminance that is greater than the display's luminance, then tone mapping will be applied
+to prevent clipping of luminance values below to the specified maximum luminance. Note that the tone mapping algorithm may not alter
+any SDR color values (otherwise the SDR color matching guarantee would be violated).
 
 ## Privacy considerations
 
-The precise capabilities of the output display, such as the exact color gamut and the precise maximum luminance values, are fingerprinting vectors, and should not be exposed to the application without user permission.
+The precise capabilities of the output display, such as the exact color gamut and the precise maximum luminance values, are
+fingerprinting vectors, and should not be exposed to the application without user permission.
 
-Access to these values is protected behind the same permission prompt that protects other screen capability fingerprinting vectors in the [window placement proposal](https://github.com/webscreens/window-placement/blob/main/EXPLAINER.md).
+Access to these values is protected behind the same permission prompt that protects other screen capability fingerprinting vectors
+in the [window placement proposal](https://github.com/webscreens/window-placement/blob/main/EXPLAINER.md).
 
 ## Example Applications
 
