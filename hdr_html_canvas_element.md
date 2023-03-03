@@ -94,7 +94,7 @@ Extend `PredefinedColorSpace` to include the following color spaces.
   partial enum PredefinedColorSpace {
     'rec2100-hlg',
     'rec2100-pq',
-    'linear-srgb'
+    'srgb-linear'
   }
 ```
 
@@ -122,9 +122,9 @@ The component signals are mapped to red, green and blue tristimulus values
 according to the Perceptual Quantizer (PQ) system system specified in Rec. ITU-R
 BT.2100.
 
-### linear-srgb
+### srgb-linear
 
-`linear-srgb` is specified in CSS Color 4 and is useful for physics-based
+`srgb-linear` is specified in CSS Color 4 and is useful for physics-based
 rendering of HDR scenes.
 
 ### Extend `CanvasRenderingContext2DSettings` to support higher bit depths
@@ -150,8 +150,9 @@ specifies the representation of each pixel of the _output bitmap_ of a
 
 ### Extend `ImageDataSettings` to support higher bit depths
 
-Add to `ImageDataSettings` a `ImageDataColorType` member that specifies the type
-of the `data` member of `ImageData`.
+Add to `ImageDataSettings` a `ImageDataColorType` member that specifies the
+conversion semantics and type of each of the items of the `data` member array of
+`ImageData`.
 
 ```idl
   partial dictionary ImageDataSettings {
@@ -161,43 +162,55 @@ of the `data` member of `ImageData`.
 
 ```idl
   enum ImageDataColorType {
-    "Uint8ClampedArray",
-    "Float16Array",
-    "Float32Array"
+    "unorm8",
+    "float16",
+    "float32"
     // and potentially others
   };
 ```
 
-## Add luminance and color gamut information to `ImageDataSettings` and `CanvasRenderingContext2DSettings`
+The values `"unorm8"`, `"float16"` and `"float32"` result in `data` returning an
+array with the type `Uint8ClampedArray`, `Float16Array`, `Float32Array`,
+respectively.
+
+## Add HDR rendering behavior and HDR metadata to `CanvasRenderingContext2DSettings`
 
 Add a new CanvasColorMetadata dictionary:
 
-  dictionary CanvasColorMetadata {
-    CanvasHighDynamicRangeMode mode = 'default';
-    CanvasSmpteSt2086Metadata smpteSt2086Metadata;
-  }
+```idl
+dictionary CanvasColorMetadata {
+  CanvasHighDynamicRangeMode mode = 'default';
+  CanvasSmpteSt2086Metadata smpteSt2086Metadata;
+}
+```
 
-  enum CanvasHighDynamicRangeMode {
-    // The default behavior.
-    // HDR is enabled for 'rec2100-hlg' and 'rec2100-pq' color spaces only.
-    'default',
-    // HDR is enabled for all color spaces
-    'extended',
-  }
+```idl
+enum CanvasHighDynamicRangeMode {
+  // The default behavior.
+  // HDR is enabled for 'rec2100-hlg' and 'rec2100-pq' color spaces only.
+  'default',
+  // HDR is enabled for all color spaces
+  'extended',
+}
+```
 
-  // SMPTE ST 2086 color volume metadata.
-  dictionary CanvasSmpteSt2086Metadata {
-    ColorVolume colorVolume;
-    required float minimumLuminanceNits;
-    required float maximumLuminanceNits;
-  }
+```idl
+// SMPTE ST 2086 color volume metadata.
+dictionary CanvasSmpteSt2086Metadata {
+  ColorVolume colorVolume;
+  required float minimumLuminanceNits;
+  required float maximumLuminanceNits;
+}
+```
 
 Add a mechanism for specifying this on `CanvasRenderingContext2D` and
 `OffscreenCanvasRenderingContext2D`.
 
+```idl
   partial interface CanvasRenderingContext2D/OffscreenCanvasRenderingContext2D {
     attribute CanvasColorMetadata colorMetadata;
   }
+```
 
 The semantics of `CanvasHighDynamicRangeMode` are as follows:
 
@@ -209,16 +222,17 @@ and the identity as its transfer function.
 converted to the *screen's native linear color space*, all of its color
 components are within the `[0, 1]` interval. When displaying content produced by
 a rendering context with `CanvasHighDynamicRangeMode` set to `'default'`, all
-colors that are within the *screen's default range* must not be gamut-mapped;
-other colors may be clipped or subject to screen-specific behavior.
+colors that are within the *screen's default range* must not be tone- or
+gamut-mapped; other colors may be clipped or subject to screen-specific
+behavior.
 
 * A color is said to be within a screen's *extended range* if, when that color
 is converted to the *screen's native linear color space*, all of its color
 components are within the `[0, highDynamicRangeHeadroom]` interval. When
 displaying content produced by a rendering context with
 `CanvasHighDynamicRangeMode` set to `'extended'`, all colors that are within the
-*screen's extended range* must not be gamut-mapped; other colors may be clipped
-or subject to screen-specific behavior.
+*screen's extended range* must not be tone- or gamut-mapped; other colors may be
+clipped or subject to screen-specific behavior.
 
 ## Annex A: Color space conversions
 
@@ -254,18 +268,33 @@ These conversions fall into two broad categories:
 ### Between HDR color spaces
 
 The conversion between `rec2100-pq` and `rec2100-hlg` is specified at [Report
-ITU-R BT.2408-5, Clause 6](https://www.itu.int/pub/R-REP-BT.2408),
+ITU-R BT.2408-5, Clause 6](https://www.itu.int/pub/R-REP-BT.2408)
 
-### Between SDR and HDR color spaces
-
-#### General
-
-Conversions to and from `srgb` are provided for `rec2100-pq` and `rec2100-hlg` color spaces.
+### From HDR to SDR color spaces
 
 #### `rec2100-pq` to `srgb`
 
-Tone mapping from `rec2100-pq` to `srgb` is specified at [SMPTE ST 2094-10,
-Annex B](https://ieeexplore.ieee.org/document/7513370).
+Tone mapping from `rec2100-pq` to `srgb` is performed using the following steps:
+
+* apply the Parametric Tone Mapping Method specified at [SMPTE ST 2094-10, Annex
+B](https://ieeexplore.ieee.org/document/7513370) using the following recommended
+parameter values:
+  * `TargetedSystemDisplayMaximumLuminance` = 100
+  * `TargetedSystemDisplayMinimumLuminance` = 0.1
+* convert to sRGB using `rec2100DisplaytoSRGB()` below
+
+```javascript
+function rec2100DisplaytoSRGB(r, g, b) {
+  const [rt, gt, bt] = matrixXYZtoRec709(matrixBT2020toXYZ(r, g, b));
+  const rp = Math.pow(rt / 100, 1/2.4);
+  const gp = Math.pow(gt / 100, 1/2.4);
+  const bp = Math.pow(bt / 100, 1/2.4);
+  return [rp, gp, bp];
+}
+```
+
+A demonstration of the method is provided at
+<https://www.sandflow.com/public/tone-mapping/index.html>.
 
 #### `rec2100-hlg` to `srgb`
 
@@ -318,6 +347,8 @@ function tonemapREC2100HLGtoSRGBdisplay(r, g, b) {
 }
 ```
 
+### From SDR to HDR color spaces
+
 #### `srgb` to `rec2100-hlg`
 
 See [TTML 2, Annex Q.2, steps 1-8](https://www.w3.org/TR/ttml2/#hlg-hdr) with
@@ -326,51 +357,3 @@ See [TTML 2, Annex Q.2, steps 1-8](https://www.w3.org/TR/ttml2/#hlg-hdr) with
 #### `srgb` to `rec2100-pq`
 
 See [TTML 2, Annex Q.1, steps 1-8](https://www.w3.org/TR/ttml2/#hdr-compositing).
-
-## Annex B: Compositing the HDR `HTMLCanvasElement`
-
-The compositing behavior of an `HTMLCanvasElement` may be specified via the
-`CanvasColorMetadata` attribute of its rendering context.
-
-### Default behavior
-
-This section describes the default compositing behavior for canvas element. This
-is the behavior that happens if the `CanvasColorMetadata` is not set, or if is
-called specifying `'default'` as the mode.
-
-In this mode, the `HTMLCanvasElement` will be composited exactly as an `<img>`
-or `<video>` element with a source in the canvas' color space would be
-composited.
-
-This means that if the canvas' color space is `'rec2100-hlg'` or `'rec2100-pq'`,
-then the canvas will be composited using high dynamic range, where available.
-
-Otherwise, e.g. if the canvas' color space is `'srgb-linear'` or `'srgb'`, the
-canvas will not be composited using high dynamic range. Pixel values outside of
-the [0, 1] interval will extend the displayed gamut beyond sRGB, but not the
-displayed luminance beyond the maximum SDR luminance.
-
-Performing appropriate tone mapping is the responsibility of the browser, the
-operating system, and the display device. If the `CanvasColorMetadata` is set to
-specify metadata and the canvas' color space is `'rec2100-pq'`, then this
-metadata will be interpreted during compositing in the same way that it would be
-interpreted if included in a source displayed via an `<img>` or `<video>`
-element.
-
-### Extended mode
-
-If the canvas' color space is `'srgb-linear'` or `'srgb'`, then pixels values
-outside of the [0, 1] interval will extend the displayed luminance beyond the
-maximum SDR luminance.
-
-It is guaranteed that SDR colors in this mode exactly match SDR colors in
-non-HDR content on the page. For example, a canvas pixel value of `'(1,0,0)'` in
-`'srgb'` is guaranteed to match the CSS color `'red'`.
-
-Performing appropriate tone mapping is the responsibility of the browser, the
-operating system, and the display device. If the `CanvasColorMetadata` specifies
-a maximum luminance that is greater than the display's luminance, then tone
-mapping will be applied to prevent clipping of luminance values below to the
-specified maximum luminance. Note that the tone mapping algorithm may not alter
-any SDR color values (otherwise the SDR color matching guarantee would be
-violated).
