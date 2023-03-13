@@ -1,4 +1,4 @@
-# Adding support High Dynamic Range (HDR) imagery to HTML Canvas
+# Adding support High Dynamic Range (HDR) imagery to HTML Canvas: a baseline proposal
 
 ## Introduction
 
@@ -20,72 +20,41 @@ up to 10,000 cd/m<sup>2</sup>.
 
 * As specified at [Rec. ITU-R BT.2100](https://www.itu.int/rec/R-REC-BT.2100),
 two color spaces tailored for HDR imagery have been developed: BT.2100 PQ and
-BT.2100
-HLG.
+BT.2100 HLG. All movies and TVs are distributed using either of these two color
+spaces. Display interfaces, such as HDMI, also use these color spaces.
 
 * To render HDR imagery, it is useful to have information on the luminance range
-and color gamut that (a) are supported by the display and (b) were used when
-authoring the image.
+and color gamut that were used when authoring the image.
 
 Accordingly, the following API modifications are needed to manipulate HDR images
 in HTML Canvas:
 
-1. add the ability to query the luminance range and color gamut of the display
-2. add BT.2100 PQ and BT.2100 HLG color spaces to `PredefinedColorSpace`
-3. add higher bit depth capabilities to `CanvasRenderingContext2DSettings`
-4. add higher bit depth capabilities to `ImageDataSettings`
-5. add luminance and color gamut information to `ImageDataSettings` and
+1. add BT.2100 PQ and BT.2100 HLG color spaces to `PredefinedColorSpace`
+2. add higher bit depth capabilities to `CanvasRenderingContext2DSettings`
+3. add higher bit depth capabilities to `ImageDataSettings`
+4. add luminance and color gamut information to `ImageDataSettings` and
    `CanvasRenderingContext2DSettings`
+
+## Target use cases
+
+The primary use case is the drawing of HDR images into an HTML Canvas element
+such that the images are displayed as they would have been if they had been
+introduced in an `img` or `video` elements. Example applications include:
+
+* drawing images retrieved from a file whose format is not supported by the
+  `img` or `video` elements
+* collages of images, both HDR and SDR, for a variety of sources
+* drawing of UI elements that accompany an HDR video presentation
 
 ## Scope
 
-We propose to extend the Web Platform to allow the HTML Canvas API to manipulate
-High Dynamic Range (HDR) images.
+We propose a minimal extension to the Web Platform to allow the HTML Canvas API
+to manipulate High Dynamic Range (HDR) images expressed using the widespread
+BT.2100 PQ and BT.2100 HLG color spaces.
 
-## Add the ability to query the luminance range and color gamut of the display
+This proposal does not preclude future additional extensions.
 
-### Querying screen HDR parameters
-
-Add a new attribute to `ScreenAdvanced` to indicate the HDR headroom currently
-available on the screen.
-
-```idl
-  partial interface ScreenAdvanced {
-    // The maximum luminance that the screen is capable of displaying across
-    // the full area of the screen, as a multiple of the luminance of SDR white.
-    // This will have a value of 1.0 for screens that are not HDR capable.
-    readonly attribute double highDynamicRangeHeadroom;
-  }
-```
-
-### Querying screen wide color gamut parameters
-
-Add new attributes to `ScreenDetailed` to indicate the gamut and white point of
-the screen.
-
-```idl
-  partial interface ScreenDetailed {
-    // The color volume that the screen is capable of displaying.
-    readonly attribute ColorVolume colorVolume;
-  }
-```
-
-```idl
-  dictionary ColorVolume {
-    // The color primaries and white point of a color volume, in CIE 1931 xy
-    // coordinates.
-    required double redPrimaryX;
-    required double redPrimaryY;
-    required double greenPrimaryX;
-    required double greenPrimaryY;
-    required double bluePrimaryX;
-    required double bluePrimaryY;
-    required double whitePointX;
-    required double whitePointY;
-  }
-```
-
-## Add color spaces intended for use with HDR imagery
+## Add color spaces intended for use with HDR images
 
 ### General
 
@@ -95,9 +64,14 @@ Extend `PredefinedColorSpace` to include the following color spaces.
   partial enum PredefinedColorSpace {
     'rec2100-hlg',
     'rec2100-pq',
-    'srgb-linear'
   }
 ```
+
+Extending `PredefinedColorSpace` automatically extends
+`CanvasRenderingContext2DSettings` and `ImageDataSettings`.
+
+A Canvas that is initialized with `rec2100-pq` and `rec2100-hlg` is an HDR
+Canvas; otherwise it is an SDR Canvas.
 
 As illustrated below, the tone mapping of `rec2100-pq` and `rec2100-hlg` images,
 i.e. the rendering of an image with a given dynamic range onto a display with
@@ -106,11 +80,12 @@ scenario where the `src` of an `img` element is a PQ or HLG image.
 
 ![Tone mapping scenarios](./tone-mapping-scenarios.png)
 
+SDR images that are drawn to an HDR Canvas are first converted to an HDR
+representation. Conversely, HDR images that are drawn into SDR Canvas are first
+converted to an SDR representation.
+
 Conversions to and from `rec2100-pq` and `rec2100-hlg` are detailed in Annex A
 below.
-
-Extending `PredefinedColorSpace` automatically extends
-`CanvasRenderingContext2DSettings` and `ImageDataSettings`.
 
 ### rec2100-hlg
 
@@ -122,11 +97,6 @@ according to the Hybrid Log-Gamma (HLG) system specified in Rec. ITU-R BT.2100.
 The component signals are mapped to red, green and blue tristimulus values
 according to the Perceptual Quantizer (PQ) system system specified in Rec. ITU-R
 BT.2100.
-
-### srgb-linear
-
-`srgb-linear` is specified in CSS Color 4 and is useful for physics-based
-rendering of HDR scenes.
 
 ### Extend `CanvasRenderingContext2DSettings` to support higher bit depths
 
@@ -180,19 +150,23 @@ Add a new CanvasColorMetadata dictionary:
 
 ```idl
 dictionary CanvasColorMetadata {
-  CanvasHighDynamicRangeMode mode = 'default';
   CanvasSmpteSt2086Metadata smpteSt2086Metadata;
 }
 ```
 
 ```idl
-enum CanvasHighDynamicRangeMode {
-  // The default behavior.
-  // HDR is enabled for 'rec2100-hlg' and 'rec2100-pq' color spaces only.
-  'default',
-  // HDR is enabled for all color spaces
-  'extended',
-}
+  dictionary ColorVolume {
+    // The color primaries and white point of a color volume, in CIE 1931 xy
+    // coordinates.
+    required double redPrimaryX;
+    required double redPrimaryY;
+    required double greenPrimaryX;
+    required double greenPrimaryY;
+    required double bluePrimaryX;
+    required double bluePrimaryY;
+    required double whitePointX;
+    required double whitePointY;
+  }
 ```
 
 ```idl
@@ -212,28 +186,6 @@ Add a mechanism for specifying this on `CanvasRenderingContext2D` and
     attribute CanvasColorMetadata colorMetadata;
   }
 ```
-
-The semantics of `CanvasHighDynamicRangeMode` are as follows:
-
-* Define a *screen's native linear color space* to be the color space with color
-primaries and white point set to the screen's `ScreenDetailed`'s `colorVolume`
-and the identity as its transfer function.
-
-* A color is said to be within a *screen's default range* if, when that color is
-converted to the *screen's native linear color space*, all of its color
-components are within the `[0, 1]` interval. When displaying content produced by
-a rendering context with `CanvasHighDynamicRangeMode` set to `'default'`, all
-colors that are within the *screen's default range* must not be tone- or
-gamut-mapped; other colors may be clipped or subject to screen-specific
-behavior.
-
-* A color is said to be within a screen's *extended range* if, when that color
-is converted to the *screen's native linear color space*, all of its color
-components are within the `[0, highDynamicRangeHeadroom]` interval. When
-displaying content produced by a rendering context with
-`CanvasHighDynamicRangeMode` set to `'extended'`, all colors that are within the
-*screen's extended range* must not be tone- or gamut-mapped; other colors may be
-clipped or subject to screen-specific behavior.
 
 ## Annex A: Color space conversions
 
@@ -306,6 +258,7 @@ _Output:_ Full-range non-linear floating-point `srgb` pixel with black at 0.0
 and diffuse white at 1.0. Values may exist outside the range 0.0 to 1.0.
 
 _Process:_
+
   1. Pseudo-linearize the HLG signal exploiting its backwards compatibility with
      SDR consumer displays
   2. Convert from ITU BT.2100 color space to sRGB color space
