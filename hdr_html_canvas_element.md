@@ -15,11 +15,12 @@ widespread use today:
 results in contouring and banding, even for traditional standard dynamic range
 (SDR) imagery, like sRGB, which covers a typical luminance range between 0 and
 100 cd/m<sup>2</sup>. These quantization artifacts become unacceptable with
-High-Dynamic Range (HDR) imagery, supports luminance ranges between 0 and up to
-10,000 cd/m<sup>2</sup>.
+High-Dynamic Range (HDR) imagery, which supports luminance ranges between 0 and
+up to 10,000 cd/m<sup>2</sup>.
 
 * As specified at [Rec. ITU-R BT.2100](https://www.itu.int/rec/R-REC-BT.2100),
-two color spaces tailored for HDR imagery have developed: BT.2100 PQ and BT.2100
+two color spaces tailored for HDR imagery have been developed: BT.2100 PQ and
+BT.2100
 HLG.
 
 * To render HDR imagery, it is useful to have information on the luminance range
@@ -238,14 +239,14 @@ clipped or subject to screen-specific behavior.
 
 ### Background
 
-In general, application should avoid conversions between color spaces and
+In general, applications should avoid conversions between color spaces and
 maintain imagery in its original color space: conversions between color spaces
 are not necessarily reversible and do not necessarily result in the same image
-appearance. In particular, conversion of an HDR image to an SDR will result in a
-signification loss of information and an SDR image that is different from the
+appearance. In particular, conversion of an HDR image to SDR will result in a
+significant loss of information and an SDR image that is different from the
 SDR image that would have been mastered from the same source material. From that
 perspective, converting from HDR to SDR imagery is similar to converting RGBA
-images to 16-color pallette images.
+images to 16-color palette images.
 
 Nevertheless, the HTML specification allows color space conversion in several
 scenarios, e.g., when [drawing images to a
