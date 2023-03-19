@@ -54,7 +54,12 @@ We propose a minimal extension to the Web Platform to allow the HTML Canvas API
 to manipulate High Dynamic Range (HDR) images expressed using the widespread
 BT.2100 PQ and BT.2100 HLG color spaces.
 
-This proposal does not preclude future additional extensions.
+This proposal:
+
+* does not target applications that require high-performance custom image
+  tone-mapping or compositing methods.
+* is not intended to limit the feature of HTML Canvas, such as support for
+  additional color spaces like a linear high-dynamic range color space.
 
 ## Add color spaces intended for use with HDR images
 
