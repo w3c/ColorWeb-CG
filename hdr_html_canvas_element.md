@@ -39,12 +39,14 @@ in HTML Canvas:
 
 The primary use case is the drawing of HDR images into an HTML Canvas element
 such that the images are displayed as they would have been if they had been
-introduced in an `img` or `video` elements. Example applications include:
+introduced in an `img` or `video` element. Example applications include:
 
 * drawing images retrieved from a file whose format is not supported by the
   `img` or `video` elements
-* collages of images, both HDR and SDR, for a variety of sources
-* drawing of UI elements that accompany an HDR video presentation
+* collage of images, both HDR and SDR
+* drawing of visual elements that are related to an HDR video presentation, with
+  the expectation that the visual elements match the look of the video
+  presentation.
 
 ## Scope
 
@@ -58,7 +60,8 @@ This proposal does not preclude future additional extensions.
 
 ### General
 
-Extend `PredefinedColorSpace` to include the following color spaces.
+Extend [`PredefinedColorSpace`](https://html.spec.whatwg.org/multipage/canvas.html#predefinedcolorspace) to
+include the following color spaces.
 
 ```idl
   partial enum PredefinedColorSpace {
@@ -101,7 +104,8 @@ BT.2100.
 ### Extend `CanvasRenderingContext2DSettings` to support higher bit depths
 
 Add to `CanvasRenderingContext2DSettings` a `CanvasColorType` member that
-specifies the representation of each pixel of the _output bitmap_ of a
+specifies the representation of each pixel of the [output
+bitmap](https://html.spec.whatwg.org/multipage/canvas.html#output-bitmap) of a
 `CanvasRenderingContext2D` and `OffscreenCanvasRenderingContext2D`.
 
 ```idl
@@ -305,9 +309,9 @@ function tonemapREC2100HLGtoSRGBdisplay(r, g, b) {
 
 #### `srgb` to `rec2100-hlg`
 
-See [TTML 2, Annex Q.2, steps 1-8](https://www.w3.org/TR/ttml2/#hlg-hdr) with
-`tts:luminanceGain = 203/80`.
+See [TTML 2, Annex Q.2, steps 1-8](https://www.w3.org/TR/ttml2/#hlg-hdr).
 
 #### `srgb` to `rec2100-pq`
 
-See [TTML 2, Annex Q.1, steps 1-8](https://www.w3.org/TR/ttml2/#hdr-compositing).
+See [TTML 2, Annex Q.1, steps 1-8](https://www.w3.org/TR/ttml2/#hdr-compositing) with
+`tts:luminanceGain = 203/80`.
