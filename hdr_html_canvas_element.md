@@ -20,8 +20,9 @@ up to 10,000 cd/m<sup>2</sup>.
 
 * As specified at [Rec. ITU-R BT.2100](https://www.itu.int/rec/R-REC-BT.2100),
 two color spaces tailored for HDR imagery have been developed: BT.2100 PQ and
-BT.2100 HLG. All movies and TVs are distributed using either of these two color
-spaces. Display interfaces, such as HDMI, also use these color spaces.
+BT.2100 HLG. All movies and TV shows are distributed using either of these two
+color spaces. Products with HDMI and/or DisplayPort interfaces, also use these
+color spaces for HDR support.
 
 * To render HDR imagery, it is useful to have information on the luminance range
 and color gamut that were used when authoring the image.
@@ -45,7 +46,7 @@ introduced in an `img` or `video` element. Example applications include:
   `img` or `video` elements
 * collage of images, both HDR and SDR
 * drawing of visual elements that are related to an HDR video presentation, with
-  the expectation that the visual elements match the look of the video
+  the expectation that the visual elements match the look of the HDR video
   presentation.
 
 ## Scope
@@ -58,8 +59,9 @@ This proposal:
 
 * does not target applications that require high-performance custom image
   tone-mapping or compositing methods.
-* is not intended to limit the feature of HTML Canvas, such as support for
-  additional color spaces like a linear high-dynamic range color space.
+* does not preclude adding other HDR capabilities to HTML Canvas, such as
+  support for additional color spaces like a linear high-dynamic range color
+  space.
 
 ## Add color spaces intended for use with HDR images
 
@@ -97,20 +99,23 @@ below.
 
 ### rec2100-hlg
 
-The component signals are mapped to red, green and blue tristimulus values
-according to the Hybrid Log-Gamma (HLG) system specified in Rec. ITU-R BT.2100.
+The non-linear component signals {R', G', B'} are mapped to red, green and blue
+tristimulus values according to the Hybrid Log-Gamma (HLG) system specified in
+Rec. ITU-R BT.2100.
 
 ### rec2100-pq
 
-The component signals are mapped to red, green and blue tristimulus values
-according to the Perceptual Quantizer (PQ) system system specified in Rec. ITU-R
-BT.2100.
+The non-linear component signals {R', G', B'} are mapped to red, green and blue
+tristimulus values according to the Perceptual Quantizer (PQ) system system
+specified in Rec. ITU-R BT.2100.
 
-### Extend `CanvasRenderingContext2DSettings` to support higher bit depths
+_NOTE: {R', G', B'} are in the range [0, 1], i.e. they are not expressed in
+cd/m<sup>2</sup>_
+
+## Extend `CanvasRenderingContext2DSettings` to support higher bit depths
 
 Add to `CanvasRenderingContext2DSettings` a `CanvasColorType` member that
-specifies the representation of each pixel of the [output
-bitmap](https://html.spec.whatwg.org/multipage/canvas.html#output-bitmap) of a
+specifies the representation of each pixel of the [output bitmap](https://html.spec.whatwg.org/multipage/canvas.html#output-bitmap) of a
 `CanvasRenderingContext2D` and `OffscreenCanvasRenderingContext2D`.
 
 ```idl
@@ -126,9 +131,18 @@ bitmap](https://html.spec.whatwg.org/multipage/canvas.html#output-bitmap) of a
   };
 ```
 
-`colorType = "unorm8"` corresponds to HTML Canvas as it exists today.
+When `colorType = "unorm8"`, the non-linear component signals {R', G', B'} are
+quantized using full range quantization, i.e. they are multiplied by 255 and
+rounded to the nearest integer. For example, R' = 0.5 is represented by the
+integer value 128.
 
-### Extend `ImageDataSettings` to support higher bit depths
+When `colorType = "float16"`, the non-linear component signals {R', G', B'} are
+not quantized, i.e. R' = 0.5 is represented by the floating point value 0.5.
+
+_NOTE: `colorType = "unorm8"` corresponds to HTML Canvas as it exists today ans
+should not be used to represent HDR signal, as detailed in the introduction._
+
+## Extend `ImageDataSettings` to support higher bit depths
 
 Add to `ImageDataSettings` a `ImageDataColorType` member that specifies the
 conversion semantics and type of each of the items of the `data` member array of
@@ -239,14 +253,14 @@ ITU-R BT.2408-5, Clause 6](https://www.itu.int/pub/R-REP-BT.2408)
 Tone mapping from `rec2100-pq` to `srgb` is performed using the following steps:
 
 * apply the Parametric Tone Mapping Method specified at [SMPTE ST 2094-10, Annex
-B](https://ieeexplore.ieee.org/document/7513370) using the following recommended
+B](https://ieeexplore.ieee.org/document/9405553) using the following recommended
 parameter values:
   * `TargetedSystemDisplayMaximumLuminance` = 100
   * `TargetedSystemDisplayMinimumLuminance` = 0.1
-* convert to sRGB using `rec2100DisplaytoSRGB()` below
+* convert to sRGB using `rec2020SDRLineartoSRGB()` below
 
 ```javascript
-function rec2100DisplaytoSRGB(r, g, b) {
+function rec2020SDRLineartoSRGB(r, g, b) {
   const [rt, gt, bt] = matrixXYZtoRec709(matrixBT2020toXYZ(r, g, b));
   const rp = Math.pow(rt / 100, 1/2.4);
   const gp = Math.pow(gt / 100, 1/2.4);
@@ -318,5 +332,5 @@ See [TTML 2, Annex Q.2, steps 1-8](https://www.w3.org/TR/ttml2/#hlg-hdr).
 
 #### `srgb` to `rec2100-pq`
 
-See [TTML 2, Annex Q.1, steps 1-8](https://www.w3.org/TR/ttml2/#hdr-compositing) with
-`tts:luminanceGain = 203/80`.
+See [TTML 2, Annex Q.1, steps 1-8](https://www.w3.org/TR/ttml2/#hdr-compositing)
+with `tts:luminanceGain = 203/80`.
