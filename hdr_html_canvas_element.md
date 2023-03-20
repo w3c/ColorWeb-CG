@@ -21,7 +21,7 @@ up to 10,000 cd/m<sup>2</sup>.
 * As specified at [Rec. ITU-R BT.2100](https://www.itu.int/rec/R-REC-BT.2100),
 two color spaces tailored for HDR imagery have been developed: BT.2100 PQ and
 BT.2100 HLG. All movies and TV shows are distributed using either of these two
-color spaces. Products with HDMI and/or DisplayPort interfaces, also use these
+color spaces. Products with HDMI and/or DisplayPort interfaces also use these
 color spaces for HDR support.
 
 * To render HDR imagery, it is useful to have information on the luminance range
@@ -139,7 +139,7 @@ integer value 128.
 When `colorType = "float16"`, the non-linear component signals {R', G', B'} are
 not quantized, i.e. R' = 0.5 is represented by the floating point value 0.5.
 
-_NOTE: `colorType = "unorm8"` corresponds to HTML Canvas as it exists today ans
+_NOTE: `colorType = "unorm8"` corresponds to HTML Canvas as it exists today and
 should not be used to represent HDR signal, as detailed in the introduction._
 
 ## Extend `ImageDataSettings` to support higher bit depths
