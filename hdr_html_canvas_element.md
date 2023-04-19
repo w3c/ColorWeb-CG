@@ -287,8 +287,15 @@ function rec2020SDRLineartoSRGB(r, g, b) {
 }
 ```
 
-A demonstration of the method is provided at
+The method is demonstrated at
 <https://www.sandflow.com/public/tone-mapping/index.html>.
+
+The method requires minimum, maximum and average luminance values as input.
+These values can be determined by analyzing the image -- as it is done in the
+demonstration above. If such an analysis is not possible, the `minimumLuminance`
+and `maximumLuminance` values of `CanvasMasteringDisplayMetadata` can be used as
+approximation for  the minimum and maximum luminance values, and a value of 10
+cd/m² can be used for the average luminance.
 
 #### `rec2100-hlg` to `srgb`
 
