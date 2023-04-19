@@ -173,7 +173,7 @@ Add a new CanvasColorMetadata dictionary:
 
 ```idl
 dictionary CanvasColorMetadata {
-  CanvasSmpteSt2086Metadata smpteSt2086Metadata;
+  CanvasMasteringDisplayMetadata masteringDisplayMetadata;
 }
 ```
 
@@ -193,13 +193,31 @@ dictionary CanvasColorMetadata {
 ```
 
 ```idl
-// SMPTE ST 2086 color volume metadata.
-dictionary CanvasSmpteSt2086Metadata {
-  ColorVolume colorVolume;
-  required float minimumLuminanceNits;
-  required float maximumLuminanceNits;
+dictionary CanvasMasteringDisplayMetadata {
+  optional ColorVolume colorVolume;
+  optional double minimumLuminance;
+  optional double maximumLuminance;
 }
 ```
+
+If present, `masteringDisplayMetadata` specifies the characteristics (the color
+primaries, white point, and luminance range) of the display that was used in
+mastering the image content. This information allows a destination display to
+optimize tone mapping based on the relationship between its own capabilities and
+those of the mastering display. [SMPTE ST
+2086:2018](https://ieeexplore.ieee.org/document/8353899) specifies the semantics
+and range of values permitted:
+* `redPrimaryX`, `redPrimaryY`, `greenPrimaryX`, `greenPrimaryY`,
+  `bluePrimaryX`, and `bluePrimaryY` are the xy coordinates, as defined in [ISO
+  11664-3](https://www.iso.org/standard/74165.html) of the nominal primaries of
+  the mastering display
+* `whitePointX` and `whitePointY` are the xy coordinates of the nominal
+  chromaticity of the white point of the mastering display
+* `minimumLuminance` and `maximumLuminance` are the nominal minimum and maximum
+  display luminance, respectively, of the mastering display in cd/m².
+
+The attributes of masteringDisplayMetadata SHOULD be set if know, e.g. if
+obtained from metadata contained in a source image, and omitted otherwise.
 
 Add a mechanism for specifying this on `CanvasRenderingContext2D` and
 `OffscreenCanvasRenderingContext2D`.
