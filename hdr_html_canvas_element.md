@@ -150,7 +150,7 @@ conversion semantics and type of each of the items of the `data` member array of
 
 ```idl
   partial dictionary ImageDataSettings {
-    ImageDataType dataType = "Uint8ClampedArray";
+    ImageDataType dataType = "unorm8";
   };
 ```
 
