@@ -45,9 +45,10 @@ introduced in an `img` or `video` element. Example applications include:
 * drawing images retrieved from a file whose format is not supported by the
   `img` or `video` elements
 * collage of images, both HDR and SDR
-* drawing of visual elements that are related to an HDR video presentation, with
-  the expectation that the visual elements match the look of the HDR video
-  presentation.
+* adding graphics to an HDR image
+* drawing of visual elements that are related to an HDR presentation in a
+ `video` element, with the expectation that the former match the look of the
+ latter.
 
 ## Scope
 
@@ -62,6 +63,8 @@ This proposal:
 * does not preclude adding other HDR capabilities to HTML Canvas, such as
   support for additional color spaces like a linear high-dynamic range color
   space.
+* neither specifies nor requires new capabilities for compositing `canvas`
+  elements with other HTML elements.
 
 ## Add color spaces intended for use with HDR images
 
@@ -72,8 +75,12 @@ include the following color spaces.
 
 ```idl
   partial enum PredefinedColorSpace {
-    'rec2100-hlg',
-    'rec2100-pq',
+    /*
+     * Currently defined values: "srgb", "display-p3"
+     */
+
+    "rec2100-hlg",
+    "rec2100-pq",
   }
 ```
 
@@ -120,6 +127,15 @@ specifies the representation of each pixel of the [output bitmap](https://html.s
 
 ```idl
   partial dictionary CanvasRenderingContext2DSettings {
+    /*
+     * Currently defined attributes:
+     *
+     * boolean alpha = true;
+     * boolean desynchronized = false;
+     * PredefinedColorSpace colorSpace = "srgb";
+     * boolean willReadFrequently = false;
+     */
+
     CanvasDataType dataType = "unorm8";
   };
 ```
@@ -144,12 +160,19 @@ should not be used to represent HDR signal, as detailed in the introduction._
 
 ## Extend `ImageDataSettings` to support higher bit depths
 
-Add to `ImageDataSettings` a `ImageDataType` member that specifies the
-conversion semantics and type of each of the items of the `data` member array of
-`ImageData`.
+Add to
+[`ImageDataSettings`](https://html.spec.whatwg.org/multipage/canvas.html#imagedatasettings)
+a `ImageDataType` member that specifies the conversion semantics and type of
+each of the items of the `data` member array of `ImageData`.
 
 ```idl
   partial dictionary ImageDataSettings {
+    /*
+     * Currently defined attributes:
+     *
+     * PredefinedColorSpace colorSpace;
+     */
+
     ImageDataType dataType = "unorm8";
   };
 ```
@@ -166,6 +189,10 @@ conversion semantics and type of each of the items of the `data` member array of
 The values `"unorm8"`, `"float16"` and `"float32"` result in `data` returning an
 array with the type `Uint8ClampedArray`, `Float16Array`, `Float32Array`,
 respectively.
+
+_NOTE: The strawman requires at least one of `"float16"` and `"float32"` to
+support HDR imagery. Both are listed above to emphasize that the strawman can
+work with both or either.
 
 ## Add HDR rendering behavior and HDR metadata to `CanvasRenderingContext2DSettings`
 
