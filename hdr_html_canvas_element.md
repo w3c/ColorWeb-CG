@@ -255,6 +255,10 @@ Add a mechanism for specifying this on `CanvasRenderingContext2D` and
   }
 ```
 
+_NOTE:_ See <https://github.com/w3c/ColorWeb-CG/issues/97> for an open issue discussing
+practices when drawing images with different color volume on the same HTML
+Canvas.
+
 ## Annex A: Color space conversions
 
 ### Background
