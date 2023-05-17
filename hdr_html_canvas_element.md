@@ -200,12 +200,12 @@ Add a new CanvasColorMetadata dictionary:
 
 ```idl
 dictionary CanvasColorMetadata {
-  CanvasMasteringDisplayMetadata masteringDisplayMetadata;
+  CanvasColorVolumeMetadata colorVolumeMetadata;
 }
 ```
 
 ```idl
-  dictionary ColorVolume {
+  dictionary Chromaticity {
     // The color primaries and white point of a color volume, in CIE 1931 xy
     // coordinates.
     required double redPrimaryX;
@@ -220,31 +220,46 @@ dictionary CanvasColorMetadata {
 ```
 
 ```idl
-dictionary CanvasMasteringDisplayMetadata {
-  optional ColorVolume colorVolume;
+dictionary CanvasColorVolumeMetadata {
+  optional Chromaticity chromaticity;
   optional double minimumLuminance;
-  optional double maximumLuminance;
+  required double maximumLuminance;
 }
 ```
 
-If present, `masteringDisplayMetadata` specifies the characteristics (the color
-primaries, white point, and luminance range) of the display that was used in
-mastering the image content. This information allows a destination display to
-optimize tone mapping based on the relationship between its own capabilities and
-those of the mastering display. [SMPTE ST
-2086:2018](https://ieeexplore.ieee.org/document/8353899) specifies the semantics
-and range of values permitted:
-* `redPrimaryX`, `redPrimaryY`, `greenPrimaryX`, `greenPrimaryY`,
-  `bluePrimaryX`, and `bluePrimaryY` are the xy coordinates, as defined in [ISO
-  11664-3](https://www.iso.org/standard/74165.html) of the nominal primaries of
-  the mastering display
-* `whitePointX` and `whitePointY` are the xy coordinates of the nominal
-  chromaticity of the white point of the mastering display
-* `minimumLuminance` and `maximumLuminance` are the nominal minimum and maximum
-  display luminance, respectively, of the mastering display in cd/m².
+`colorVolumeMetadata` specifies the nominal color volume occupied by
+the image content in the CIE 1931 XYZ color space. The boundaries of the color
+volume are defined by:
 
-The attributes of masteringDisplayMetadata SHOULD be set if know, e.g. if
-obtained from metadata contained in a source image, and omitted otherwise.
+* the xy coordinates, as defined in [ISO
+  11664-3](https://www.iso.org/standard/74165.html), of three color primaries:
+  `redPrimaryX`, `redPrimaryY`, `greenPrimaryX`, `greenPrimaryY`,
+  `bluePrimaryX`, and `bluePrimaryY`;
+* the xy coordinates of a white point: `whitePointX` and `whitePointY`; and
+* a minimum and maximum luminance in cd/m²: `minimumLuminance` and `maximumLuminance`.
+
+If omitted, `chromaticity` is equal to the chromaticity of the color space of
+the Canvas.
+
+If omitted, `minimumLuminance` is equal to 0.
+
+The color volume is nominal because it MAY be smaller or larger than the actual
+color volume of image content, but SHOULD not be larger.
+
+If present, `colorVolumeMetadata` SHOULD completely defined the tone mapping
+algorithm  used when rendering the image to a display. For example, the
+_rec2100-pq to srgb_ mapping specified in Annex A uses the `minimumLuminance`
+and `maximumLuminance` parameters.
+
+`colorVolumeMetadata` SHOULD be set if known, e.g. if obtained from metadata
+contained in a source image, and omitted otherwise. This is particularly
+important when drawing a temporal sequence of images. If `colorVolumeMetadata`
+is not set, the tone mapping algorithm can vary over the sequence, resulting in
+temporal artifacts.
+
+For example, `colorVolumeMetadata` can be set according to the Mastering Display
+Color Volume chunk found in a PNG image: the color volume of the image content
+typically coincides with that of the mastering display.
 
 Add a mechanism for specifying this on `CanvasRenderingContext2D` and
 `OffscreenCanvasRenderingContext2D`.
@@ -254,10 +269,6 @@ Add a mechanism for specifying this on `CanvasRenderingContext2D` and
     attribute CanvasColorMetadata colorMetadata;
   }
 ```
-
-_NOTE:_ See <https://github.com/w3c/ColorWeb-CG/issues/97> for an open issue discussing
-practices when drawing images with different color volume on the same HTML
-Canvas.
 
 ## Annex A: Color space conversions
 
@@ -301,32 +312,29 @@ ITU-R BT.2408-5, Clause 6](https://www.itu.int/pub/R-REP-BT.2408)
 
 Tone mapping from `rec2100-pq` to `srgb` is performed using the following steps:
 
-* apply the Parametric Tone Mapping Method specified at [SMPTE ST 2094-10, Annex
-B](https://ieeexplore.ieee.org/document/9405553) using the following recommended
-parameter values:
-  * `TargetedSystemDisplayMaximumLuminance` = 100
-  * `TargetedSystemDisplayMinimumLuminance` = 0.1
-* convert to sRGB using `rec2020SDRLineartoSRGB()` below
+* apply the EETF specified at [Rep. ITU-R BT.2408, Annex
+5](https://www.itu.int/pub/R-REP-BT.2408) using the following parameter values:
+  * L<sub>B</sub> = `CanvasColorVolumeMetadata::minimumLuminance` || 0;
+  * L<sub>W</sub> = `CanvasColorVolumeMetadata::maximumLuminance` || 1000;
+  * L<sub>min</sub> = 0
+  * L<sub>max</sub> = 203
+* convert to sRGB using `rec2100PQtoSRGB()` below
 
 ```javascript
-function rec2020SDRLineartoSRGB(r, g, b) {
-  const [rt, gt, bt] = matrixXYZtoRec709(matrixBT2020toXYZ(r, g, b));
-  const rp = Math.pow(rt / 100, 1/2.4);
-  const gp = Math.pow(gt / 100, 1/2.4);
-  const bp = Math.pow(bt / 100, 1/2.4);
+function rec2100PQtoSRGB(r, g, b) {
+  let rt = 10000 * pqEOTF(r) / 203;
+  let gt = 10000 * pqEOTF(g) / 203;
+  let bt = 10000 * pqEOTF(b) / 203; 
+  [rt, gt, bt] = matrixXYZtoRec709(matrixBT2020toXYZ(rt, gt, bt));
+  const rp = Math.pow(rt, 1/2.4);
+  const gp = Math.pow(gt, 1/2.4);
+  const bp = Math.pow(bt, 1/2.4);
   return [rp, gp, bp];
 }
 ```
 
 The method is demonstrated at
 <https://www.sandflow.com/public/tone-mapping/index.html>.
-
-The method requires minimum, maximum and average luminance values as input.
-These values can be determined by analyzing the image -- as it is done in the
-demonstration above. If such an analysis is not possible, the `minimumLuminance`
-and `maximumLuminance` values of `CanvasMasteringDisplayMetadata` can be used as
-approximation for  the minimum and maximum luminance values, and a value of 10
-cd/m² can be used for the average luminance.
 
 #### `rec2100-hlg` to `srgb`
 
