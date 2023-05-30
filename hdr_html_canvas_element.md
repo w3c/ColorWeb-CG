@@ -241,7 +241,9 @@ volume are defined by:
 If omitted, `chromaticity` is equal to the chromaticity of the color space of
 the Canvas.
 
-If omitted, `minimumLuminance` is equal to 0.
+If omitted, `minimumLuminance` is equal to 0 cd/m².
+
+If omitted, `maximumLuminance` is equal to 10,000 cd/m².
 
 The color volume is nominal because it MAY be smaller or larger than the actual
 color volume of image content, but SHOULD not be smaller.
