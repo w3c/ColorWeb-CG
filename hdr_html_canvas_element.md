@@ -260,8 +260,14 @@ is not set, the tone mapping algorithm can vary over the sequence, resulting in
 temporal artifacts.
 
 For example, `colorVolumeMetadata` can be set according to the Mastering Display
-Color Volume chunk found in a PNG image: the color volume of the image content
-is typically smaller than, or coincides with, that of the mastering display.
+Color Volume and Content Light Level Information chunks found in a PNG image:
+the color volume of the image content is typically smaller than, or coincides
+with, that of the mastering display. For the color primaries and white point of
+the color volume, the colour primaries and white point parameters of the
+Mastering Display Color Volume chunk can be used. For the `minimumLuminance` and
+`maximumLuminance` parameters,  MaxCLL parameter of the Content Light Level
+Information chunk can provide more accurate information than the minimum and
+maximum luminance parameters of the Mastering Display Color Volume chunk.
 
 Add a mechanism for specifying this on `CanvasRenderingContext2D` and
 `OffscreenCanvasRenderingContext2D`.
