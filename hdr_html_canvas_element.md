@@ -244,9 +244,9 @@ the Canvas.
 If omitted, `minimumLuminance` is equal to 0.
 
 The color volume is nominal because it MAY be smaller or larger than the actual
-color volume of image content, but SHOULD not be larger.
+color volume of image content, but SHOULD not be smaller.
 
-If present, `colorVolumeMetadata` SHOULD completely defined the tone mapping
+If present, `colorVolumeMetadata` SHOULD completely define the tone mapping
 algorithm  used when rendering the image to a display. For example, the
 _rec2100-pq to srgb_ mapping specified in Annex A uses the `minimumLuminance`
 and `maximumLuminance` parameters.
@@ -259,7 +259,7 @@ temporal artifacts.
 
 For example, `colorVolumeMetadata` can be set according to the Mastering Display
 Color Volume chunk found in a PNG image: the color volume of the image content
-typically coincides with that of the mastering display.
+is typically smaller than, or coincides with, that of the mastering display.
 
 Add a mechanism for specifying this on `CanvasRenderingContext2D` and
 `OffscreenCanvasRenderingContext2D`.
