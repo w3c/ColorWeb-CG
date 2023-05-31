@@ -223,7 +223,7 @@ dictionary CanvasColorMetadata {
 dictionary CanvasColorVolumeMetadata {
   optional Chromaticity chromaticity;
   optional double minimumLuminance;
-  required double maximumLuminance;
+  optional double maximumLuminance;
 }
 ```
 
@@ -243,15 +243,18 @@ the Canvas.
 
 If omitted, `minimumLuminance` is equal to 0 cd/m².
 
-If omitted, `maximumLuminance` is equal to 10,000 cd/m².
+If omitted, `maximumLuminance` is equal to 1,000 cd/m².
 
 The color volume is nominal because it MAY be smaller or larger than the actual
 color volume of image content, but SHOULD not be smaller.
 
 If present, `colorVolumeMetadata` SHOULD completely define the tone mapping
-algorithm  used when rendering the image to a display. For example, the
+algorithm used when rendering the image to a display. For example, the
 _rec2100-pq to srgb_ mapping specified in Annex A uses the `minimumLuminance`
 and `maximumLuminance` parameters.
+
+If `colorVolumeMetadata` is not present, the tone mapping algorithm is left
+entirely to the implementation.
 
 `colorVolumeMetadata` SHOULD be set if known, e.g. if obtained from metadata
 contained in a source image, and omitted otherwise. This is particularly
