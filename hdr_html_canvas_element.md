@@ -192,7 +192,7 @@ respectively.
 
 _NOTE: The strawman requires at least one of `"float16"` and `"float32"` to
 support HDR imagery. Both are listed above to emphasize that the strawman can
-work with both or either.
+work with both or either._
 
 ## Add HDR rendering behavior and HDR metadata to `CanvasRenderingContext2DSettings`
 
@@ -205,7 +205,7 @@ dictionary CanvasColorMetadata {
 ```
 
 ```idl
-  dictionary Chromaticity {
+  dictionary Chromaticities {
     // The color primaries and white point of a color volume, in CIE 1931 xy
     // coordinates.
     required double redPrimaryX;
@@ -221,10 +221,19 @@ dictionary CanvasColorMetadata {
 
 ```idl
 dictionary CanvasColorVolumeMetadata {
-  optional Chromaticity chromaticity;
+  optional Chromaticities chromaticity;
   optional double minimumLuminance;
   optional double maximumLuminance;
 }
+```
+
+Add a mechanism for specifying this on `CanvasRenderingContext2D` and
+`OffscreenCanvasRenderingContext2D`.
+
+```idl
+  partial interface CanvasRenderingContext2D/OffscreenCanvasRenderingContext2D {
+    attribute CanvasColorMetadata colorMetadata;
+  }
 ```
 
 `colorVolumeMetadata` specifies the nominal color volume occupied by
@@ -238,7 +247,7 @@ volume are defined by:
 * the xy coordinates of a white point: `whitePointX` and `whitePointY`; and
 * a minimum and maximum luminance in cd/m²: `minimumLuminance` and `maximumLuminance`.
 
-If omitted, `chromaticity` is equal to the chromaticity of the color space of
+If omitted, `chromaticities` is equal to the chromaticity of the color space of
 the Canvas.
 
 If omitted, `minimumLuminance` is equal to 0 cd/m².
@@ -267,19 +276,12 @@ Color Volume and Content Light Level Information chunks found in a PNG image:
 the color volume of the image content is typically smaller than, or coincides
 with, that of the mastering display. For the color primaries and white point of
 the color volume, the colour primaries and white point parameters of the
-Mastering Display Color Volume chunk can be used. For the `minimumLuminance` and
-`maximumLuminance` parameters,  MaxCLL parameter of the Content Light Level
-Information chunk can provide more accurate information than the minimum and
-maximum luminance parameters of the Mastering Display Color Volume chunk.
-
-Add a mechanism for specifying this on `CanvasRenderingContext2D` and
-`OffscreenCanvasRenderingContext2D`.
-
-```idl
-  partial interface CanvasRenderingContext2D/OffscreenCanvasRenderingContext2D {
-    attribute CanvasColorMetadata colorMetadata;
-  }
-```
+Mastering Display Color Volume chunk can be used. For the `minimumLuminance`
+parameter, the minimum luminance parameter of the Mastering Display Color Volume
+chunk can be used. For the `maximumLuminance` parameter, the MaxCLL parameter of
+the Content Light Level Information chunk can provide more accurate information
+than the maximum luminance parameter of the Mastering Display Color Volume
+chunk.
 
 ## Annex A: Color space conversions
 
@@ -362,7 +364,7 @@ _Process:_
   2. Convert from ITU BT.2100 color space to sRGB color space
   3. Convert back to non-linear using a reciprocal transform
 
-_Note 3_ This transform utilises the backwards compatibility of ITU-R BT.2100
+_NOTE_ This transform utilises the backwards compatibility of ITU-R BT.2100
 HLG HDR with consumer electronic displays.  Prior to display, the gamut may need
 to be limited to the range 0-1.  The simplest method is to clip values but other
 gamut reduction techniques may provide better output images.
