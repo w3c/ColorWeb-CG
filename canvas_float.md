@@ -95,10 +95,7 @@ In the interface `CanvasImageData`, the functions `createImageData` and `getImag
 
 If the `ImageDataSettings` specifies `colorType`, then the resulting `ImageData` will have that specified `colorType`.
 
-If the `ImageDataSettings` does not specify `colorType`, then the resulting `ImageData`'s `colorType` will be as follows:
-
-* If the `CanvasImageData` has a `colorType` of `"unorm8"`, then the `ImageData`'s `colorType` will be `"unorm8"`.
-* If the `CanvasImageData` has a `colorType` of `"float16"`, then the `ImageData`'s `colorType` will be `"float32"`.
+If the `ImageDataSettings` does not specify `colorType`, then the resulting `ImageData`'s `colorType` will be `"unorm8"`.
 
 ### Values outside of the `[0, 1]` interval
 
@@ -277,17 +274,14 @@ E.g, one would write `255` instead of `1.0`.
 
 This can be avoided by examining the `colorType` member the `ImageData`.
 
-### Choice of defaulting `getImageData` to `Float32Array` for `"float16"` canvas
+### Choice of defaulting `getImageData` to `"unorm8"`
 
-There exists a trade-off in the default behavior of `getImageData` for a `"float16"` canvas.
+Historically, all calls to `getImageData` have returned an `ImageData` with a `Uint8ClampedArray`.
 
-Suppose one is to default to returning a `Uint8ClampedArray`.
-The benefit of this behavior is that there is a lesser likelihood of falling into the above mentioned pitfall.
-The downside of this behavior is that a `getImageData` and then `putImageData` round-trip will lose precision.
+Changing the default type that is returned by this function will break any software that relies on
+that default type, which is currently all software that uses this function.
 
-Suppose one is to default to returning a `Float32Array`.
-The benefit of this behavior is that a `getImageData` and then `putImageData` round-trip will not lose precision.
-The downside is that there is a higher likelihood of falling into the above mentioned pitfall.
-
-This is resolved in favor of preserving round-trip precision, following the decision with respect to the default behavior for `colorSpace` for `getImageData`.
+Changing the default type that is returned by this function will significantly hinder the adoption
+of `"float16"` canvas, because no application can change the backing of any canvas without first
+ensuring that all libraries that it uses have been updated to support all possible return values.
 
