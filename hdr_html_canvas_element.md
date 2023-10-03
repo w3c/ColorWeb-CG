@@ -405,7 +405,37 @@ function tonemapREC2100HLGtoSRGBdisplay(r, g, b) {
 
 #### `srgb` to `rec2100-hlg`
 
-See [TTML 2, Annex Q.2, steps 1-8](https://www.w3.org/TR/ttml2/#hlg-hdr).
+```js
+function convertSRGBtoREC2100HLG(r, g, b) {
+  const systemGamma = 1.0;
+  const linearLightScaler = 0.26496256042100724;
+
+  /* Linearize using the sRGB EOTF */
+  const r1 = srgb_eotf(r);
+  const g1 = srgb_eotf(g);
+  const b1 = srgb_eotf(b);
+
+  /* convert color coordinates from sRGB to BT.2020 color space */
+  const [r2, g2, b2] = matrixXYZtoBT2020(matrixSRGBtoXYZ(r1, g1, b1));
+
+  /* Scale pixel values (see NOTE 1) */
+  const r3 = linearLightScaler * r2;
+  const g3 = linearLightScaler * g2;
+  const b3 = linearLightScaler * b2;
+
+  /* apply HLG Inverse OOTF */
+  const [r4, g4, b4] = hlg_inverse_ootf(r3, g3, b3, systemGamma);
+
+  /* apply HLG OETF (see NOTE 2) */
+  const [r5, g5, b5] = hlg_oetf(r4, g4, b4);
+
+  return [r5, g5, b5]
+}
+```
+
+_NOTE 1_: The `linearLightScaler` is calculated by computing the inverse HLG OETF of 0.75, which is the diffuse white level defined for `rec2100-hlg`.
+
+_NOTE 2_: ITU-R BT.2408-4, 5.3 discusses negative transfer functions in format conversions.
 
 #### `srgb` to `rec2100-pq`
 
