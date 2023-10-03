@@ -310,10 +310,15 @@ values that are not known to be valid or accurate.
   latter -- this allows the application to use its own mapping algorithm,
   substituting those provided by the underlying platform.
 
-In absence of `displayColorVolume`, the
-[`dynamic-range`](https://drafts.csswg.org/mediaqueries-5/#dynamic-range) media
-query can be used to determine whether the output device supports high-dynamic
-range imagery.
+In absence of `displayColorVolume`:
+
+* the [`dynamic-range`](https://drafts.csswg.org/mediaqueries-5/#dynamic-range)
+media query can be used to determine whether the output device supports
+high-dynamic range imagery; and
+* the
+[`color-gamut`](https://drafts.csswg.org/mediaqueries-5/#descdef-media-color-gamut)
+media query feature can be used to determine whether the output device supports
+wide color gamut imagery.
 
 ## Color Volume Mapping
 
