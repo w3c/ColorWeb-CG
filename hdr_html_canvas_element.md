@@ -297,15 +297,23 @@ If present, the `displayColorVolume` attribute specifies the set of colors that
 the screen of the output device can reproduce without significant color volume
 mapping.
 
-This information 
+It is preferable to omit `displayColorVolume` than to provide default or nominal
+values that are not known to be valid or accurate.
 
-* an authoring application can use the information to (i) avoid image
-  colors exceeding the color volume of the output device and (ii) set
+`displayColorVolume` can, for example, be used in the following scenarios:
+
+* an authoring application can use the information to (i) avoid image colors
+  exceeding the color volume of the output device and (ii) correspondingly set
   `colorVolumeMetadata` in `CanvasColorMetadata` (see above).
 * a player application can use the information to map the colors of the image to
   the color volume of the output device if some of the former are outside the
   latter -- this allows the application to use its own mapping algorithm,
   substituting those provided by the underlying platform.
+
+In absence of `displayColorVolume`, the
+[`dynamic-range`](https://drafts.csswg.org/mediaqueries-5/#dynamic-range) media
+query can be used to determine whether the output device supports high-dynamic
+range imagery.
 
 ## Color Volume Mapping
 
