@@ -288,7 +288,7 @@ if the color volume of the image is smaller than that of the display.
 Add a new `displayColorVolume` attribute to the `Screen` interface:
 
 ```idl
-partial interface Sceeen {
+partial interface Screen {
   optional ColorVolumeInfo displayColorVolume;
 }
 ```
