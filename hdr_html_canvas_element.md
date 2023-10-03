@@ -297,6 +297,9 @@ If present, the `displayColorVolume` attribute specifies the set of colors that
 the screen of the output device can reproduce without significant color volume
 mapping.
 
+If omitted, the values of `chromaticity`, `minimumLuminance` and
+`maximumLuminance` are unspecified.
+
 It is preferable to omit `displayColorVolume` than to provide default or nominal
 values that are not known to be valid or accurate.
 
