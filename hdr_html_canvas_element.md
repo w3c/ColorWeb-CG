@@ -285,25 +285,49 @@ if the color volume of the image is smaller than that of the display.
 
 ## Add display color volume information to `Screen` interface of the CSS Object Model
 
-Add a new `displayColorVolume` attribute to the `Screen` interface:
+Add a new `screenColorInfo` attribute to the `Screen` interface:
 
 ```idl
 partial interface Screen {
-  optional ColorVolumeInfo displayColorVolume;
+  optional ScreenColorInfo screenColorInfo;
 }
 ```
 
-If present, the `displayColorVolume` attribute specifies the set of colors that
-the screen of the output device can reproduce without significant color volume
-mapping.
+```idl
+dictionary ScreenColorInfo {
+  optional ColorVolumeInfo colorVolume;
+  optional double referenceWhiteLuminance;
+}
+```
 
-If omitted, the values of `chromaticity`, `minimumLuminance` and
-`maximumLuminance` are unspecified.
+If present,
 
-It is preferable to omit `displayColorVolume` than to provide default or nominal
-values that are not known to be valid or accurate.
+* `colorVolume` specifies, as defined above, the set of colors that the screen
+of the output device can reproduce without significant color volume mapping; and
+* `referenceWhiteLuminance` specifies the luminance of reference white as
+reproduced by the screen of the output device, and reflects viewing environment
+and user settings.
 
-`displayColorVolume` can, for example, be used in the following scenarios:
+When omitted, the value of a parameter is unspecified. It is preferable to omit
+parameters than to provide default or nominal values that are not known to be
+valid or accurate.
+
+`referenceWhiteLuminance` must be larger than or equal to `minimumLuminance`,
+and smaller than or equal to `maximumLuminance`. The ratio of `maximumLuminance`
+to `referenceWhiteLuminance` effectively specifies the headroom available for
+HDR imagery.
+
+_Reference white_ is also commonly referred to as diffuse white and graphics
+white.
+
+_EXAMPLE_: [Report ITU-R BT.2408](https://www.itu.int/pub/R-REP-BT.2408)
+specifies that the luminance of reference white for a PQ reference display, or a
+1 000 cd/m² HLG display, is 203 cd/m².
+
+_EXAMPLE_: A PC monitor in a bright environment might report a
+`maximumLuminance` of 600 cd/m² and a `referenceWhiteLuminance` of 400 cd/m².
+
+`screenColorInfo` can, for example, be used in the following scenarios:
 
 * an authoring application can use the information to (i) avoid image colors
   exceeding the color volume of the output device and (ii) correspondingly set
@@ -313,7 +337,7 @@ values that are not known to be valid or accurate.
   latter -- this allows the application to use its own mapping algorithm,
   substituting those provided by the underlying platform.
 
-In absence of `displayColorVolume`:
+In absence of some or all the parameters of `screenColorInfo`:
 
 * the [`dynamic-range`](https://drafts.csswg.org/mediaqueries-5/#dynamic-range)
 media query can be used to determine whether the output device supports
@@ -336,7 +360,7 @@ of the display.
 
 It is possible for an application to avoid color volume mapping by the platform
 by ensuring that the color volume of the image, as specified
-by`colorVolumeMetadata`, is within `displayColorVolume`. This can be achieved,
+by`colorVolumeMetadata`, is within `screenColorInfo`. This can be achieved,
 for example, by:
 
 * preventing in the first place an author from creating colors exceeding the
