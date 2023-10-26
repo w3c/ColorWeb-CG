@@ -88,6 +88,7 @@ include the following HDR color spaces.
 
     "rec2100-hlg",
     "rec2100-pq",
+    "rec2100-linear-display",
   }
 ```
 
@@ -115,6 +116,12 @@ specified in Rec. ITU-R BT.2100.
 
 _NOTE: {R', G', B'} are in the range [0, 1], i.e. they are not expressed in
 cd/m<sup>2</sup>_
+
+### rec2100-display-linear
+
+The linear display-referred component signals {R, G, B} are mapped to red, green
+and blue tristimulus values such that R = G = B = 1.0 represents HDR reference
+white with a nominal luminance of 203 cd/m².
 
 ## Extend `CanvasRenderingContext2DSettings` to support higher bit depths
 
@@ -197,7 +204,7 @@ Add a new CanvasColorMetadata dictionary:
 
 ```idl
 dictionary CanvasColorMetadata {
-  ColorVolumeInfo colorVolumeMetadata;
+  optional ColorVolumeInfo contentColorVolume;
 }
 ```
 
@@ -233,7 +240,7 @@ Add a mechanism for specifying this on `CanvasRenderingContext2D` and
   }
 ```
 
-`colorVolumeMetadata` specifies the nominal color volume occupied by
+`contentColorVolume` specifies the nominal color volume occupied by
 the image content in the CIE 1931 XYZ color space. The boundaries of the color
 volume are defined by:
 
@@ -254,21 +261,21 @@ If omitted, `maximumLuminance` is equal to 1,000 cd/m².
 The color volume is nominal because it MAY be smaller or larger than the actual
 color volume of image content, but SHOULD not be smaller.
 
-If present, `colorVolumeMetadata` SHOULD completely define the color volume mapping
+If present, `contentColorVolume` SHOULD completely define the color volume mapping
 algorithm used when rendering the image to a display. For example, the
 _rec2100-pq to srgb_ mapping specified in Annex A uses the `minimumLuminance`
 and `maximumLuminance` parameters.
 
-If `colorVolumeMetadata` is not present, the color volume mapping algorithm is left
+If `contentColorVolume` is not present, the color volume mapping algorithm is left
 entirely to the implementation.
 
-`colorVolumeMetadata` SHOULD be set if known, e.g. if obtained from metadata
+`contentColorVolume` SHOULD be set if known, e.g. if obtained from metadata
 contained in a source image, and omitted otherwise. This is particularly
-important when drawing a temporal sequence of images. If `colorVolumeMetadata`
+important when drawing a temporal sequence of images. If `contentColorVolume`
 is not set, the color volume mapping algorithm can vary over the sequence, resulting in
 temporal artifacts.
 
-For example, `colorVolumeMetadata` can be set according to the Mastering Display
+For example, `contentColorVolume` can be set according to the Mastering Display
 Color Volume and Content Light Level Information chunks found in a PNG image:
 the color volume of the image content is typically smaller than, or coincides
 with, that of the mastering display. For the color primaries and white point of
@@ -331,7 +338,7 @@ _EXAMPLE_: A PC monitor in a bright environment might report a
 
 * an authoring application can use the information to (i) avoid image colors
   exceeding the color volume of the output device and (ii) correspondingly set
-  `colorVolumeMetadata` in `CanvasColorMetadata` (see above).
+  `contentColorVolume` in `CanvasColorMetadata` (see above).
 * a player application can use the information to map the colors of the image to
   the color volume of the output device if some of the former are outside the
   latter -- this allows the application to use its own mapping algorithm,
@@ -360,7 +367,7 @@ of the display.
 
 It is possible for an application to avoid color volume mapping by the platform
 by ensuring that the color volume of the image, as specified
-by`colorVolumeMetadata`, is within `screenColorInfo`. This can be achieved,
+by`contentColorVolume`, is within `screenColorInfo`. This can be achieved,
 for example, by:
 
 * preventing in the first place an author from creating colors exceeding the
