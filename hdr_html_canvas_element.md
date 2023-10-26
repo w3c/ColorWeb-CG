@@ -436,15 +436,29 @@ following steps:
 * convert to sRGB using `rec2100PQtoSRGB()` below
 
 ```javascript
+function simpleInverseTransform(value, gamma) {
+  if (value < 0) {
+    return -1.0 * Math.pow(-1.0 * value, 1.0 / gamma);
+  } else {
+    return Math.pow(value, 1.0 / gamma);
+  }
+}
+
 function rec2100PQtoSRGB(r, g, b) {
   let rt = 10000 * pqEOTF(r) / 203;
   let gt = 10000 * pqEOTF(g) / 203;
-  let bt = 10000 * pqEOTF(b) / 203; 
-  [rt, gt, bt] = matrixXYZtoRec709(matrixBT2020toXYZ(rt, gt, bt));
-  const rp = Math.pow(rt, 1/2.4);
-  const gp = Math.pow(gt, 1/2.4);
-  const bp = Math.pow(bt, 1/2.4);
-  return [rp, gp, bp];
+  let bt = 10000 * pqEOTF(b) / 203;
+
+  [rt, gt, bt] = matrixXYZtoSRGB(matrixBT2020toXYZ(rt, gt, bt));
+
+  const srgbGamma = 2.2;
+  const r2 = simpleInverseTransform(rt, srgbGamma);
+  const g2 = simpleInverseTransform(gt, srgbGamma);
+  const b2 = simpleInverseTransform(bt, srgbGamma);
+
+  const [r3, g3, b3] = limitToSRGBGamut(r2, g2, b2);
+
+  return [r3, g3, b3];
 }
 ```
 
@@ -502,7 +516,7 @@ function tonemapREC2100HLGtoSRGBdisplay(r, g, b) {
   const g3 = simpleInverseTransform(g2, srgbGamma);
   const b3 = simpleInverseTransform(b2, srgbGamma);
 
-  const [r4, g4, b4] = limitTosRGBGamut(r3, g3, b3);
+  const [r4, g4, b4] = limitToSRGBGamut(r3, g3, b3);
 
   return [r4, g4, b4];
 }
