@@ -362,7 +362,7 @@ _Process:_
   1. Pseudo-linearize the HLG signal exploiting its backwards compatibility with
      SDR consumer displays
   2. Convert from ITU BT.2100 color space to sRGB color space
-  3. Convert back to non-linear using a reciprocal transform
+  3. Convert to non-linear sRGB values
 
 _NOTE_ This transform utilises the backwards compatibility of ITU-R BT.2100
 HLG HDR with consumer electronic displays.  Prior to display, the gamut may need
@@ -371,32 +371,37 @@ gamut reduction techniques may provide better output images.
 
 ```javascript
 
-function simpleTransform(value, systemGamma) {
-  if (value < 1.0) {
-    return -1.0 * Math.pow(-1.0 * value, systemGamma);
+function simpleTransform(value, gamma) {
+  if (value < 0) {
+    return -1.0 * Math.pow(-1.0 * value, gamma);
   } else {
-    return Math.pow(value, systemGamma);
+    return Math.pow(value, gamma);
   } 
 }
 
-function simpleInverseTransform(value, systemGamma) {
-  if (value < 1.0) {
-    return -1.0 * Math.pow(-1.0 * value, 1.0 / systemGamma);
+function simpleInverseTransform(value, gamma) {
+  if (value < 0) {
+    return -1.0 * Math.pow(-1.0 * value, 1.0 / gamma);
   } else {
-    return Math.pow(value, 1.0 / systemGamma);
+    return Math.pow(value, 1.0 / gamma);
   }
 }
 
 function tonemapREC2100HLGtoSRGBdisplay(r, g, b) {
-  const systemGamma = 2.2;
-  const r1 = simpleTransform(r, systemGamma);
-  const g1 = simpleTransform(g, systemGamma);
-  const b1 = simpleTransform(b, systemGamma);
+  const displayGamma = 2.2;
+  const r1 = simpleTransform(r, displayGamma);
+  const g1 = simpleTransform(g, displayGamma);
+  const b1 = simpleTransform(b, displayGamma);
+
   const [r2, g2, b2] = matrixXYZtoSRGB(matrixBT2020toXYZ(r1, g1, b1));
-  const r3 = simpleInverseTransform(r2, systemGamma);
-  const g3 = simpleInverseTransform(g2, systemGamma);
-  const b3 = simpleInverseTransform(b2, systemGamma);
+
+  const srgbGamma = 2.2;
+  const r3 = simpleInverseTransform(r2, srgbGamma);
+  const g3 = simpleInverseTransform(g2, srgbGamma);
+  const b3 = simpleInverseTransform(b2, srgbGamma);
+
   const [r4, g4, b4] = limitTosRGBGamut(r3, g3, b3);
+
   return [r4, g4, b4];
 }
 ```
@@ -405,7 +410,42 @@ function tonemapREC2100HLGtoSRGBdisplay(r, g, b) {
 
 #### `srgb` to `rec2100-hlg`
 
-See [TTML 2, Annex Q.2, steps 1-8](https://www.w3.org/TR/ttml2/#hlg-hdr).
+This conversion method adjust the HLG pseudo-display nominal peak luminance such
+that the sRGB peak luminance maps to HDR reference white luminance. Using an
+sRGB peak luminance value of 80 cd/m² and the extended range gamma formula
+specified in BT.2100, Footnote 2, this results in an HLG nominal peak luminance
+L<sub>w</sub> of 302.2 cd/m² and a system gamma of 1.001.
+
+```js
+function convertSRGBtoREC2100HLG(r, g, b) {
+
+  /* Linearize using the sRGB EOTF */
+  const r1 = srgb_eotf(r);
+  const g1 = srgb_eotf(g);
+  const b1 = srgb_eotf(b);
+
+  /* convert color coordinates from sRGB to BT.2020 color space */
+  const [r2, g2, b2] = matrixXYZtoBT2020(matrixSRGBtoXYZ(r1, g1, b1));
+
+  /* Scale pixel values to match the HLG nominal peak luminance */
+  const linearLightScaler = 80/302.2;
+  const r3 = linearLightScaler * r2;
+  const g3 = linearLightScaler * g2;
+  const b3 = linearLightScaler * b2;
+
+  /* apply HLG Inverse OOTF to obtain scene light values */
+  const systemGamma = 1.001;
+  const [r4, g4, b4] = hlg_inverse_ootf(r3, g3, b3, systemGamma);
+
+  /* apply HLG OETF to obtain the non-linear HLG signal (see NOTE 1) */
+  const [r5, g5, b5] = hlg_oetf(r4, g4, b4);
+
+  return [r5, g5, b5]
+}
+```
+
+_NOTE 1_: ITU-R BT.2408-4, 5.3 discusses negative transfer functions in format
+conversions.
 
 #### `srgb` to `rec2100-pq`
 
