@@ -1,4 +1,4 @@
-# Adding support High Dynamic Range (HDR) imagery to HTML Canvas: a baseline proposal
+# Adding support High Dynamic Range (HDR) imagery to HTML Canvas: a baseline proposal (version 2)
 
 ## Introduction
 
@@ -24,23 +24,31 @@ BT.2100 HLG. All movies and TV shows are distributed using either of these two
 color spaces. Products with HDMI and/or DisplayPort interfaces also use these
 color spaces for HDR support.
 
-* To render HDR imagery, it is useful to have information on the luminance range
-and color gamut that were used when authoring the image.
+* To reproduce an HDR image on a display, it is useful to have information on
+both the color volume of that display and the color volume of the image since
+one can be significantly smaller than the other.
 
 Accordingly, the following API modifications are needed to manipulate HDR images
 in HTML Canvas:
 
-1. add BT.2100 PQ and BT.2100 HLG color spaces to `PredefinedColorSpace`
+1. add BT.2100 color spaces to `PredefinedColorSpace`
 2. add higher bit depth capabilities to `CanvasRenderingContext2DSettings`
 3. add higher bit depth capabilities to `ImageDataSettings`
-4. add luminance and color gamut information to `ImageDataSettings` and
+4. add image color volume information to `ImageDataSettings` and
    `CanvasRenderingContext2DSettings`
+5. add display color volume information to the `Screen` interface of the CSS
+   Object Model, to determine the characteristics of the display on which the
+   image is being reproduced
 
 ## Target use cases
 
-The primary use case is the drawing of HDR images into an HTML Canvas element
-such that the images are displayed as they would have been if they had been
-introduced in an `img` or `video` element. Example applications include:
+As illustrated below, the primary use case is the drawing of HDR images into an
+HTML Canvas element such that the images are displayed as they would have been
+if they had been introduced in an `img` or `video` element.
+
+![Primary Use Case](./primary-use-case.png)
+
+Example applications include:
 
 * drawing images retrieved from a file whose format is not supported by the
   `img` or `video` elements
@@ -48,7 +56,8 @@ introduced in an `img` or `video` element. Example applications include:
 * adding graphics to an HDR image
 * drawing of visual elements that are related to an HDR presentation in a
  `video` element, with the expectation that the former match the look of the
- latter.
+ latter
+* authoring HDR images
 
 ## Scope
 
@@ -58,8 +67,6 @@ BT.2100 PQ and BT.2100 HLG color spaces.
 
 This proposal:
 
-* does not target applications that require high-performance custom image
-  tone-mapping or compositing methods.
 * does not preclude adding other HDR capabilities to HTML Canvas, such as
   support for additional color spaces like a linear high-dynamic range color
   space.
@@ -71,7 +78,7 @@ This proposal:
 ### General
 
 Extend [`PredefinedColorSpace`](https://html.spec.whatwg.org/multipage/canvas.html#predefinedcolorspace) to
-include the following color spaces.
+include the following HDR color spaces.
 
 ```idl
   partial enum PredefinedColorSpace {
@@ -81,28 +88,19 @@ include the following color spaces.
 
     "rec2100-hlg",
     "rec2100-pq",
+    "rec2100-display-linear",
   }
 ```
 
 Extending `PredefinedColorSpace` automatically extends
 `CanvasRenderingContext2DSettings` and `ImageDataSettings`.
 
-A Canvas that is initialized with `rec2100-pq` and `rec2100-hlg` is an HDR
-Canvas; otherwise it is an SDR Canvas.
+A Canvas that is initialized with an HDR color space is an HDR Canvas; otherwise
+it is an SDR Canvas.
 
-As illustrated below, the tone mapping of `rec2100-pq` and `rec2100-hlg` images,
-i.e. the rendering of an image with a given dynamic range onto a display with
-different dynamic range, is performed by the platform. This is akin to the
-scenario where the `src` of an `img` element is a PQ or HLG image.
-
-![Tone mapping scenarios](./tone-mapping-scenarios.png)
-
-SDR images that are drawn to an HDR Canvas are first converted to an HDR
-representation. Conversely, HDR images that are drawn into SDR Canvas are first
-converted to an SDR representation.
-
-Conversions to and from `rec2100-pq` and `rec2100-hlg` are detailed in Annex A
-below.
+When drawing an image into a Canvas, the image will be transformed unless the
+color spaces of the image and the Canvas match. Annex A specifies transformation
+to and from `rec2100-pq` and `rec2100-hlg`.
 
 ### rec2100-hlg
 
@@ -118,6 +116,12 @@ specified in Rec. ITU-R BT.2100.
 
 _NOTE: {R', G', B'} are in the range [0, 1], i.e. they are not expressed in
 cd/m<sup>2</sup>_
+
+### rec2100-display-linear
+
+The linear display-referred component signals {R, G, B} are mapped to red, green
+and blue tristimulus values such that R = G = B = 1.0 represents HDR reference
+white with a nominal luminance of 203 cd/m².
 
 ## Extend `CanvasRenderingContext2DSettings` to support higher bit depths
 
@@ -200,7 +204,7 @@ Add a new CanvasColorMetadata dictionary:
 
 ```idl
 dictionary CanvasColorMetadata {
-  CanvasColorVolumeMetadata colorVolumeMetadata;
+  optional ColorVolumeInfo contentColorVolume;
 }
 ```
 
@@ -220,7 +224,7 @@ dictionary CanvasColorMetadata {
 ```
 
 ```idl
-dictionary CanvasColorVolumeMetadata {
+dictionary ColorVolumeInfo {
   optional Chromaticities chromaticity;
   optional double minimumLuminance;
   optional double maximumLuminance;
@@ -236,7 +240,7 @@ Add a mechanism for specifying this on `CanvasRenderingContext2D` and
   }
 ```
 
-`colorVolumeMetadata` specifies the nominal color volume occupied by
+`contentColorVolume` specifies the nominal color volume occupied by
 the image content in the CIE 1931 XYZ color space. The boundaries of the color
 volume are defined by:
 
@@ -257,21 +261,21 @@ If omitted, `maximumLuminance` is equal to 1,000 cd/m².
 The color volume is nominal because it MAY be smaller or larger than the actual
 color volume of image content, but SHOULD not be smaller.
 
-If present, `colorVolumeMetadata` SHOULD completely define the tone mapping
+If present, `contentColorVolume` SHOULD completely define the color volume mapping
 algorithm used when rendering the image to a display. For example, the
 _rec2100-pq to srgb_ mapping specified in Annex A uses the `minimumLuminance`
 and `maximumLuminance` parameters.
 
-If `colorVolumeMetadata` is not present, the tone mapping algorithm is left
+If `contentColorVolume` is not present, the color volume mapping algorithm is left
 entirely to the implementation.
 
-`colorVolumeMetadata` SHOULD be set if known, e.g. if obtained from metadata
+`contentColorVolume` SHOULD be set if known, e.g. if obtained from metadata
 contained in a source image, and omitted otherwise. This is particularly
-important when drawing a temporal sequence of images. If `colorVolumeMetadata`
-is not set, the tone mapping algorithm can vary over the sequence, resulting in
+important when drawing a temporal sequence of images. If `contentColorVolume`
+is not set, the color volume mapping algorithm can vary over the sequence, resulting in
 temporal artifacts.
 
-For example, `colorVolumeMetadata` can be set according to the Mastering Display
+For example, `contentColorVolume` can be set according to the Mastering Display
 Color Volume and Content Light Level Information chunks found in a PNG image:
 the color volume of the image content is typically smaller than, or coincides
 with, that of the mastering display. For the color primaries and white point of
@@ -282,6 +286,97 @@ chunk can be used. For the `maximumLuminance` parameter, the MaxCLL parameter of
 the Content Light Level Information chunk can provide more accurate information
 than the maximum luminance parameter of the Mastering Display Color Volume
 chunk.
+
+As specified below, the platform does not generally apply color volume mapping
+if the color volume of the image is smaller than that of the display.
+
+## Add display color volume information to `Screen` interface of the CSS Object Model
+
+Add a new `screenColorInfo` attribute to the `Screen` interface:
+
+```idl
+partial interface Screen {
+  optional ScreenColorInfo screenColorInfo;
+}
+```
+
+```idl
+dictionary ScreenColorInfo {
+  optional ColorVolumeInfo colorVolume;
+  optional double referenceWhiteLuminance;
+}
+```
+
+If present,
+
+* `colorVolume` specifies, as defined above, the set of colors that the screen
+of the output device can reproduce without significant color volume mapping; and
+* `referenceWhiteLuminance` specifies the luminance of reference white as
+reproduced by the screen of the output device, and reflects viewing environment
+and user settings.
+
+When omitted, the value of a parameter is unspecified. It is preferable to omit
+parameters than to provide default or nominal values that are not known to be
+valid or accurate.
+
+`referenceWhiteLuminance` must be larger than or equal to `minimumLuminance`,
+and smaller than or equal to `maximumLuminance`. The ratio of `maximumLuminance`
+to `referenceWhiteLuminance` effectively specifies the headroom available for
+HDR imagery.
+
+_Reference white_ is also commonly referred to as diffuse white and graphics
+white.
+
+_EXAMPLE_: [Report ITU-R BT.2408](https://www.itu.int/pub/R-REP-BT.2408)
+specifies that the luminance of reference white for a PQ reference display, or a
+1 000 cd/m² HLG display, is 203 cd/m².
+
+_EXAMPLE_: A PC monitor in a bright environment might report a
+`maximumLuminance` of 600 cd/m² and a `referenceWhiteLuminance` of 400 cd/m².
+
+`screenColorInfo` can, for example, be used in the following scenarios:
+
+* an authoring application can use the information to (i) avoid image colors
+  exceeding the color volume of the output device and (ii) correspondingly set
+  `contentColorVolume` in `CanvasColorMetadata` (see above).
+* a player application can use the information to map the colors of the image to
+  the color volume of the output device if some of the former are outside the
+  latter -- this allows the application to use its own mapping algorithm,
+  substituting those provided by the underlying platform.
+
+In absence of some or all the parameters of `screenColorInfo`:
+
+* the [`dynamic-range`](https://drafts.csswg.org/mediaqueries-5/#dynamic-range)
+media query can be used to determine whether the output device supports
+high-dynamic range imagery; and
+* the
+[`color-gamut`](https://drafts.csswg.org/mediaqueries-5/#descdef-media-color-gamut)
+media query feature can be used to determine whether the output device supports
+wide color gamut imagery.
+
+## Color Volume Mapping
+
+As illustrated by (b) below, when the the color volume of the image is not a
+subset of the color volume of the display, the platform performs color volume
+mapping, i.e. modifies the colors of the image to make them fit within the
+capabilities of the display.
+
+Conversely and as illustrated by (a) below, the platform does not perform color
+volume mapping if the color volume of the image is a subset of the color volume
+of the display.
+
+It is possible for an application to avoid color volume mapping by the platform
+by ensuring that the color volume of the image, as specified
+by`contentColorVolume`, is within `screenColorInfo`. This can be achieved,
+for example, by:
+
+* preventing in the first place an author from creating colors exceeding the
+  display color volume.
+* the application performing its own color volume mapping such that the
+  resulting image color volume is within the display color volume, as
+  illustrated by (c) below.
+
+![Color Volume Mapping Scenarios](./tone-mapping-scenarios.png)
 
 ## Annex A: Color space conversions
 
@@ -312,7 +407,13 @@ The following illustrates the conversions that are explicitly specified:
 These conversions fall into two broad categories:
 
 * conversion between HDR color spaces
-* conversion between an HDR and an SDR color space (tone mapping)
+* conversion between between images with different luminance dynamic ranges
+  (tone mapping)
+
+### Rendering to an HDR display with a lower dynamic range
+
+[Rep. ITU-R BT.2408, Annex 5](https://www.itu.int/pub/R-REP-BT.2408) specifies a
+method to render an HDR image to an HDR display with a lower dynamic range.
 
 ### Between HDR color spaces
 
@@ -323,26 +424,41 @@ ITU-R BT.2408-5, Clause 6](https://www.itu.int/pub/R-REP-BT.2408)
 
 #### `rec2100-pq` to `srgb`
 
-Tone mapping from `rec2100-pq` to `srgb` is performed using the following steps:
+Color volume mapping from `rec2100-pq` to `srgb` is performed using the
+following steps:
 
 * apply the EETF specified at [Rep. ITU-R BT.2408, Annex
 5](https://www.itu.int/pub/R-REP-BT.2408) using the following parameter values:
-  * L<sub>B</sub> = `CanvasColorVolumeMetadata::minimumLuminance` || 0;
-  * L<sub>W</sub> = `CanvasColorVolumeMetadata::maximumLuminance` || 1000;
+  * L<sub>B</sub> = `ColorVolumeInfo::minimumLuminance` || 0;
+  * L<sub>W</sub> = `ColorVolumeInfo::maximumLuminance` || 1000;
   * L<sub>min</sub> = 0
   * L<sub>max</sub> = 203
 * convert to sRGB using `rec2100PQtoSRGB()` below
 
 ```javascript
+function simpleInverseTransform(value, gamma) {
+  if (value < 0) {
+    return -1.0 * Math.pow(-1.0 * value, 1.0 / gamma);
+  } else {
+    return Math.pow(value, 1.0 / gamma);
+  }
+}
+
 function rec2100PQtoSRGB(r, g, b) {
   let rt = 10000 * pqEOTF(r) / 203;
   let gt = 10000 * pqEOTF(g) / 203;
-  let bt = 10000 * pqEOTF(b) / 203; 
-  [rt, gt, bt] = matrixXYZtoRec709(matrixBT2020toXYZ(rt, gt, bt));
-  const rp = Math.pow(rt, 1/2.4);
-  const gp = Math.pow(gt, 1/2.4);
-  const bp = Math.pow(bt, 1/2.4);
-  return [rp, gp, bp];
+  let bt = 10000 * pqEOTF(b) / 203;
+
+  [rt, gt, bt] = matrixXYZtoSRGB(matrixBT2020toXYZ(rt, gt, bt));
+
+  const srgbGamma = 2.2;
+  const r2 = simpleInverseTransform(rt, srgbGamma);
+  const g2 = simpleInverseTransform(gt, srgbGamma);
+  const b2 = simpleInverseTransform(bt, srgbGamma);
+
+  const [r3, g3, b3] = limitToSRGBGamut(r2, g2, b2);
+
+  return [r3, g3, b3];
 }
 ```
 
@@ -400,7 +516,7 @@ function tonemapREC2100HLGtoSRGBdisplay(r, g, b) {
   const g3 = simpleInverseTransform(g2, srgbGamma);
   const b3 = simpleInverseTransform(b2, srgbGamma);
 
-  const [r4, g4, b4] = limitTosRGBGamut(r3, g3, b3);
+  const [r4, g4, b4] = limitToSRGBGamut(r3, g3, b3);
 
   return [r4, g4, b4];
 }
