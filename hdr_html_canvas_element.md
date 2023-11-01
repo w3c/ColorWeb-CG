@@ -31,7 +31,7 @@ one can be significantly smaller than the other.
 Accordingly, the following API modifications are needed to manipulate HDR images
 in HTML Canvas:
 
-1. add BT.2100 PQ and BT.2100 HLG color spaces to `PredefinedColorSpace`
+1. add BT.2100 color spaces to `PredefinedColorSpace`
 2. add higher bit depth capabilities to `CanvasRenderingContext2DSettings`
 3. add higher bit depth capabilities to `ImageDataSettings`
 4. add image color volume information to `ImageDataSettings` and
@@ -117,7 +117,7 @@ specified in Rec. ITU-R BT.2100.
 _NOTE: {R', G', B'} are in the range [0, 1], i.e. they are not expressed in
 cd/m<sup>2</sup>_
 
-### rec2100-display-linear
+### rec2100-linear-display
 
 The linear display-referred component signals {R, G, B} are mapped to red, green
 and blue tristimulus values such that R = G = B = 1.0 represents HDR reference
