@@ -88,7 +88,7 @@ include the following HDR color spaces.
 
     "rec2100-hlg",
     "rec2100-pq",
-    "rec2100-linear-display",
+    "rec2100-display-linear",
   }
 ```
 
@@ -117,7 +117,7 @@ specified in Rec. ITU-R BT.2100.
 _NOTE: {R', G', B'} are in the range [0, 1], i.e. they are not expressed in
 cd/m<sup>2</sup>_
 
-### rec2100-linear-display
+### rec2100-display-linear
 
 The linear display-referred component signals {R, G, B} are mapped to red, green
 and blue tristimulus values such that R = G = B = 1.0 represents HDR reference
