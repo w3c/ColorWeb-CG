@@ -102,6 +102,10 @@ When drawing an image into a Canvas, the image will be transformed unless the
 color spaces of the image and the Canvas match. Annex A specifies transformation
 to and from `rec2100-pq` and `rec2100-hlg`.
 
+At the time of this writing, [the current draft of CSS Color HDR Module Level 1](https://drafts.csswg.org/css-color-hdr/)
+provides detailed definitions of`rec2100-hlg`, `rec2100-pq` and
+`rec2100-display-linear` (called `rec2100-linear` in that document).
+
 ### rec2100-hlg
 
 The non-linear component signals {R', G', B'} are mapped to red, green and blue
@@ -290,9 +294,10 @@ chunk.
 As specified below, the platform does not generally apply color volume mapping
 if the color volume of the image is smaller than that of the display.
 
-## Add display color volume information to `Screen` interface of the CSS Object Model
+## Add display color volume information to the `Screen` interface defined in the CSSOM View Module
 
-Add a new `colorInfo` attribute to the `Screen` interface:
+Add, in the [CSSOM View Module](https://www.w3.org/TR/cssom-view-1/), a new
+`colorInfo` attribute to the `Screen` interface:
 
 ```idl
 partial interface Screen {
