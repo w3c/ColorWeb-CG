@@ -292,11 +292,11 @@ if the color volume of the image is smaller than that of the display.
 
 ## Add display color volume information to `Screen` interface of the CSS Object Model
 
-Add a new `screenColorInfo` attribute to the `Screen` interface:
+Add a new `colorInfo` attribute to the `Screen` interface:
 
 ```idl
 partial interface Screen {
-  optional ScreenColorInfo screenColorInfo;
+  optional ScreenColorInfo colorInfo;
 }
 ```
 
@@ -334,7 +334,7 @@ specifies that the luminance of reference white for a PQ reference display, or a
 _EXAMPLE_: A PC monitor in a bright environment might report a
 `maximumLuminance` of 600 cd/m² and a `referenceWhiteLuminance` of 400 cd/m².
 
-`screenColorInfo` can, for example, be used in the following scenarios:
+`colorInfo` can, for example, be used in the following scenarios:
 
 * an authoring application can use the information to (i) avoid image colors
   exceeding the color volume of the output device and (ii) correspondingly set
@@ -344,7 +344,7 @@ _EXAMPLE_: A PC monitor in a bright environment might report a
   latter -- this allows the application to use its own mapping algorithm,
   substituting those provided by the underlying platform.
 
-In absence of some or all the parameters of `screenColorInfo`:
+In absence of some or all the parameters of `colorInfo`:
 
 * the [`dynamic-range`](https://drafts.csswg.org/mediaqueries-5/#dynamic-range)
 media query can be used to determine whether the output device supports
@@ -367,7 +367,7 @@ of the display.
 
 It is possible for an application to avoid color volume mapping by the platform
 by ensuring that the color volume of the image, as specified
-by`contentColorVolume`, is within `screenColorInfo`. This can be achieved,
+by`contentColorVolume`, is within `colorInfo`. This can be achieved,
 for example, by:
 
 * preventing in the first place an author from creating colors exceeding the
