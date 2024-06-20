@@ -166,6 +166,10 @@ not quantized, i.e. R' = 0.5 is represented by the floating point value 0.5.
 _NOTE: `dataType = "unorm8"` corresponds to HTML Canvas as it exists today and
 should not be used to represent HDR signal, as detailed in the introduction._
 
+The `HTMLCanvasElement` methods `toDataURL()` and `toBlob()` should produce
+resources that preserve the color space of the underlying Canvas context
+For example, CICP metadata or an ICC profile.
+
 ## Extend `ImageDataSettings` to support higher bit depths
 
 Add to
