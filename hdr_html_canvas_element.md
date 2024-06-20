@@ -102,6 +102,10 @@ When drawing an image into a Canvas, the image will be transformed unless the
 color spaces of the image and the Canvas match. Annex A specifies transformation
 to and from `rec2100-pq` and `rec2100-hlg`.
 
+At the time of this writing, [the current draft of CSS Color HDR Module Level 1](https://drafts.csswg.org/css-color-hdr/)
+provides detailed definitions of`rec2100-hlg`, `rec2100-pq` and
+`rec2100-display-linear` (called `rec2100-linear` in that document).
+
 ### rec2100-hlg
 
 The non-linear component signals {R', G', B'} are mapped to red, green and blue
