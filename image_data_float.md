@@ -39,12 +39,12 @@ Create the new enum type `ImageDataPixelFormat`.
 
 ```idl
   enum ImageDataPixelFormat {
-    "rgba8unorm",
-    "rgba16float",
+    "rgba8-unorm",
+    "rgba16-float",
   };
 ```
 
-To the `ImageDataSettings` dictionary add a `pixelFormat` member of type `ImageDataPixelFormat`, and have it default to `"rgba8unorm"`.
+To the `ImageDataSettings` dictionary add a `pixelFormat` member of type `ImageDataPixelFormat`, and have it default to `"rgba8-unorm"`.
 
 ```idl
   partial dictionary CanvasRenderingContext2DSettings {
@@ -52,13 +52,16 @@ To the `ImageDataSettings` dictionary add a `pixelFormat` member of type `ImageD
   };
 ```
 
-To the `ImageData` interface add a `pixelFormat` member of type `ImageDataPixelFormat`, change the type of `data` from `Uint8ClampedArray` to `ImageDataArray`, and add a constructor that takes a `Float16Array`.
+To the `ImageData` interface:
+* add a `pixelFormat` member of type `ImageDataPixelFormat`
+* change the type of `data` from `Uint8ClampedArray` to `ImageDataArray`
+* change the constructor's `Uint8ClampedArray` argument to `ImageDataArray`
 
 ```idl
   partial interface ImageData {
     readonly attribute ImageDataPixelFormat pixelFormat;
     readonly attribute ImageDataArray data;
-    constructor(Float16Array data, unsigned long sw, optional unsigned long sh,
+    constructor(ImageDataArray data, unsigned long sw, optional unsigned long sh,
                 optional ImageDataSettings settings = {});
   }
 ```
@@ -69,31 +72,31 @@ To the [algorithm to initialize an `ImageData`](https://html.spec.whatwg.org/mul
 Ensure consistency between the optional `settings` parameter and the optional `source` parameter. In particular:
 
 * If _source_ is given and is of type `Uint8ClampedArray`:
-  * If _settings_ was given and _settings_`["pixelFormat"]` is not `"rgba8unorm"`, then throw an `"InvalidStateError"` exception.
-  * Otherwise, set `pixelFormat` to `"rgba8unorm"`.
+  * If _settings_ was given and _settings_`["pixelFormat"]` is not `"rgba8-unorm"`, then throw an `"InvalidStateError"` exception.
+  * Otherwise, set `pixelFormat` to `"rgba8-unorm"`.
 * If _source_ is given of type `Float16Array`:
-  * If _settings_ was given and _settings_`["pixelFormat"]` is not `"rgba16float"`, then throw an `"InvalidStateError"` exception.
-  * Otherwise, set `pixelFormat` to `"rgba16unorm"`.
+  * If _settings_ was given and _settings_`["pixelFormat"]` is not `"rgba16-float"`, then throw an `"InvalidStateError"` exception.
+  * Otherwise, set `pixelFormat` to `"rgba16-float"`.
 * If _source_ is not given:
   * If _settings_ was given:
     * Set `pixelFormat` to _settings_`["pixelFormat"]`
-  * If `pixelFormat` is `"rgba16float"`, then set `data` to a `Float16Array`. Otherwise, set `data` to a `Uint8ClampedArray`
+  * If `pixelFormat` is `"rgba16-float"`, then set `data` to a `Float16Array`. Otherwise, set `data` to a `Uint8ClampedArray`
 
 ### Preservation of precision during use
 
 #### `ImageBitmap`
 
-When converting an `ImageData` with `pixelFormat` `"rgba16float"` to an `ImageBitmap` via [`createImageBitmap`](https://html.spec.whatwg.org/multipage/imagebitmap-and-animations.html#dom-createimagebitmap), the resulting `ImageBitmap` must not lose any precision.
+When converting an `ImageData` with `pixelFormat` `"rgba16-float"` to an `ImageBitmap` via [`createImageBitmap`](https://html.spec.whatwg.org/multipage/imagebitmap-and-animations.html#dom-createimagebitmap), the resulting `ImageBitmap` must not lose any precision.
 
 ### WebGPU
 
 In WebGPU, `ImageData` may be used as source of texture data, via [`GPUCopyExternalImageSource`](https://www.w3.org/TR/webgpu/#gpucopyexternalimagesourceinfo).
-Copies using an `ImageData` with `pixelFormat` of `"rgba16float"` must work, and not lose any precision.
+Copies using an `ImageData` with `pixelFormat` of `"rgba16-float"` must work, and not lose any precision.
 
 ### WebGL
 
 In WebGL, `ImageData` may be used as source of texture data, via [`TexImageSource`](https://registry.khronos.org/webgl/specs/latest/1.0/#5.14).
-Copies using an `ImageData` with `pixelFormat` of `"rgba16float"` must work, and not lose any precision.
+Copies using an `ImageData` with `pixelFormat` of `"rgba16-float"` must work, and not lose any precision.
 
 ## Feature detection
 
@@ -127,7 +130,7 @@ This code is future-dangerous, because 2D canvas may get more color types than a
 
 The `ImageDataSettings` dictionary does not specify a default `pixelFormat` value.
 
-The default value is effectively `"rgba8unorm"`, unless a `Float16Array` is specified.
+The default value is effectively `"rgba8-unorm"`, unless a `Float16Array` is specified.
 Consider the following example:
 
 ```js
@@ -135,12 +138,12 @@ Consider the following example:
    let myImageData = new ImageData(myFloat16Array, w, h, {colorSpace:"rec2100-linear"});
 ```
 
-If it were the case that `ImageDataSettings` set `pixelFormat` to `"rgba8unorm"` by default, then this would throw an exception, because of the mismatch between the `data` type and the `pixelFormat` value.
+If it were the case that `ImageDataSettings` set `pixelFormat` to `"rgba8-unorm"` by default, then this would throw an exception, because of the mismatch between the `data` type and the `pixelFormat` value.
 
 This would be the case even if we set a default value for the `Float16Array` constructor
 
 ```idl
     constructor(Float16Array data, unsigned long sw, optional unsigned long sh,
-                optional ImageDataSettings settings = {pixelFormat:"rgba16float"});
+                optional ImageDataSettings settings = {pixelFormat:"rgba16-float"});
 ```
 
