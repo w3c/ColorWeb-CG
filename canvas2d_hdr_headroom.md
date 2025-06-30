@@ -105,4 +105,5 @@ A color space conversion happens when importing images to WebGL and WebGPU.
 For WebGL, the target of the color space conversion is the attribute [`unpackColorSpace`](https://registry.khronos.org/webgl/specs/latest/1.0/). A similar `unpackHdrHeadroom` parameter could be added.
 
 For WebGPU, the target of the color space conversion is the `colorSpace` entry of [`GPUCopyExternalImageDestInfo`](https://www.w3.org/TR/webgpu/#gpucopyexternalimagedestinfo). A similar `hdrHeadroom` entry could be added.
+See [this explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/canvas2d_hdr_headroom/webgpu_hdr_headroom.md) for details.
 

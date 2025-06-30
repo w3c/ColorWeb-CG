@@ -1,4 +1,4 @@
-# WebGPU 2D Canvas rendering HDR headroom parameter
+# WebGPU texture import and copy HDR headroom parameter
 
 ## Introduction
 
