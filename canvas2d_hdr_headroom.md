@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This proposal suggest a mechanism for drawing HDR images as HDR in a `CanvasRenderingContext2D` or `OffscreenCanvasRenderingContext2D`.
+This proposal suggest a mechanism for drawing HDR content as HDR in a `CanvasRenderingContext2D` or `OffscreenCanvasRenderingContext2D`.
 
 ## Motivation
 
@@ -11,10 +11,15 @@ This proposal suggest a mechanism for drawing HDR images as HDR in a `CanvasRend
 When drawing an image to an HDR canvas, using `drawImage`, the source image is converted from its native color space to the color space of the canvas.
 There is currently no indication about what tone mapping, if any, should be done during this conversion.
 
-### Enable drawing images as HDR
+### Enable drawing HDR images and video as HDR
 
 By default, all implementations tone map to SDR in the process of converting to the color space of the canvas.
 It should be possible to preserve HDR-ness of HDR images in the canvas, especially now that canvas' backing bitmaps can be floating-point.
+
+### Enable drawing HDR CSS colors as HDR
+
+HDR CSS colors (using [`color-hdr`](https://drafts.csswg.org/css-color-hdr/#hdr-color-function)) are parameterized by a target HDR headroom.
+When such colors are used with 2D canvas, this displaying their non-HDR representation.
 
 ### Standardize tone mapping for SDR renditions of HDR images
 
@@ -67,7 +72,7 @@ A less clearly specified version of this is ISO 22028-5 images.
 The tone mapping at HDR headroom of 0 (SDR) is defined in ISO 22208-5, but tone mapping to other headrooms is not specified.
 A set of WPT tests that draw these images at HDR headroom 0 (SDR) and their maximum HDR headroom should be added.
 
-## Future work
+## Separate work
 
 ### Tone mapping
 
