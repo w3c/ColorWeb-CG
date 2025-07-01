@@ -23,10 +23,10 @@ The analogous proposal (which has a lot of the exact same language as this propo
 To the [`WebGLRenderingContextBase`](https://registry.khronos.org/webgl/specs/latest/1.0/#5.14) interface, add the following attribute:
 
 ```idl
-  partial interfacel WebGLRenderingContextBase {
+  partial interface WebGLRenderingContextBase {
     // The HDR headroom (in log2 space) to tone map the source image to when
-    // copying to the destination texture.
-    attribute float unpackHdrHeadroom = 0;
+    // copying to the destination texture using tex[Sub]Image.
+    attribute float unpackHDRHeadroom = 0;
   }
 ```
 
