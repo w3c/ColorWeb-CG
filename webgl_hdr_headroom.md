@@ -13,10 +13,10 @@ At the moment the HDR image is put into pixels in a buffer, this infinite number
 
 A related problem is when an HDR image must be drawn to a `CanvasRenderingContext2D` via `drawImage`.
 The analogous proposal to this proposal is to add a target HDR headroom parameter.
-See [this explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/canvas2d_hdr_headroom/canvas2d_hdr_headroom.md) and [this spec issue](https://github.com/whatwg/html/issues/11165).
+See [this explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/canvas2d_hdr_headroom.md) and [this spec issue](https://github.com/whatwg/html/issues/11165).
 
 Another related problem is when an HDR image must be imported into WebGPU.
-The analogous proposal (which has a lot of the exact same language as this proposal) is in [this explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/canvas2d_hdr_headroom/webgpu_hdr_headroom.md).
+The analogous proposal (which has a lot of the exact same language as this proposal) is in [this explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/webgpu_hdr_headroom.md).
 
 ## Proposal
 
@@ -30,7 +30,7 @@ To the [`WebGLRenderingContextBase`](https://registry.khronos.org/webgl/specs/la
   }
 ```
 
-This parameter is the same as the targeted HDR headroom from the [2D canvas explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/canvas2d_hdr_headroom/canvas2d_hdr_headroom.md) and the [WebGPU explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/canvas2d_hdr_headroom/webgpu_hdr_headroom.md).
+This parameter is the same as the targeted HDR headroom from the [2D canvas explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/canvas2d_hdr_headroom.md) and the [WebGPU explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/webgpu_hdr_headroom.md).
 
 Note the similarity between this attribute and the `unpackColorSpace` attribute.
 This attribute shall be ignored in all situations where the `unpackColorSpace` is ignored (when `UNPACK_COLORSPACE_CONVERSION_WEBGL` is `NONE`).
