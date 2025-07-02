@@ -84,3 +84,10 @@ For higher bit depth encoding, PQ encoding is preferable because it can express 
 
 It may be that [`"rec2100-pq"`](https://drafts.csswg.org/css-color-hdr/#valdef-color-rec2100-pq) and [`"rec2100-hlg"`](https://drafts.csswg.org/css-color-hdr/#valdef-color-rec2100-hlg) will also be desirable.
 
+## Interaction with `dynamic-range-limit`
+
+The `dynamic-range-limit` applies to HTML cavas elements the same as it applies to video and image elements.
+
+A canvas that specifies to use `"extended"`, but has `dynamic-range-limit:standard` will display the same the canvas would have had it specified `"standard"`, because the "tone mapping" is just to clamp (or project, more accurately) to the available dynamic range.
+For a non-trivial tone mapping, this would not be true.
+
