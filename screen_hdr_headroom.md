@@ -47,8 +47,8 @@ To the [`ScreenDetailed`](https://www.w3.org/TR/window-management/#screendetaile
 
 ```idl
   partial interface ScreenDetailed : Screen {
-    readonly attribute float headroom;
-    attribute EventHandler onheadroomchange;
+    readonly attribute float hdrHeadroom;
+    attribute EventHandler onhdrheadroomchange;
   }
 ```
 
@@ -68,6 +68,24 @@ of _screenDetailed_ using the
 to
 [fire an event](https://dom.spec.whatwg.org/#concept-event-fire)
 named `headroomchange` at _screenDetailed_.
+
+## Example use cases
+
+### Example 1: Custom tone mapping (e.g, in WebGPU)
+
+It is planned to enabled customizable tone mapping for all canvas types, but this customizable tone mapping is limited to global tone mapping of a particular parameterized form.
+
+If one wishes to perform local tone mapping, or a particular tone mapping, then one needs the HDR headroom of the target screen to perform this tone mapping.
+
+The application would indicate that it wishes to use [`"extended"`](https://www.w3.org/TR/webgpu/#dom-gpucanvastonemappingmode-extended) tone mapping mode and perform its own custom tone mapping, targeting the HDR headroom of the target display.
+
+### Example 2: Ensuring accurate color grading (e.g, of video)
+
+If one is authoring or editing HDR video, it is important to know whether or not one is seeing the full dynamic range of the video.
+
+If the video uses an HDR headroom higher than the HDR headroom of the target display, then one is not actually seeing the content that one is authoring.
+
+Only if a content authoring tool knows the HDR headroom of the current display can the content authoring tool can indicate to the author whether or not the content falls within the capabilities of the device.
 
 ## Issues
 
@@ -105,12 +123,13 @@ Information about the color volume would be stored in a single structure, but th
 
 ### Naming
 
-This proposal uses the name `headroom` for the attribute and `headroomchanged` for the event type.
+This proposal uses the name `hdrHeadroom` for the attribute and `onhdrheadroomchanged` for the event type.
 
 Alternatives include:
 
 * `highDynamicRangeHeadroom` and `highdynamicrangeheadroomchanged`
-* `hdrHeadroom` and `hdrheadroomchanged`
+* `headroom` and `headroomchanged`
 
-The current form is chosen for brevity and because there exists no other concept of headroom for which it could be confused.
+The current form is chosen for brevity.
+While there exists no other concept of headroom for which `headroom` could be confused, the HDR prefix is still helpful.
 
