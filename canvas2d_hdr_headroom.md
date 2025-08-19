@@ -40,13 +40,13 @@ These two implementations are extremely similar, down to the variable names.
 
 ## Proposal
 
-Add to the mixin interface, `CanvasState` the following attribute
+Add to the mixin interface, `CanvasCompositing` the following attribute
 
 ```idl
-  partial interface mixin CanvasState {
+  partial interface mixin CanvasCompositing {
     // The target HDR headroom (in log2 space) to tone map content to when
     // drawing to the canvas.
-    attribute unrestricted double targetHdrHeadroom; // (default 0)
+    attribute unrestricted double globalHDRHeadroom; // (default 0)
   }
 ```
 
