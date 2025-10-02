@@ -18,7 +18,7 @@ let loadImage = function(url) {
     }
     let ctx = canvas.getContext('2d');
     // This is the proposed default behavior.
-    ctx.globalHDRHeadroom = 0;
+    ctx.globalHDRHeadroom = Infinity;
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
   }
   image.src = url;
