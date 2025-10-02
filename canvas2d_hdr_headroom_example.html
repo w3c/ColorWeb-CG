@@ -1,0 +1,30 @@
+<body>
+</body>
+<script>
+let loadImage = function(url) {
+  let canvas = document.createElement('canvas');
+  canvas.style.margin = '10px';
+  document.body.appendChild(canvas);
+  let image = new Image();
+  image.onload = function() {
+    if (image.width > image.height) {
+      canvas.style.width = 320;
+      canvas.width = 640;
+      canvas.height = canvas.width * image.height / image.width;
+    } else {
+      canvas.style.height = 320;
+      canvas.height = 640;
+      canvas.width = canvas.height * image.width / image.height;
+    }
+    let ctx = canvas.getContext('2d');
+    // This is the proposed default behavior.
+    ctx.globalHDRHeadroom = 0;
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+  }
+  image.src = url;
+}
+
+loadImage('resources/rochetta-pixel-pq-small.png');
+loadImage('resources/galleria-pixel-ultrahdr.jpg');
+
+</script>
