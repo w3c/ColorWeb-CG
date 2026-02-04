@@ -97,20 +97,22 @@
         <text transform="translate(-790 333.76395)" fill="black">
           <tspan font-family="Helvetica Neue" font-weight="bold" font-size="16" fill="black" x="25.264" y="16" xml:space="preserve">Potentially HDR Content</tspan>
           <tspan font-family="Menlo" font-size="16" fill="black" x="0" y="52.46411" xml:space="preserve">color-hdr</tspan>
-          <tspan font-family="Helvetica Neue" font-size="16" fill="black" y="52.46411" xml:space="preserve"> CSS color</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" y="52.46411" xml:space="preserve"> CSS color **</tspan>
           <tspan font-family="Menlo" font-size="16" fill="black" x="0" y="71.46411" xml:space="preserve">HTMLCanvasElement</tspan>
           <tspan font-family="Menlo" font-size="16" fill="black" x="0" y="90.46411" xml:space="preserve">HTMLImageElement</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" y="90.46411" xml:space="preserve"> +</tspan>
           <tspan font-family="Menlo" font-size="16" fill="black" x="0" y="109.46411" xml:space="preserve">HTMLVideoElement</tspan>
-          <tspan font-family="Helvetica Neue" font-size="16" fill="black" y="109.46411" xml:space="preserve">+</tspan>
-          <tspan font-family="Menlo" font-size="16" fill="black" x="0" y="128.46411" xml:space="preserve">ImageBitmap++</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" y="109.46411" xml:space="preserve"> *</tspan>
+          <tspan font-family="Menlo" font-size="16" fill="black" x="0" y="128.46411" xml:space="preserve">ImageBitmap</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" y="128.46411" xml:space="preserve"> +</tspan>
           <tspan font-family="Menlo" font-size="16" fill="black" x="0" y="147.46411" xml:space="preserve">OffscreenCanvas</tspan>
           <tspan font-family="Menlo" font-size="16" fill="black" x="0" y="166.46411" xml:space="preserve">VideoFrame</tspan>
-          <tspan font-family="Helvetica Neue" font-size="16" fill="black" y="166.46411" xml:space="preserve">+</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" y="166.46411" xml:space="preserve"> *</tspan>
           <tspan font-family="Menlo" font-size="16" fill="black" x="0" y="185.46411" xml:space="preserve">SVGImageElement</tspan>
-          <tspan font-family="Helvetica Neue" font-size="16" fill="black" y="185.46411" xml:space="preserve">**</tspan>
-          <tspan font-family="Helvetica Neue" font-size="12" fill="black" x="20.956" y="212.4641" xml:space="preserve">+ Usable with importExternalTexture</tspan>
-          <tspan font-family="Helvetica Neue" font-size="12" fill="black" x="22.204" y="240.8001" xml:space="preserve">++ Supports ISO 21496-1 gain map</tspan>
-          <tspan font-family="Helvetica Neue" font-size="12" fill="black" x="12.67" y="269.1361" xml:space="preserve">* Not usable with WebGL and WebGPU</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" y="185.46411" xml:space="preserve"> **</tspan>
+          <tspan font-family="Helvetica Neue" font-size="12" fill="black" x="25.804" y="212.4641" xml:space="preserve">+ Supports ISO 21496-1 gain map</tspan>
+          <tspan font-family="Helvetica Neue" font-size="12" fill="black" x="22.444" y="240.8001" xml:space="preserve">* Usable with importExternalTexture</tspan>
+          <tspan font-family="Helvetica Neue" font-size="12" fill="black" x="10.558" y="269.1361" xml:space="preserve">** Not usable with WebGL and WebGPU</tspan>
         </text>
       </g>
       <g id="Line_307">
@@ -214,7 +216,7 @@
         <path d="M -87.496 719.5281 L -78.050945 719.5281 L -78.050945 709.2891 L -68.61156 709.2891 L -68.61156 719.5281 L -59.166505 719.5281 L -59.166505 729.761 L -68.61156 729.761 L -68.61156 740 L -78.050945 740 L -78.050945 729.761 L -87.496 729.761 Z" fill="#4040ff"/>
       </g>
       <g id="Graphic_344">
-        <text transform="translate(-38.999997 705)" fill="black">
+        <text transform="translate(-39 705)" fill="black">
           <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="0" y="15" xml:space="preserve">Tone map to screen’s HDR headroom,</tspan>
           <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="0" y="33.448" xml:space="preserve">adjusted by CSS </tspan>
           <tspan font-family="Menlo" font-size="16" fill="black" y="33.448" xml:space="preserve">dynamic-range-limit</tspan>
