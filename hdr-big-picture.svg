@@ -193,24 +193,23 @@
         </text>
       </g>
       <g id="Graphic_337">
-        <rect x="-512" y="260" width="260" height="68" fill="white"/>
-        <rect x="-512" y="260" width="260" height="68" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-        <text transform="translate(-507 275.552)" fill="black">
-          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="35.936" y="15" xml:space="preserve">HTML element (including </tspan>
-          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="10.168" y="33.448" xml:space="preserve">ImageBitmapRenderingContext)</tspan>
+        <rect x="-512" y="260" width="176" height="68" fill="white"/>
+        <rect x="-512" y="260" width="176" height="68" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-507 284.776)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="30.536" y="15" xml:space="preserve">HTML element</tspan>
         </text>
       </g>
       <g id="Line_339">
-        <path d="M -252 288.34083 C -200.9122 290.8456 -139.3573 299.1826 -76 320 C 13.308531 349.34423 82.55775 395.71904 126.03093 430.6518" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M -336 287.70207 C -268.56224 286.1873 -171.2059 290.90052 -76 320 C 17.282059 348.51146 84.50804 393.1006 126.27497 427.6507" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Graphic_340">
-        <path d="M -60.02721 325.6905 L -50.582157 325.6905 L -50.582157 315.45147 L -41.14277 315.45147 L -41.14277 325.6905 L -31.697717 325.6905 L -31.697717 335.92337 L -41.14277 335.92337 L -41.14277 346.1624 L -50.582157 346.1624 L -50.582157 335.92337 L -60.02721 335.92337 Z" fill="#4040ff"/>
-        <text transform="translate(-55.02721 321.56758)" fill="white">
+        <path d="M -108.83006 309.491 L -99.38501 309.491 L -99.38501 299.25197 L -89.94562 299.25197 L -89.94562 309.491 L -80.50057 309.491 L -80.50057 319.72387 L -89.94562 319.72387 L -89.94562 329.9629 L -99.38501 329.9629 L -99.38501 319.72387 L -108.83006 319.72387 Z" fill="#4040ff"/>
+        <text transform="translate(-103.83006 305.36807)" fill="white">
           <tspan font-family="Helvetica Neue" font-size="16" fill="white" x="4.7167463" y="15" xml:space="preserve">0</tspan>
         </text>
       </g>
       <g id="Line_341">
-        <path d="M -544 329.62143 C -537.255 325.6923 -530.508 322.1708 -523.8063 319.0163" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <path d="M -544 329.2151 C -536.9723 324.4165 -530.1202 320.2326 -523.48196 316.5877" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
       </g>
       <g id="Graphic_343">
         <path d="M -87.496 719.5281 L -78.050945 719.5281 L -78.050945 709.2891 L -68.61156 709.2891 L -68.61156 719.5281 L -59.166505 719.5281 L -59.166505 729.761 L -68.61156 729.761 L -68.61156 740 L -78.050945 740 L -78.050945 729.761 L -87.496 729.761 Z" fill="#4040ff"/>
