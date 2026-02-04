@@ -53,10 +53,10 @@ This document will use the verbose but unambiguous term "linear HDR headroom".
 
 ### HDR display definition and characterization
 
-A display is HDR capable if it can produce colors brighter than `white`, or
-in other words, if its linear HDR headroom is greater than 1.
+A display's HDR capability is parameterized entirely by its HDR headroom.
 
-A display is standard dynamic range (SDR) if its linear HDR headroom is equal to 1 (it can never be less than 1).
+A display is HDR capable if its linear HDR headroom is greater than 1.
+A display is not HDR capable, or is standard dynamic range (SDR), if its linear HDR headroom is equal to 1 (it can never be less than 1).
 
 SDR displays are important and will be with us forever.
 This strategy must be well-defined and high quality in SDR.
@@ -78,15 +78,15 @@ at a specified targeted HDR headroom.
 The only parameter for tone mapping is the targeted HDR headroom.
 There are no other parameters.
 
-All images that are HDR specify how they are to be tone mapped to any targeted HDR headroom value.
-This transformation is image-dependent and is specified by metadata.
-
 One way to think about this is that an image that does not have tone mapping is a function that maps $x$ and $y$ coordinates to colors,
   so the color at $(x,y)$ is $f(x,y)$.
 An image that has HDR tone mapping is a function that maps $x$ and $y$ coordinates, plus a targeted HDR headroom $H_\text{target}$ to colors,
   so the color at $(x,y)$ targeting HDR headroom $H_\text{target}$ is $f(x,y,H_\text{target})$.
 
-Examples of specifications for this formulation are:
+All images that are HDR specify (or must have specified) how they are to be tone mapped to any targeted HDR headroom value.
+This transformation is image-dependent and is specified by metadata.
+
+Examples of specifications for metadata are:
 * [ISO 21496-1 gain map](https://www.iso.org/standard/86775.html), which is a published standard
 * [SMPTE ST 2094-50 gain curve](https://github.com/SMPTE/st2094-50), which is currently available for comment as a Public Committee Draft (PCD)
 * A default treatment for images that contain no open standard metadata should be agreed upon, see [WhatWG issue #9112](https://github.com/whatwg/html/issues/9112)
