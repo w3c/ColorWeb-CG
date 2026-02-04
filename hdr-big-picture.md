@@ -55,9 +55,9 @@ This document will use the verbose but unambiguous term "linear HDR headroom".
 
 A display is HDR capable if it can produce colors brighter than `white`.
 
-A display's HDR capability is quantified by its linear HDR headroom.
+A display's HDR capability is quantified by its linear HDR headroom, which is the ratio of its peak brightness to the brightness of white.
+A display is standard dynamic range (SDR) only if its linear HDR headroom is equal to 1 (it can never be less than 1).
 A display is HDR if its linear HDR headroom is greater than 1.
-A display is standard dynamic range (SDR) only if its linear HDR headroom is equal to 1.
 
 SDR displays are important and will be with us forever.
 This strategy must be well-defined and high quality in SDR.
@@ -70,30 +70,31 @@ E-ink is SDR (in this definition) and is forever.
 An image is HDR if it specifies colors brighter than `white`.
 
 This can be specified directly as pixel values (e.g, a PQ image),
-or it can be specified by metadata (e.g, an ISO 21496-1 gain map image).
+or it can be specified by metadata (e.g, an ISO 21496-1 gain map or SMPTE ST 2094-50 gain curve).
 
-### Headroom-adaptive tone mapping characterization
+### Tone mapping parameterized by targeted HDR headroom
 
 Tone mapping is the process of transforming an image for display
 at a specified targeted HDR headroom.
 The only parameter for tone mapping is the targeted HDR headroom.
 There are no other parameters.
 
-All images that are HDR specify how they are to be tone mapped to any targeted HDR headroom value. This transformation is image-dependent and is specified by metadata.
+All images that are HDR specify how they are to be tone mapped to any targeted HDR headroom value.
+This transformation is image-dependent and is specified by metadata.
 
-* An example of such metadata is
-an ISO 21496-1 gain map image.
-This specifies an entirely independent image to display at a specified targeted headroom, and interpolation for intermediate targeted headrooms.
-* Another example of such metadata is
-an ICC or SMPTE ST 2094-50 adaptive gain curve.
-This specifies a global tone mapping operation.
+One way to think about this is that an image that does not have tone mapping is a function that maps $x$ and $y$ coordinates to colors,
+  so the color at $(x,y)$ is $f(x,y)$.
+An image that has HDR tone mapping is a function that maps $x$ and $y$ coordinates, plus a targeted HDR headroom $H_\text{target}$ to colors,
+  so the color at $(x,y)$ targeting HDR headroom $H_\text{target}$ is $f(x,y,H_\text{target})$.
+
+Examples of specifications for this formulation are:
+* [ISO 21496-1 gain map](https://www.iso.org/standard/86775.html), which is a published standard
+* [SMPTE ST 2094-50 gain curve](https://github.com/SMPTE/st2094-50), which is currently available for comment as a Public Committee Draft (PCD)
+* A default treatment for images that contain no open standard metadata should be agreed upon, see [WhatWG issue #9112](https://github.com/whatwg/html/issues/9112)
 
 An important property about these metadata is that they _prescribe_ an exact tone mapped color value for every pixel of the image or video, for every targeted headroom.
 This is different from _descriptive_ metadata that describes the scene but leaves the transformation up to the implementation.
-
-A default treatment for images that contain no open standard metadata should be agreed upon.
-A good candidate is the reference white tone mapping operator currently in draft at
-[ISO/DIS 22028-5](https://www.iso.org/standard/81863.html#draft), and in draft (not yet available) in SMPTE ST 2094-50, but this document does not cover this topic any further.
+Metadata that is not prescriptive does not have behavior that can be used for interoperability testing, and is therefore incompatible with the web.
 
 ## Core features
 
@@ -131,7 +132,7 @@ None of these interfaces provide a way to get at the "raw pixels" of the image.
 * An SDR image can be encoded using P3 pixel values versus Rec2020 pixel values, and that detail is not visible to these interfaces.
 * An HDR image can be encoded using Display P3 as the pixel values (and a gain map or gain curve to go up to HDR) or as PQ as the pixel values (and a gain map or gain curve to go down to SDR), and that detail is not visible to these interfaces.
 
-These explainers are all written against the idea of specifying HDR headroom in log2 space. The preference for linear space has since been indicated.
+These explainers are all written against the idea of specifying HDR headroom in log2 space. The preference for linear space has since been indicated (see [issue #129](https://github.com/w3c/ColorWeb-CG/issues/129).
 
 * The `globalHDRHeadroom` parameter should be renamed to `globalLinearHDRHeadroom` if a linear encoding is to be used
 * The `unpackHDRHeadroom` parameter should be renamed to `unpackLinearHDRHeadroom`
