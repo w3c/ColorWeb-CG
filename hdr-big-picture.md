@@ -167,7 +167,18 @@ It is likely that we will want to add some constructors for common curves (e.g, 
 
 SMPTE ST 2094-50 will be supported in videos and in images, and so exporting a canvas to an image or streaming it to a video will be supported.
 
-### Accessing SMPTE ST 2094-50 metadata via WebCodecs
+#### Common tone mapping algorithms
+
+It would be helpful to provide some common tone mapping algorithms. Examples could include:
+
+* ITU-R BT.2408 Annex 5 tone mapper (will need some small adjustment because it is presented as an EETF)
+* Reference white tone mapping operator (the default on macOS and iOS)
+* Reinhard tone mapper
+
+For the moment these have not been included in any explainer.
+These can be implemented (or even specified) as specific sets of SMPTE ST 2094-50 metadata (and that way can be carried along with videos and images).
+
+### Using SMPTE ST 2094-50 metadata with WebCodecs
 
 [That same explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/smpte_st_2094_50.md) proposes adding SMPTE ST 2094-50 metadata to the [VideoFrame Metadata Registry](https://w3c.github.io/webcodecs/video_frame_metadata_registry.html).
 
