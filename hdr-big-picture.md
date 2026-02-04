@@ -14,6 +14,11 @@ From there, the details of the individual specification changes can be taken car
 The following image shows an overview of the treatment of HDR content.
 The numbered symbols indicate features that need to be added (except 0), and proposes an order for adding them.
 
+There three broad components of the feature work:
+* The "blue crosses" are for [displaying HDR elements](#displaying-html-elements-and-the-dynamic-range-limit-css-property)
+* The "red stars" are for [drawing HDR content to a buffer](#drawing-hdr-content-to-a-bitmap-or-texture)
+* The "magenta suns" are for [attaching HDR metadata to canvases](#displaying-an-hdr-canvas)
+
 ![Diagram of HDR big picture](hdr-big-picture.svg)
 
 ## Background
@@ -105,7 +110,7 @@ The window's HDR headroom is a very high precision fingerprinting vector and is 
 The [`dynamic-range-limit`](https://www.w3.org/TR/css-color-hdr-1/#the-dynamic-range-limit-property) CSS property may be specified on elements to indicate that they should be further restricted.
 This property applies to images, videos, canvases, and CSS colors.
 
-### Drawing an HDR image into to a bitmap or texture
+### Drawing HDR content to a bitmap or texture
 
 HDR images can be rendered an infinite number of ways, depending on the HDR headroom at which they are to be rendered.
 
@@ -134,7 +139,9 @@ These explainers are all written against the idea of specifying HDR headroom in 
 
 The valid range of values for the linear parameter is [1, `Infinity`].
 
-### Displaying an HDR canvas (trivial tone mapping)
+### Displaying an HDR canvas
+
+#### Trivial tone mapping
 
 The default behavior for all HTML canvas elements is to limit their contents to the SDR color volume of the target display. In WebGPU, a canvas can instead allow use of the full HDR color volume of the target display via the [`GPUCanvasToneMapping`](https://gpuweb.github.io/gpuweb/#dictdef-gpucanvastonemapping) structure.
 
@@ -147,7 +154,7 @@ The WebGPU explainer [indiciated](https://github.com/ccameron-chromium/webgpu-hd
 
 [This WebGL explainer](https://github.com/ccameron-chromium/webgl-hdr/blob/master/EXPLAINER.md) indicates how these parameters would be added to WebGL, though it is somewhat out-of-date.
 
-### Displaying an HDR canvas using SMPTE ST 2094-50
+#### Using SMPTE ST 2094-50 metadata
 
 The SMPTE ST 2094-50 specification defines non-trivial global tone mapping.
 
