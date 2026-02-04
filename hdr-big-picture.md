@@ -5,19 +5,16 @@ the many changes to many specifications
 needed to provide a complete strategy for high dynamic range (HDR) on the web.
 
 This is an elaboration of [this spreadsheet](https://docs.google.com/spreadsheets/d/1zq6vhz3w2aCp9sgCidpGncQxybaDyBBr9p3nVqASaUQ/edit?usp=sharing) tracking various HDR related features.
-
 These specification changes affect many features covering many different areas, including:
-
-* CSS
-* 2D canvas
-* WebGL
-* WebGPU
-* WebCodecs
-
-![Diagram of HDR big picture](hdr-big-picture.svg)
+CSS, 2D canvas, WebGL, WebGPU, and WebCodecs.
 
 This document proposes to achieve an alignment about high level concept and directions (e.g, how to encode HDR headroom) across all APIs here in the [color on the web community group](https://www.w3.org/groups/cg/colorweb/).
 From there, the details of the individual specification changes can be taken care of in their respective groups.
+
+The following image shows an overview of the treatment of HDR content.
+The numbered symbols indicate features that need to be added (except 0), and proposes an order for adding them.
+
+![Diagram of HDR big picture](hdr-big-picture.svg)
 
 ## Background
 
