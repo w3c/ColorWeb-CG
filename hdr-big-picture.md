@@ -53,11 +53,10 @@ This document will use the verbose but unambiguous term "linear HDR headroom".
 
 ### HDR display definition and characterization
 
-A display is HDR capable if it can produce colors brighter than `white`.
+A display is HDR capable if it can produce colors brighter than `white`, or
+in other words, if its linear HDR headroom is greater than 1.
 
-A display's HDR capability is quantified by its linear HDR headroom, which is the ratio of its peak brightness to the brightness of white.
-A display is standard dynamic range (SDR) only if its linear HDR headroom is equal to 1 (it can never be less than 1).
-A display is HDR if its linear HDR headroom is greater than 1.
+A display is standard dynamic range (SDR) if its linear HDR headroom is equal to 1 (it can never be less than 1).
 
 SDR displays are important and will be with us forever.
 This strategy must be well-defined and high quality in SDR.
