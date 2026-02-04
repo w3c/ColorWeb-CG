@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xl="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" version="1.1" viewBox="-801 259 1089 592" width="1089" height="592">
+  <defs>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 7 6" markerWidth="7" markerHeight="6" color="black">
+      <g>
+        <path d="M 4.8 0 L 0 -1.8 L 0 1.8 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+  </defs>
+  <g id="HDR_APIs" stroke-opacity="1" stroke-dasharray="none" fill-opacity="1" stroke="none" fill="none">
+    <title>HDR APIs</title>
+    <rect fill="white" x="-801" y="259" width="1089" height="592"/>
+    <g id="HDR_APIs_Layer_1">
+      <title>Layer 1</title>
+      <g id="Graphic_282">
+        <rect x="-52" y="436" width="108" height="84" fill="white"/>
+        <rect x="-52" y="436" width="108" height="84" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-47 450.328)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="22.184" y="15" xml:space="preserve">Canvas</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="24.24" y="33.448" xml:space="preserve">Output </tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="23.36" y="51.895996" xml:space="preserve">Bitmap</tspan>
+        </text>
+      </g>
+      <g id="Graphic_295">
+        <rect x="-512" y="344" width="176" height="76" fill="white"/>
+        <rect x="-512" y="344" width="176" height="76" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-507 353.776)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="43.88" y="15" xml:space="preserve">Canvas 2D</tspan>
+          <tspan font-family="Menlo" font-size="16" fill="black" x="39.652344" y="52.448" xml:space="preserve">drawImage</tspan>
+        </text>
+      </g>
+      <g id="Graphic_298">
+        <rect x="-164" y="436" width="84" height="84" fill="white"/>
+        <rect x="-164" y="436" width="84" height="84" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-159 450.328)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="10.488" y="15" xml:space="preserve">WebGL</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="8.4" y="33.448" xml:space="preserve">sampler </tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="4.104" y="51.895996" xml:space="preserve">in shader</tspan>
+        </text>
+      </g>
+      <g id="Graphic_299">
+        <rect x="-166" y="536" width="84" height="84" fill="white"/>
+        <rect x="-166" y="536" width="84" height="84" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-161 550.328)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="3.976" y="15" xml:space="preserve">WebGPU</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="8.4" y="33.448" xml:space="preserve">sampler </tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="4.104" y="51.895996" xml:space="preserve">in shader</tspan>
+        </text>
+      </g>
+      <g id="Graphic_300">
+        <rect x="-512" y="436" width="176" height="84" fill="white"/>
+        <rect x="-512" y="436" width="176" height="84" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-507 440.776)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="56.488" y="15" xml:space="preserve">WebGL</tspan>
+          <tspan font-family="Menlo" font-size="16" fill="black" x="20.386719" y="51.448" xml:space="preserve">tex[Sub]Image</tspan>
+          <tspan font-family="Menlo" font-size="16" fill="black" x="49.285156" y="70.448" xml:space="preserve">[2D,3D]</tspan>
+        </text>
+      </g>
+      <g id="Graphic_301">
+        <rect x="-512" y="536" width="176" height="84" fill="white"/>
+        <rect x="-512" y="536" width="176" height="84" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-507 540.776)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="49.976" y="15" xml:space="preserve">WebGPU</tspan>
+          <tspan font-family="Menlo" font-size="16" fill="black" x="1.1210938" y="51.448" xml:space="preserve">copyExternalImage</tspan>
+          <tspan font-family="Menlo" font-size="16" fill="black" x="39.652344" y="70.448" xml:space="preserve">ToTexture</tspan>
+        </text>
+      </g>
+      <g id="Graphic_303">
+        <rect x="-276" y="436" width="84" height="84" fill="white"/>
+        <rect x="-276" y="436" width="84" height="84" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-271 459.552)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="10.488" y="15" xml:space="preserve">WebGL</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="12.256" y="33.448" xml:space="preserve">texture</tspan>
+        </text>
+      </g>
+      <g id="Graphic_304">
+        <rect x="-276" y="536" width="84" height="84" fill="white"/>
+        <rect x="-276" y="536" width="84" height="84" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-271 559.552)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="3.976" y="15" xml:space="preserve">WebGPU</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="12.256" y="33.448" xml:space="preserve">texture</tspan>
+        </text>
+      </g>
+      <g id="Graphic_305">
+        <rect x="-512" y="636" width="176" height="84" fill="white"/>
+        <rect x="-512" y="636" width="176" height="84" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-507 640.776)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="49.976" y="15" xml:space="preserve">WebGPU</tspan>
+          <tspan font-family="Menlo" font-size="16" fill="black" x="15.570312" y="51.448" xml:space="preserve">importExternal</tspan>
+          <tspan font-family="Menlo" font-size="16" fill="black" x="49.285156" y="70.448" xml:space="preserve">Texture</tspan>
+        </text>
+      </g>
+      <g id="Graphic_306">
+        <rect x="-800" y="288" width="256" height="364" fill="white"/>
+        <rect x="-800" y="288" width="256" height="364" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-790 333.76395)" fill="black">
+          <tspan font-family="Helvetica Neue" font-weight="bold" font-size="16" fill="black" x="25.264" y="16" xml:space="preserve">Potentially HDR Content</tspan>
+          <tspan font-family="Menlo" font-size="16" fill="black" x="0" y="52.46411" xml:space="preserve">color-hdr</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" y="52.46411" xml:space="preserve"> CSS color **</tspan>
+          <tspan font-family="Menlo" font-size="16" fill="black" x="0" y="71.46411" xml:space="preserve">HTMLCanvasElement</tspan>
+          <tspan font-family="Menlo" font-size="16" fill="black" x="0" y="90.46411" xml:space="preserve">HTMLImageElement</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" y="90.46411" xml:space="preserve"> +</tspan>
+          <tspan font-family="Menlo" font-size="16" fill="black" x="0" y="109.46411" xml:space="preserve">HTMLVideoElement</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" y="109.46411" xml:space="preserve"> *</tspan>
+          <tspan font-family="Menlo" font-size="16" fill="black" x="0" y="128.46411" xml:space="preserve">ImageBitmap</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" y="128.46411" xml:space="preserve"> +</tspan>
+          <tspan font-family="Menlo" font-size="16" fill="black" x="0" y="147.46411" xml:space="preserve">OffscreenCanvas</tspan>
+          <tspan font-family="Menlo" font-size="16" fill="black" x="0" y="166.46411" xml:space="preserve">VideoFrame</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" y="166.46411" xml:space="preserve"> *</tspan>
+          <tspan font-family="Menlo" font-size="16" fill="black" x="0" y="185.46411" xml:space="preserve">SVGImageElement</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" y="185.46411" xml:space="preserve"> **</tspan>
+          <tspan font-family="Helvetica Neue" font-size="12" fill="black" x="25.804" y="212.4641" xml:space="preserve">+ Supports ISO 21496-1 gain map</tspan>
+          <tspan font-family="Helvetica Neue" font-size="12" fill="black" x="22.444" y="240.8001" xml:space="preserve">* Usable with importExternalTexture</tspan>
+          <tspan font-family="Helvetica Neue" font-size="12" fill="black" x="10.558" y="269.1361" xml:space="preserve">** Not usable with WebGL and WebGPU</tspan>
+        </text>
+      </g>
+      <g id="Line_307">
+        <line x1="-544" y1="474.12903" x2="-524.8933" y2="474.7454" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_308">
+        <line x1="-544" y1="525.74194" x2="-523.8272" y2="534.5269" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_309">
+        <path d="M -544 588.4669 C -533.1432 598.0103 -522.35984 607.3111 -512 616 C -506.92184 620.2591 -502.11804 624.2264 -497.57546 627.9219" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_310">
+        <line x1="-336" y1="578" x2="-288.9" y2="578" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_311">
+        <line x1="-336" y1="478" x2="-288.9" y2="478" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_312">
+        <line x1="-192" y1="478" x2="-176.9" y2="478" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_313">
+        <line x1="-192" y1="578" x2="-178.9" y2="578" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_314">
+        <path d="M -336 680.903 C -306.0411 679.2931 -272.02546 674.67515 -240 664 C -210.8949 654.2983 -188.1204 641.156 -170.75386 628.0673" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_315">
+        <path d="M -544 416.799 C -537.35314 414.29116 -530.7149 411.84015 -524.1596 409.48524" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_316">
+        <path d="M -336 370.7056 C -285.25983 366.8941 -219.84818 366.5131 -160 380 C -109.88666 391.29315 -73.45904 410.1046 -47.99204 428.24355" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_317">
+        <line x1="-80" y1="478" x2="-64.9" y2="478" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_318">
+        <path d="M -82 563.1884 C -72.531 558.3898 -62.24052 552.1274 -52 544 C -46.11249 539.3274 -40.698115 534.4007 -35.76096 529.4309" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Graphic_319">
+        <rect x="136" y="436" width="84" height="84" fill="white"/>
+        <rect x="136" y="436" width="84" height="84" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(141 468.776)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="11.96" y="15" xml:space="preserve">Screen</tspan>
+        </text>
+      </g>
+      <g id="Line_320">
+        <path d="M -5.859828 520 C -19.015812 563.4296 -54.16202 631.05844 -148 676 C -295.8852 746.82625 -371.5482 786.3608 -520 728 C -557.4316 713.2845 -585.6505 689.5869 -606.9228 662.37234" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Graphic_321">
+        <rect x="-340" y="768" width="184" height="72" fill="white"/>
+        <rect x="-340" y="768" width="184" height="72" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-335 775.776)" fill="black">
+          <tspan font-family="Menlo" font-size="16" fill="black" x="5.121094" y="15" xml:space="preserve">createImageBitmap</tspan>
+          <tspan font-family="Menlo" font-size="16" fill="black" x="22.539937" y="34" xml:space="preserve">VideoFrame</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" y="34" xml:space="preserve"> ctor</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="23.28" y="53" xml:space="preserve">Blob then decode</tspan>
+        </text>
+      </g>
+      <g id="Line_324">
+        <line x1="56" y1="478" x2="123.1" y2="478" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_325">
+        <path d="M -340 817.0429 C -403.12745 819.8967 -486.9209 811.2652 -552 760 C -585.5161 733.59816 -609.67115 699.3526 -627.0797 663.6958" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_326">
+        <path d="M 7.871115 520 C 6.78667 548.07134 -3.1757114 588.5029 -39.599853 636 C -77.45044 685.3572 -134.36409 729.9406 -179.15555 760.7562" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Graphic_335">
+        <path d="M -192.0692 353.39067 L -187.52234 367.70156 L -172.8084 367.70156 L -184.71223 376.54617 L -180.16537 390.85707 L -192.0692 382.01245 L -203.97303 390.85707 L -199.42617 376.54617 L -211.33 367.70156 L -196.61606 367.70156 Z" fill="#ff4040"/>
+        <text transform="translate(-196.46146 364.8776)" fill="white">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="white" x="0" y="15" xml:space="preserve">1</tspan>
+        </text>
+      </g>
+      <g id="Graphic_336">
+        <path d="M 76.274 472.88356 L 85.71905 472.88356 L 85.71905 462.64454 L 95.15844 462.64454 L 95.15844 472.88356 L 104.6035 472.88356 L 104.6035 483.11644 L 95.15844 483.11644 L 95.15844 493.35546 L 85.71905 493.35546 L 85.71905 483.11644 L 76.274 483.11644 Z" fill="#4040ff"/>
+        <text transform="translate(81.274 468.76065)" fill="white">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="white" x="4.7167463" y="15" xml:space="preserve">5</tspan>
+        </text>
+      </g>
+      <g id="Graphic_337">
+        <rect x="-512" y="260" width="176" height="68" fill="white"/>
+        <rect x="-512" y="260" width="176" height="68" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(-507 284.776)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="30.536" y="15" xml:space="preserve">HTML element</tspan>
+        </text>
+      </g>
+      <g id="Line_339">
+        <path d="M -336 287.70207 C -268.56224 286.1873 -171.2059 290.90052 -76 320 C 17.282059 348.51146 84.50804 393.1006 126.27497 427.6507" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Graphic_340">
+        <path d="M -108.83006 309.491 L -99.38501 309.491 L -99.38501 299.25197 L -89.94562 299.25197 L -89.94562 309.491 L -80.50057 309.491 L -80.50057 319.72387 L -89.94562 319.72387 L -89.94562 329.9629 L -99.38501 329.9629 L -99.38501 319.72387 L -108.83006 319.72387 Z" fill="#4040ff"/>
+        <text transform="translate(-103.83006 305.36807)" fill="white">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="white" x="4.7167463" y="15" xml:space="preserve">0</tspan>
+        </text>
+      </g>
+      <g id="Line_341">
+        <path d="M -544 329.2151 C -536.9723 324.4165 -530.1202 320.2326 -523.48196 316.5877" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Graphic_343">
+        <path d="M -87.496 719.5281 L -78.050945 719.5281 L -78.050945 709.2891 L -68.61156 709.2891 L -68.61156 719.5281 L -59.166505 719.5281 L -59.166505 729.761 L -68.61156 729.761 L -68.61156 740 L -78.050945 740 L -78.050945 729.761 L -87.496 729.761 Z" fill="#4040ff"/>
+      </g>
+      <g id="Graphic_344">
+        <text transform="translate(-39 705)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="0" y="15" xml:space="preserve">Tone map to screen’s HDR headroom,</tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="0" y="33.448" xml:space="preserve">adjusted by CSS </tspan>
+          <tspan font-family="Menlo" font-size="16" fill="black" y="33.448" xml:space="preserve">dynamic-range-limit</tspan>
+        </text>
+      </g>
+      <g id="Graphic_345">
+        <path d="M -71.748 758.5782 L -67.20114 772.8891 L -52.4872 772.8891 L -64.39103 781.7337 L -59.84417 796.0446 L -71.748 787.19995 L -83.65183 796.0446 L -79.10497 781.7337 L -91.0088 772.8891 L -76.29486 772.8891 Z" fill="#ff4040"/>
+      </g>
+      <g id="Graphic_346">
+        <text transform="translate(-39 773)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="0" y="15" xml:space="preserve">Tone map to specified HDR headroom</tspan>
+        </text>
+      </g>
+      <g id="Graphic_347">
+        <path d="M -533.8766 646.6563 L -531.496 648 L -533.8766 649.3437 L -531.81356 651.1251 L -534.40056 652 L -532.7341 654.1251 L -535.44783 654.4688 L -534.2416 656.8749 L -536.9716 656.7187 L -536.2572 659.31264 L -538.9079 658.62496 L -538.73334 661.31264 L -541.1773 660.1251 L -541.54233 662.7811 L -543.7009 661.15616 L -544.5896 663.68736 L -546.38316 661.6563 L -547.748 664 L -549.1288 661.6563 L -550.92234 663.68736 L -551.7951 661.15616 L -553.9696 662.7811 L -554.3346 660.1251 L -556.7786 661.31264 L -556.60404 658.62496 L -559.2544 659.31264 L -558.5403 656.7187 L -561.2703 656.8749 L -560.0641 654.4688 L -562.77785 654.1251 L -561.1114 652 L -563.69836 651.1251 L -561.63533 649.3437 L -564 648 L -561.63533 646.6563 L -563.69836 644.8749 L -561.1114 644 L -562.77785 641.8749 L -560.0641 641.5312 L -561.2703 639.1251 L -558.5403 639.2813 L -559.2544 636.68736 L -556.60404 637.37504 L -556.7786 634.68736 L -554.3346 635.8749 L -553.9696 633.2189 L -551.7951 634.84384 L -550.92234 632.31264 L -549.1288 634.31264 L -547.7639 632 L -546.38316 634.31264 L -544.5896 632.31264 L -543.7009 634.84384 L -541.54233 633.2189 L -541.1773 635.8749 L -538.73334 634.68736 L -538.9079 637.37504 L -536.2572 636.68736 L -536.9716 639.2813 L -534.2416 639.1251 L -535.44783 641.5312 L -532.7341 641.8749 L -534.40056 644 L -531.81356 644.8749 L -533.8766 646.6563 Z" fill="#ff40ff"/>
+        <text transform="translate(-556.07464 638.776)" fill="white">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="white" x="3.878641" y="15" xml:space="preserve">6</tspan>
+        </text>
+      </g>
+      <g id="Graphic_348">
+        <text transform="translate(-39 825)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="0" y="15" xml:space="preserve">Has HDR metadata</tspan>
+        </text>
+      </g>
+      <g id="Graphic_350">
+        <path d="M 65.65632 514.6563 L 68 516 L 65.65632 517.3437 L 67.68736 519.1251 L 65.14048 520 L 66.78112 522.1251 L 64.10944 522.4688 L 65.29696 524.8749 L 62.60928 524.7187 L 63.31264 527.31264 L 60.70304 526.62496 L 60.87488 529.31264 L 58.4688 528.1251 L 58.10944 530.7811 L 55.98432 529.15616 L 55.10944 531.68736 L 53.34368 529.6563 L 52 532 L 50.64064 529.6563 L 48.87488 531.68736 L 48.01568 529.15616 L 45.87488 530.7811 L 45.51552 528.1251 L 43.10944 529.31264 L 43.28128 526.62496 L 40.672 527.31264 L 41.37504 524.7187 L 38.68736 524.8749 L 39.87488 522.4688 L 37.2032 522.1251 L 38.84384 520 L 36.29696 519.1251 L 38.328 517.3437 L 36 516 L 38.328 514.6563 L 36.29696 512.8749 L 38.84384 512 L 37.2032 509.8749 L 39.87488 509.5312 L 38.68736 507.1251 L 41.37504 507.2813 L 40.672 504.68736 L 43.28128 505.37504 L 43.10944 502.68736 L 45.51552 503.8749 L 45.87488 501.2189 L 48.01568 502.84384 L 48.87488 500.31264 L 50.64064 502.31264 L 51.98432 500 L 53.34368 502.31264 L 55.10944 500.31264 L 55.98432 502.84384 L 58.10944 501.2189 L 58.4688 503.8749 L 60.87488 502.68736 L 60.70304 505.37504 L 63.31264 504.68736 L 62.60928 507.2813 L 65.29696 507.1251 L 64.10944 509.5312 L 66.78112 509.8749 L 65.14048 512 L 67.68736 512.8749 L 65.65632 514.6563 Z" fill="#ff40ff"/>
+        <text transform="translate(43.88 506.776)" fill="white">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="white" x="3.672" y="15" xml:space="preserve">5</tspan>
+        </text>
+      </g>
+      <g id="Graphic_351">
+        <path d="M -58.34368 833.2345 L -56 834.5782 L -58.34368 835.9218 L -56.31264 837.7033 L -58.85952 838.5782 L -57.21888 840.7033 L -59.89056 841.047 L -58.70304 843.453 L -61.39072 843.2969 L -60.68736 845.8908 L -63.29696 845.2031 L -63.12512 847.8908 L -65.5312 846.7033 L -65.89056 849.3593 L -68.01568 847.7343 L -68.89056 850.2655 L -70.65632 848.2345 L -72 850.5782 L -73.35936 848.2345 L -75.12512 850.2655 L -75.98432 847.7343 L -78.12512 849.3593 L -78.48448 846.7033 L -80.89056 847.8908 L -80.71872 845.2031 L -83.328 845.8908 L -82.62496 843.2969 L -85.31264 843.453 L -84.12512 841.047 L -86.7968 840.7033 L -85.15616 838.5782 L -87.70304 837.7033 L -85.672 835.9218 L -88 834.5782 L -85.672 833.2345 L -87.70304 831.453 L -85.15616 830.5782 L -86.7968 828.453 L -84.12512 828.1094 L -85.31264 825.7033 L -82.62496 825.8594 L -83.328 823.2655 L -80.71872 823.9532 L -80.89056 821.2655 L -78.48448 822.453 L -78.12512 819.797 L -75.98432 821.422 L -75.12512 818.8908 L -73.35936 820.8908 L -72.01568 818.5782 L -70.65632 820.8908 L -68.89056 818.8908 L -68.01568 821.422 L -65.89056 819.797 L -65.5312 822.453 L -63.12512 821.2655 L -63.29696 823.9532 L -60.68736 823.2655 L -61.39072 825.8594 L -58.70304 825.7033 L -59.89056 828.1094 L -57.21888 828.453 L -58.85952 830.5782 L -56.31264 831.453 L -58.34368 833.2345 Z" fill="#ff40ff"/>
+      </g>
+      <g id="Graphic_352">
+        <path d="M -309.63275 457.2891 L -305.0859 471.6 L -290.37195 471.6 L -302.2758 480.4446 L -297.72892 494.7555 L -309.63275 485.91087 L -321.53658 494.7555 L -316.98972 480.4446 L -328.89355 471.6 L -314.1796 471.6 Z" fill="#ff4040"/>
+        <text transform="translate(-314.025 468.776)" fill="white">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="white" x="0" y="15" xml:space="preserve">2</tspan>
+        </text>
+      </g>
+      <g id="Graphic_353">
+        <path d="M -311.748 557.2891 L -307.20114 571.6 L -292.4872 571.6 L -304.39103 580.4446 L -299.84417 594.7555 L -311.748 585.9109 L -323.65183 594.7555 L -319.10497 580.4446 L -331.0088 571.6 L -316.29486 571.6 Z" fill="#ff4040"/>
+        <text transform="translate(-316.14026 568.776)" fill="white">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="white" x="0" y="15" xml:space="preserve">3</tspan>
+        </text>
+      </g>
+      <g id="Graphic_354">
+        <path d="M -251.85405 646.9469 L -247.3072 661.2578 L -232.59325 661.2578 L -244.49708 670.1024 L -239.95022 684.4133 L -251.85405 675.5687 L -263.75788 684.4133 L -259.21102 670.1024 L -271.11485 661.2578 L -256.4009 661.2578 Z" fill="#ff4040"/>
+        <text transform="translate(-256.2463 658.4338)" fill="white">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="white" x="0" y="15" xml:space="preserve">4</tspan>
+        </text>
+      </g>
+      <g id="Line_356">
+        <path d="M 178.32943 520 C 175.77836 531.9675 170.42227 544.79115 160 556 C 129.96967 588.2968 107.12982 565.93594 72 592 C 60.61882 600.4441 52.833524 609.2946 47.508723 617.4019" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Graphic_357">
+        <path d="M 36 628 C 24.9648 628 16 636.9452 16 648 C 16 659.0548 24.9648 668 36 668 C 47.0548 668 56 659.0548 56 648 C 56 636.9452 47.0548 628 36 628 M 46.8984 637.1016 C 52.3672 642.5704 52.7968 651.086 48.3436 657.1408 L 26.8788 635.6564 C 32.914 631.2032 41.4296 631.672 46.8984 637.1016 M 25.1016 658.8984 C 19.6524 653.4296 19.2032 644.914 23.6564 638.8592 L 45.1212 660.3436 C 39.086 664.7968 30.5704 664.3672 25.1016 658.8984 Z" fill="red"/>
+      </g>
+      <g id="Graphic_358">
+        <text transform="translate(65 622.328)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="0" y="15" xml:space="preserve">Rendered pixels, and screen </tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="0" y="33.448" xml:space="preserve">HDR headroom used to </tspan>
+          <tspan font-family="Helvetica Neue" font-size="16" fill="black" x="0" y="51.895996" xml:space="preserve">render them, are unavailable</tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>
