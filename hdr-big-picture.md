@@ -16,8 +16,14 @@ The numbered symbols indicate features that need to be added (except 0), and pro
 
 There three broad components of the feature work:
 * The "blue crosses" are for [displaying HDR elements](#displaying-html-elements-and-the-dynamic-range-limit-css-property)
-* The "red stars" are for [drawing HDR content to a buffer](#drawing-hdr-content-to-a-bitmap-or-texture)
-* The "magenta suns" are for [attaching HDR metadata to canvases](#displaying-an-hdr-canvas)
+* The "red stars" are for [drawing HDR content to a buffer](#drawing-hdr-content-to-a-bitmap-or-texture). See the individual explainers:
+  * [2D canvas drawing HDR headroom parameter](canvas-compositing-headroom.md)
+  * [WebGL texture import HDR headroom parameter](webgl-unpack-headroom.md)
+  * [WebGPU texture import and copy HDR headroom parameter](webgpu-external-headroom.md)
+* The "magenta suns" are for [attaching HDR metadata to canvases](#displaying-an-hdr-canvas). See the individual explainers:
+  * [2D canvas tone mapping](canvas-tone-map.md)
+  * [WebGL tone mapping](webgl-drawing-buffer-tone-map.md)
+  * [SMPTE ST 2094-50 tone mapping](canvas-smpte-st-2094-50.md)
 
 ![Diagram of HDR big picture](hdr-big-picture.svg)
 
@@ -42,14 +48,14 @@ Those are common image and video encodings for HDR content, but are not the only
 
 HDR headroom is defined as the ratio of peak luminance (of a thing) to the luminance of `white` (in that thing).
 
-It is often (e.g, in
-[ISO 21496-1](https://www.iso.org/standard/86775.html) gain map images and
-[SMPTE ST 2094-50](https://github.com/SMPTE/st2094-50))
-defined as the log base 2 of that ratio.
+In all existing specifications that use this concept
+([ISO 21496-1](https://www.iso.org/standard/86775.html) gain map images and [SMPTE ST 2094-50](https://github.com/SMPTE/st2094-50)),
+it is defined as the log base 2 of that ratio.
+This formulation can potentially be un-ergonomic and confusing because no APIs specify colors in the log2 domain, but many specify colors in a linear domain.
 
-In many discussions of web specifications this encoding in log2 has been controversial,
-and a preference for representation as a linear encoding has been indicated.
-This document will use the verbose but unambiguous term "linear HDR headroom".
+We will use the unambiguous term "linear HDR headroom" when an exact number is relevant to the discussion.
+We will use the term "HDR headroom" to to the concept.
+This is consistent with the tentative resolution of [issue #129](https://github.com/w3c/ColorWeb-CG/issues/129).
 
 ### HDR display definition and characterization
 
@@ -119,9 +125,11 @@ There exists a general problem wherein an HDR image must be put into pixels in a
 This general problem has instances in 2D canvas, WebGL, and WebGPU.
 
 * For 2D canvas, the [`drawImage`](https://html.spec.whatwg.org/multipage/canvas.html#canvasdrawimage) and similar functions exposed by the `CanvasDrawImage` interface included in `CanvasRenderingContext2D` and `OffscreenCanvasRenderingContext2D` perform this operation.
-[This explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/canvas2d_hdr_headroom.md) proposes adding a `globalHDRHeadroom` attribute to the [`CanvasCompositing`](https://html.spec.whatwg.org/multipage/canvas.html#canvascompositing) interface.
-* For WebGL, the `texImage2D` and related functions perform this operation. [This explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/webgl_hdr_headroom.md) proposes adding a `unpackHDRHeadroom` attribute to the [`WebGLRenderingContextBase`](https://registry.khronos.org/webgl/specs/latest/1.0/#5.14) interface.
-* For WebGPU, the [`copyExternalImageToTexture`](https://www.w3.org/TR/webgpu/#dom-gpuqueue-copyexternalimagetotexture) and [`importExternalTexture`](https://www.w3.org/TR/webgpu/#dom-gpudevice-importexternaltexture) functions perform this operation. [This explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/webgpu_hdr_headroom.md) proposes adding an `hdrHeadroom` parameter to the [`GPUCopyExternalImageDestInfo`](https://www.w3.org/TR/webgpu/#gpucopyexternalimagedestinfo) and [`GPUExternalTextureDescriptor`](https://www.w3.org/TR/webgpu/#external-texture-creation) dictionaries.
+  * [This explainer](canvas-compositing-headroom.md) proposes adding a `globalLinearHDRHeadroom` attribute to the [`CanvasCompositing`](https://html.spec.whatwg.org/multipage/canvas.html#canvascompositing) interface.
+* For WebGL, the `texImage2D` and related functions perform this operation.
+  * [This explainer](webgl-unpack-headroom.md) proposes adding a `unpackLinearHDRHeadroom` attribute to the [`WebGLRenderingContextBase`](https://registry.khronos.org/webgl/specs/latest/1.0/#5.14) interface.
+* For WebGPU, the [`copyExternalImageToTexture`](https://www.w3.org/TR/webgpu/#dom-gpuqueue-copyexternalimagetotexture) and [`importExternalTexture`](https://www.w3.org/TR/webgpu/#dom-gpudevice-importexternaltexture) functions perform this operation.
+  * [This explainer](webgpu-external-headroom.md) proposes adding an `lienarHDRHeadroom` parameter to the [`GPUCopyExternalImageDestInfo`](https://www.w3.org/TR/webgpu/#gpucopyexternalimagedestinfo) and [`GPUExternalTextureDescriptor`](https://www.w3.org/TR/webgpu/#external-texture-creation) dictionaries.
 
 The default behavior for all of these APIs is for them to tone map to SDR.
 That way, any application that is oblivious to HDR will produce good results (as opposed to having out of range values clamped, etc).
@@ -131,28 +139,21 @@ None of these interfaces provide a way to get at the "raw pixels" of the image.
 * An SDR image can be encoded using P3 pixel values versus Rec2020 pixel values, and that detail is not visible to these interfaces.
 * An HDR image can be encoded using Display P3 as the pixel values (and a gain map or gain curve to go up to HDR) or as PQ as the pixel values (and a gain map or gain curve to go down to SDR), and that detail is not visible to these interfaces.
 
-These explainers are all written against the idea of specifying HDR headroom in log2 space. The preference for linear space has since been indicated (see [issue #129](https://github.com/w3c/ColorWeb-CG/issues/129).
-
-* The `globalHDRHeadroom` parameter should be renamed to `globalLinearHDRHeadroom` if a linear encoding is to be used
-* The `unpackHDRHeadroom` parameter should be renamed to `unpackLinearHDRHeadroom`
-* The `hdrHeadroom` parameter should be renamed to `linearHDRHeadroom`
-
-The valid range of values for the linear parameter is [1, `Infinity`].
+The valid range of values for this parameter is [1, `Infinity`].
 
 ### Displaying an HDR canvas
 
 #### Trivial tone mapping
 
-The default behavior for all HTML canvas elements is to limit their contents to the SDR color volume of the target display. In WebGPU, a canvas can instead allow use of the full HDR color volume of the target display via the [`GPUCanvasToneMapping`](https://gpuweb.github.io/gpuweb/#dictdef-gpucanvastonemapping) structure.
+The default behavior for all HTML canvas elements is to limit their contents to the SDR color volume of the target display.
 
+In WebGPU, a canvas can instead allow use of the full HDR color volume of the target display via the [`GPUCanvasToneMapping`](https://gpuweb.github.io/gpuweb/#dictdef-gpucanvastonemapping) structure.
 In both of these cases, the transformation performed by tone mapping is the trivial tone mapping operation of "do nothing". The pixel values are unchanged regardless of the targeted headroom. See the next section for more involved tone mapping.
-
 This behavior was limited to WebGPU because, at the time of writing, only WebGPU supported pixel formats that allowed expressing values outside of SDR color volumes. This has since been addressed for [2D contexts](https://github.com/whatwg/html/issues/8708) and for [WebGL](https://github.com/KhronosGroup/WebGL/pull/3222).
+
 The WebGPU explainer [indiciated](https://github.com/ccameron-chromium/webgpu-hdr/blob/main/EXPLAINER.md#notes-on-canvasrenderingcontext2d-and-unification-of-apis) that this API should be generalized.
-
-[This 2D canvas explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/canvas2d_tone_map.md) and [explainer PR](https://github.com/whatwg/html/pull/11734) add these parameters to the HTML specification, and allow the [`CanvasRenderingContext2DSettings`](https://html.spec.whatwg.org/multipage/canvas.html#canvasrenderingcontext2dsettings) to specify them.
-
-[This WebGL explainer](https://github.com/ccameron-chromium/webgl-hdr/blob/master/EXPLAINER.md) indicates how these parameters would be added to WebGL, though it is somewhat out-of-date.
+* [This 2D canvas explainer](canvas-tone-map.md) and [explainer PR](https://github.com/whatwg/html/pull/11734) move these parameters to the HTML specification, and allow the [`CanvasRenderingContext2DSettings`](https://html.spec.whatwg.org/multipage/canvas.html#canvasrenderingcontext2dsettings) to specify them.
+* [This WebGL explainer](webgl-drawing-buffer-tone-map.md) indicates how these parameters would be added to WebGL, though it is somewhat out-of-date.
 
 #### Using SMPTE ST 2094-50 metadata
 
@@ -160,10 +161,7 @@ The SMPTE ST 2094-50 specification defines non-trivial global tone mapping.
 
 Once all APIs (2D, WebGL, and WebGPU) are use the same `CanvasToneMapping` interface described above, we can add support for tone mapping using SMPTE ST 2094-50 metadata to that interface, and it will be supported by all APIs.
 
-[This explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/smpte_st_2094_50.md) proposes such an interface.
-That explainer proposes using a `Blob`, but it may be better to have an `interface` for SMPTE ST 2094-50 metadata.
-It is likely that we will want to add some constructors for common curves (e.g, the aforementioned reference white tone mapping operator).
-
+[This explainer](canvas-smpte-st-2094-50.md) proposes such an interface.
 SMPTE ST 2094-50 will be supported in videos and in images, and so exporting a canvas to an image or streaming it to a video will be supported.
 
 #### Common tone mapping algorithms
@@ -176,10 +174,6 @@ It would be helpful to provide some common tone mapping algorithms. Examples cou
 
 For the moment these have not been included in any explainer.
 These can be implemented (or even specified) as specific sets of SMPTE ST 2094-50 metadata (and that way can be carried along with videos and images).
-
-### Using SMPTE ST 2094-50 metadata with WebCodecs
-
-[That same explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/smpte_st_2094_50.md) proposes adding SMPTE ST 2094-50 metadata to the [VideoFrame Metadata Registry](https://w3c.github.io/webcodecs/video_frame_metadata_registry.html).
 
 ### CSS HDR Colors
 
@@ -197,7 +191,11 @@ The [`dynamic-range`](https://www.w3.org/TR/mediaqueries-5/#dynamic-range) media
 
 Exactly how HDR the screen is, what its HDR headroom is, however, is not query-able.
 
-## Example, how do I use the canvas APIs?
+## Security and privacy
+
+The headroom-parameterized approach is designed to enable HDR without exposing any user fingerprinting vectors to the web.
+
+## Examples
 
 The question of "how would I use these APIs" often comes up.
 
@@ -229,36 +227,4 @@ You will tone map your scene-referred luminance values to display-referred with 
 Maybe, if you arrange things right, you can manage to have this scene-referred to display-referred mapping be a no-op. But in general, physically-based scene-referred dynamic range is ginormous and totally unsuitable for direct display.
 
 You'll then configure your canvas to use SMPTE ST 2094-50 metadata indicating how to tone map display-referred at 4x to other headroom values.
-
-## Dependencies and making forward progress
-
-The list of spec changes to make is fairly ginormous, and so there is a question of what to do and in what order.
-
-### No dependencies at all: `CanvasToneMapping`
-
-The proposal ([explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/canvas2d_tone_map.md), [spec pre-review-PR](https://github.com/whatwg/html/pull/11734), [issue](https://github.com/whatwg/html/issues/11424)) to move WebGPU's tone mapping API to HTML canvas has nothing it depends on.
-
-This can be done now.
-
-After this is done, the [WebGL version](https://github.com/KhronosGroup/WebGL/issues/3666) can be done, and the WebGPU spec can be updated to link to the HTML spec (as it already does for color spaces).
-
-### Depends only on log2 vs linear encoding: drawing images to bitmaps and textures
-
-We need to decide if all APIs will use linear or log2 HDR headroom.
-
-Once we do that, we can land
-* [`globalHDRHeadroom`](https://github.com/whatwg/html/issues/11165) in 2D
-* [`unpackHDRHeadroom`](https://github.com/KhronosGroup/WebGL/issues/3735) in WebGL
-* [`hdrHeadroom`](https://github.com/gpuweb/gpuweb/issues/5236) in WebGPU
-
-We can use images with existing and published headroom-parameterized tone mapping for WPT and conformance tests.
-
-We can write tests for `hdr-color` in 2D canvas.
-
-### Depends on SMPTE ST 2094-50
-
-Once SMPTE ST 2094-50 is published, we can add support in the aforementioned `CanvasToneMapping` API, as well as WebCodecs.
-That is outlined in [this explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/smpte_st_2094_50.md).
-
-We can beef up existing tests with images of this format, and we can add tests ensuring that image encoding and video streaming are supported.
 
