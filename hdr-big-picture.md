@@ -191,7 +191,11 @@ The [`dynamic-range`](https://www.w3.org/TR/mediaqueries-5/#dynamic-range) media
 
 Exactly how HDR the screen is, what its HDR headroom is, however, is not query-able.
 
-## Example, how do I use the canvas APIs?
+## Security and privacy
+
+The headroom-parameterized approach is designed to enable HDR without exposing any user fingerprinting vectors to the web.
+
+## Examples
 
 The question of "how would I use these APIs" often comes up.
 
