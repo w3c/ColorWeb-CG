@@ -42,14 +42,14 @@ Those are common image and video encodings for HDR content, but are not the only
 
 HDR headroom is defined as the ratio of peak luminance (of a thing) to the luminance of `white` (in that thing).
 
-It is often (e.g, in
-[ISO 21496-1](https://www.iso.org/standard/86775.html) gain map images and
-[SMPTE ST 2094-50](https://github.com/SMPTE/st2094-50))
-defined as the log base 2 of that ratio.
+In all existing specifications that use this concept
+([ISO 21496-1](https://www.iso.org/standard/86775.html) gain map images and [SMPTE ST 2094-50](https://github.com/SMPTE/st2094-50)),
+it is defined as the log base 2 of that ratio.
+This formulation can potentially be un-ergonomic and confusing because no APIs specify colors in the log2 domain, but many specify colors in a linear domain.
 
-In many discussions of web specifications this encoding in log2 has been controversial,
-and a preference for representation as a linear encoding has been indicated.
-This document will use the verbose but unambiguous term "linear HDR headroom".
+We will use the unambiguous term "linear HDR headroom" when an exact number is relevant to the discussion.
+We will use the term "HDR headroom" to to the concept.
+This is consistent with the tentative resolution of [issue #129](https://github.com/w3c/ColorWeb-CG/issues/129).
 
 ### HDR display definition and characterization
 
@@ -119,9 +119,9 @@ There exists a general problem wherein an HDR image must be put into pixels in a
 This general problem has instances in 2D canvas, WebGL, and WebGPU.
 
 * For 2D canvas, the [`drawImage`](https://html.spec.whatwg.org/multipage/canvas.html#canvasdrawimage) and similar functions exposed by the `CanvasDrawImage` interface included in `CanvasRenderingContext2D` and `OffscreenCanvasRenderingContext2D` perform this operation.
-[This explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/canvas2d_hdr_headroom.md) proposes adding a `globalHDRHeadroom` attribute to the [`CanvasCompositing`](https://html.spec.whatwg.org/multipage/canvas.html#canvascompositing) interface.
-* For WebGL, the `texImage2D` and related functions perform this operation. [This explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/webgl_hdr_headroom.md) proposes adding a `unpackHDRHeadroom` attribute to the [`WebGLRenderingContextBase`](https://registry.khronos.org/webgl/specs/latest/1.0/#5.14) interface.
-* For WebGPU, the [`copyExternalImageToTexture`](https://www.w3.org/TR/webgpu/#dom-gpuqueue-copyexternalimagetotexture) and [`importExternalTexture`](https://www.w3.org/TR/webgpu/#dom-gpudevice-importexternaltexture) functions perform this operation. [This explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/webgpu_hdr_headroom.md) proposes adding an `hdrHeadroom` parameter to the [`GPUCopyExternalImageDestInfo`](https://www.w3.org/TR/webgpu/#gpucopyexternalimagedestinfo) and [`GPUExternalTextureDescriptor`](https://www.w3.org/TR/webgpu/#external-texture-creation) dictionaries.
+[This explainer](canvas-compositing-headroom.md) proposes adding a `globalLinearHDRHeadroom` attribute to the [`CanvasCompositing`](https://html.spec.whatwg.org/multipage/canvas.html#canvascompositing) interface.
+* For WebGL, the `texImage2D` and related functions perform this operation. [This explainer](webgl-unpack-headroom.md) proposes adding a `unpackLinearHDRHeadroom` attribute to the [`WebGLRenderingContextBase`](https://registry.khronos.org/webgl/specs/latest/1.0/#5.14) interface.
+* For WebGPU, the [`copyExternalImageToTexture`](https://www.w3.org/TR/webgpu/#dom-gpuqueue-copyexternalimagetotexture) and [`importExternalTexture`](https://www.w3.org/TR/webgpu/#dom-gpudevice-importexternaltexture) functions perform this operation. [This explainer](webgpu-external-headroom.md) proposes adding an `lienarHDRHeadroom` parameter to the [`GPUCopyExternalImageDestInfo`](https://www.w3.org/TR/webgpu/#gpucopyexternalimagedestinfo) and [`GPUExternalTextureDescriptor`](https://www.w3.org/TR/webgpu/#external-texture-creation) dictionaries.
 
 The default behavior for all of these APIs is for them to tone map to SDR.
 That way, any application that is oblivious to HDR will produce good results (as opposed to having out of range values clamped, etc).
@@ -131,13 +131,7 @@ None of these interfaces provide a way to get at the "raw pixels" of the image.
 * An SDR image can be encoded using P3 pixel values versus Rec2020 pixel values, and that detail is not visible to these interfaces.
 * An HDR image can be encoded using Display P3 as the pixel values (and a gain map or gain curve to go up to HDR) or as PQ as the pixel values (and a gain map or gain curve to go down to SDR), and that detail is not visible to these interfaces.
 
-These explainers are all written against the idea of specifying HDR headroom in log2 space. The preference for linear space has since been indicated (see [issue #129](https://github.com/w3c/ColorWeb-CG/issues/129).
-
-* The `globalHDRHeadroom` parameter should be renamed to `globalLinearHDRHeadroom` if a linear encoding is to be used
-* The `unpackHDRHeadroom` parameter should be renamed to `unpackLinearHDRHeadroom`
-* The `hdrHeadroom` parameter should be renamed to `linearHDRHeadroom`
-
-The valid range of values for the linear parameter is [1, `Infinity`].
+The valid range of values for this parameter is [1, `Infinity`].
 
 ### Displaying an HDR canvas
 
