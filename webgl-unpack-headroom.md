@@ -26,7 +26,7 @@ To the [`WebGLRenderingContextBase`](https://registry.khronos.org/webgl/specs/la
   }
 ```
 
-Note the similarity between this attribute and the `unpackColorSpace` attribute.
+Note the similarity between this attribute and the [`unpackColorSpace`](https://registry.khronos.org/webgl/specs/latest/1.0/#5.14.1) attribute.
 This attribute shall be ignored in all situations where the `unpackColorSpace` is ignored (when `UNPACK_COLORSPACE_CONVERSION_WEBGL` is `NONE`).
 
 This attribute may be set to `Infinity` to indicate that the "maximum headroom" version is desired.

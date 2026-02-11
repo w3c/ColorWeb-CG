@@ -16,8 +16,14 @@ The numbered symbols indicate features that need to be added (except 0), and pro
 
 There three broad components of the feature work:
 * The "blue crosses" are for [displaying HDR elements](#displaying-html-elements-and-the-dynamic-range-limit-css-property)
-* The "red stars" are for [drawing HDR content to a buffer](#drawing-hdr-content-to-a-bitmap-or-texture)
-* The "magenta suns" are for [attaching HDR metadata to canvases](#displaying-an-hdr-canvas)
+* The "red stars" are for [drawing HDR content to a buffer](#drawing-hdr-content-to-a-bitmap-or-texture). See the individual explainers:
+  * [2D canvas drawing HDR headroom parameter](canvas-compositing-headroom.md)
+  * [WebGL texture import HDR headroom parameter](webgl-unpack-headroom.md)
+  * [WebGPU texture import and copy HDR headroom parameter](webgpu-external-headroom.md)
+* The "magenta suns" are for [attaching HDR metadata to canvases](#displaying-an-hdr-canvas). See the individual explainers:
+  * [2D canvas tone mapping](canvas-tone-map.md)
+  * [WebGL tone mapping](webgl-drawing-buffer-tone-map.md)
+  * [SMPTE ST 2094-50 tone mapping](canvas-smpte-st-2094-50.md)
 
 ![Diagram of HDR big picture](hdr-big-picture.svg)
 
@@ -119,9 +125,11 @@ There exists a general problem wherein an HDR image must be put into pixels in a
 This general problem has instances in 2D canvas, WebGL, and WebGPU.
 
 * For 2D canvas, the [`drawImage`](https://html.spec.whatwg.org/multipage/canvas.html#canvasdrawimage) and similar functions exposed by the `CanvasDrawImage` interface included in `CanvasRenderingContext2D` and `OffscreenCanvasRenderingContext2D` perform this operation.
-[This explainer](canvas-compositing-headroom.md) proposes adding a `globalLinearHDRHeadroom` attribute to the [`CanvasCompositing`](https://html.spec.whatwg.org/multipage/canvas.html#canvascompositing) interface.
-* For WebGL, the `texImage2D` and related functions perform this operation. [This explainer](webgl-unpack-headroom.md) proposes adding a `unpackLinearHDRHeadroom` attribute to the [`WebGLRenderingContextBase`](https://registry.khronos.org/webgl/specs/latest/1.0/#5.14) interface.
-* For WebGPU, the [`copyExternalImageToTexture`](https://www.w3.org/TR/webgpu/#dom-gpuqueue-copyexternalimagetotexture) and [`importExternalTexture`](https://www.w3.org/TR/webgpu/#dom-gpudevice-importexternaltexture) functions perform this operation. [This explainer](webgpu-external-headroom.md) proposes adding an `lienarHDRHeadroom` parameter to the [`GPUCopyExternalImageDestInfo`](https://www.w3.org/TR/webgpu/#gpucopyexternalimagedestinfo) and [`GPUExternalTextureDescriptor`](https://www.w3.org/TR/webgpu/#external-texture-creation) dictionaries.
+  * [This explainer](canvas-compositing-headroom.md) proposes adding a `globalLinearHDRHeadroom` attribute to the [`CanvasCompositing`](https://html.spec.whatwg.org/multipage/canvas.html#canvascompositing) interface.
+* For WebGL, the `texImage2D` and related functions perform this operation.
+  * [This explainer](webgl-unpack-headroom.md) proposes adding a `unpackLinearHDRHeadroom` attribute to the [`WebGLRenderingContextBase`](https://registry.khronos.org/webgl/specs/latest/1.0/#5.14) interface.
+* For WebGPU, the [`copyExternalImageToTexture`](https://www.w3.org/TR/webgpu/#dom-gpuqueue-copyexternalimagetotexture) and [`importExternalTexture`](https://www.w3.org/TR/webgpu/#dom-gpudevice-importexternaltexture) functions perform this operation.
+  * [This explainer](webgpu-external-headroom.md) proposes adding an `lienarHDRHeadroom` parameter to the [`GPUCopyExternalImageDestInfo`](https://www.w3.org/TR/webgpu/#gpucopyexternalimagedestinfo) and [`GPUExternalTextureDescriptor`](https://www.w3.org/TR/webgpu/#external-texture-creation) dictionaries.
 
 The default behavior for all of these APIs is for them to tone map to SDR.
 That way, any application that is oblivious to HDR will produce good results (as opposed to having out of range values clamped, etc).
@@ -137,16 +145,15 @@ The valid range of values for this parameter is [1, `Infinity`].
 
 #### Trivial tone mapping
 
-The default behavior for all HTML canvas elements is to limit their contents to the SDR color volume of the target display. In WebGPU, a canvas can instead allow use of the full HDR color volume of the target display via the [`GPUCanvasToneMapping`](https://gpuweb.github.io/gpuweb/#dictdef-gpucanvastonemapping) structure.
+The default behavior for all HTML canvas elements is to limit their contents to the SDR color volume of the target display.
 
+In WebGPU, a canvas can instead allow use of the full HDR color volume of the target display via the [`GPUCanvasToneMapping`](https://gpuweb.github.io/gpuweb/#dictdef-gpucanvastonemapping) structure.
 In both of these cases, the transformation performed by tone mapping is the trivial tone mapping operation of "do nothing". The pixel values are unchanged regardless of the targeted headroom. See the next section for more involved tone mapping.
-
 This behavior was limited to WebGPU because, at the time of writing, only WebGPU supported pixel formats that allowed expressing values outside of SDR color volumes. This has since been addressed for [2D contexts](https://github.com/whatwg/html/issues/8708) and for [WebGL](https://github.com/KhronosGroup/WebGL/pull/3222).
+
 The WebGPU explainer [indiciated](https://github.com/ccameron-chromium/webgpu-hdr/blob/main/EXPLAINER.md#notes-on-canvasrenderingcontext2d-and-unification-of-apis) that this API should be generalized.
-
-[This 2D canvas explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/canvas2d_tone_map.md) and [explainer PR](https://github.com/whatwg/html/pull/11734) add these parameters to the HTML specification, and allow the [`CanvasRenderingContext2DSettings`](https://html.spec.whatwg.org/multipage/canvas.html#canvasrenderingcontext2dsettings) to specify them.
-
-[This WebGL explainer](https://github.com/ccameron-chromium/webgl-hdr/blob/master/EXPLAINER.md) indicates how these parameters would be added to WebGL, though it is somewhat out-of-date.
+* [This 2D canvas explainer](canvas-tone-map.md) and [explainer PR](https://github.com/whatwg/html/pull/11734) move these parameters to the HTML specification, and allow the [`CanvasRenderingContext2DSettings`](https://html.spec.whatwg.org/multipage/canvas.html#canvasrenderingcontext2dsettings) to specify them.
+* [This WebGL explainer](webgl-drawing-buffer-tone-map.md) indicates how these parameters would be added to WebGL, though it is somewhat out-of-date.
 
 #### Using SMPTE ST 2094-50 metadata
 

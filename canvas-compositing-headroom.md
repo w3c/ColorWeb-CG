@@ -59,7 +59,7 @@ Add to the mixin interface, `CanvasCompositing` the following attribute
 
 ```idl
   partial interface mixin CanvasCompositing {
-    // The target lienar HDR headroom to tone map content to when
+    // The linear HDR headroom to tone map content to when
     // drawing to the canvas.
     attribute unrestricted double globalLinearHDRHeadroom; // (default 1)
   }
