@@ -161,10 +161,7 @@ The SMPTE ST 2094-50 specification defines non-trivial global tone mapping.
 
 Once all APIs (2D, WebGL, and WebGPU) are use the same `CanvasToneMapping` interface described above, we can add support for tone mapping using SMPTE ST 2094-50 metadata to that interface, and it will be supported by all APIs.
 
-[This explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/smpte_st_2094_50.md) proposes such an interface.
-That explainer proposes using a `Blob`, but it may be better to have an `interface` for SMPTE ST 2094-50 metadata.
-It is likely that we will want to add some constructors for common curves (e.g, the aforementioned reference white tone mapping operator).
-
+[This explainer](canvas-smpte-st-2094-50.md) proposes such an interface.
 SMPTE ST 2094-50 will be supported in videos and in images, and so exporting a canvas to an image or streaming it to a video will be supported.
 
 #### Common tone mapping algorithms
@@ -177,10 +174,6 @@ It would be helpful to provide some common tone mapping algorithms. Examples cou
 
 For the moment these have not been included in any explainer.
 These can be implemented (or even specified) as specific sets of SMPTE ST 2094-50 metadata (and that way can be carried along with videos and images).
-
-### Using SMPTE ST 2094-50 metadata with WebCodecs
-
-[That same explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/smpte_st_2094_50.md) proposes adding SMPTE ST 2094-50 metadata to the [VideoFrame Metadata Registry](https://w3c.github.io/webcodecs/video_frame_metadata_registry.html).
 
 ### CSS HDR Colors
 
@@ -230,36 +223,4 @@ You will tone map your scene-referred luminance values to display-referred with 
 Maybe, if you arrange things right, you can manage to have this scene-referred to display-referred mapping be a no-op. But in general, physically-based scene-referred dynamic range is ginormous and totally unsuitable for direct display.
 
 You'll then configure your canvas to use SMPTE ST 2094-50 metadata indicating how to tone map display-referred at 4x to other headroom values.
-
-## Dependencies and making forward progress
-
-The list of spec changes to make is fairly ginormous, and so there is a question of what to do and in what order.
-
-### No dependencies at all: `CanvasToneMapping`
-
-The proposal ([explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/canvas2d_tone_map.md), [spec pre-review-PR](https://github.com/whatwg/html/pull/11734), [issue](https://github.com/whatwg/html/issues/11424)) to move WebGPU's tone mapping API to HTML canvas has nothing it depends on.
-
-This can be done now.
-
-After this is done, the [WebGL version](https://github.com/KhronosGroup/WebGL/issues/3666) can be done, and the WebGPU spec can be updated to link to the HTML spec (as it already does for color spaces).
-
-### Depends only on log2 vs linear encoding: drawing images to bitmaps and textures
-
-We need to decide if all APIs will use linear or log2 HDR headroom.
-
-Once we do that, we can land
-* [`globalHDRHeadroom`](https://github.com/whatwg/html/issues/11165) in 2D
-* [`unpackHDRHeadroom`](https://github.com/KhronosGroup/WebGL/issues/3735) in WebGL
-* [`hdrHeadroom`](https://github.com/gpuweb/gpuweb/issues/5236) in WebGPU
-
-We can use images with existing and published headroom-parameterized tone mapping for WPT and conformance tests.
-
-We can write tests for `hdr-color` in 2D canvas.
-
-### Depends on SMPTE ST 2094-50
-
-Once SMPTE ST 2094-50 is published, we can add support in the aforementioned `CanvasToneMapping` API, as well as WebCodecs.
-That is outlined in [this explainer](https://github.com/ccameron-chromium/ColorWeb-CG/blob/master/smpte_st_2094_50.md).
-
-We can beef up existing tests with images of this format, and we can add tests ensuring that image encoding and video streaming are supported.
 
