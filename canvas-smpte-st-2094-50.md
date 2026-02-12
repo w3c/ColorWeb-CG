@@ -1,10 +1,13 @@
 # SMPTE ST 2094-50 Tone mapping for canvas elements
 
 This proposal suggests an interface for adding support for [SMPTE ST 2094-50](https://github.com/SMPTE/st2094-50) tone mapping to `CanvasToneMapping`.
+The SMPTE ST 2094-50 standard is currently in public review.
+The most recent public draft can be downloaded at the above link, under the "Public Committee Draft (PCD) Notice" section.
 
-This fits into the [HDR on the web, the big picture](hdr-big-picture.md) proposal. It is the "magenta sun number 5" and "magenta sun number 6" problem in the proposal diagram.
+This fits into the [HDR on the web, the big picture](hdr-big-picture.md) proposal.
+It is the "magenta sun number 5" and "magenta sun number 6" problem in the proposal diagram.
 
-The `CanvasToneMapping` API is proposed in [this explainer](canvas-tone-map.md).
+A prerequisite is the `CanvasToneMapping` API is proposed in [this explainer](canvas-tone-map.md).
 
 ## Proposal
 
