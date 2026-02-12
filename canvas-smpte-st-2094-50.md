@@ -13,53 +13,54 @@ Add the following dictionaries for the SMPTE ST 2094-50 color volume transform m
 ```idl
   dictionary SmpteSt2094App5ColorVolumeTransform {
     required double hdrReferenceWhite;
-    optional SmpteSt2094App5HeadroomAdaptiveToneMap headroomAdaptiveToneMap;
-  }
+    SmpteSt2094App5HeadroomAdaptiveToneMap headroomAdaptiveToneMap;
+  };
   dictionary SmpteSt2094App5HeadroomAdaptiveToneMap {
     required double baselineHdrHeadroom;
-    required double gainApplicationColorSpacePrimaries[8];
-    required SmpteSt2094App5HeadroomAlternateImage alternateImages[];
-  }
+    required sequence<double> gainApplicationColorSpacePrimaries; // must have exactly 8
+    required sequence<SmpteSt2094App5HeadroomAlternateImage> alternateImages;
+  };
   dictionary SmpteSt2094App5HeadroomAlternateImage {
     required double hdrHeadroom;
     SmpteSt2094App5HeadroomColorGainFunction colorGainFunction;
-  }
+  };
   dictionary SmpteSt2094App5HeadroomColorGainfunction {
-    SmpteSt2094App5HeadroomComponentMixingFunction componentMix;
+    SmpteSt2094App5HeadroomComponentMixingFunction componentMix = {};
     SmpteSt2094App5HeadroomGainCurve gainCurve;
-  }
-  SmpteSt2094App5HeadroomComponentMixingFunction {
-    required double red = 0;
-    required double green = 0;
-    required double blue = 0;
-    required double max = 0;
-    required double min = 0;
-    required double component = 0;
-  }
-  SmpteSt2094App5HeadroomGainCurve {
-    SmpteSt2094App5HeadroomGainCurveControlPoint controlPoints[];
-  }
-  SmpteSt2094App5HeadroomGainCurveControlPoint {
+  };
+  dictionary SmpteSt2094App5HeadroomComponentMixingFunction {
+    double red = 0;
+    double green = 0;
+    double blue = 0;
+    double max = 0;
+    double min = 0;
+    double component = 0;
+  };
+  dictionary SmpteSt2094App5HeadroomGainCurve {
+    required sequence<SmpteSt2094App5HeadroomGainCurveControlPoint> controlPoints; // must have at least 1
+  };
+  dictionary SmpteSt2094App5HeadroomGainCurveControlPoint {
     required double x;
     required double y;
     required double m;
-  }
+  };
 ```
 
 To the `CanvasToneMappingMode` enum, add an entry to indicate to use SMPTE ST 2094-50.
 
 ```idl
   enum CanvasToneMappingMode {
+      // ...
       "smpte-st-2094-application-5",
-  }
+  };
 ```
 
 To the `CanvasToneMapping` dictionary, add an entry for the parameters.
 
 ```
-  enum CanvasToneMapping {
-    optional SmpteSt2094App5ColorVolumeTransform smpteSt2094App5ColorVolumeTransform;
-  }
+  partial dictionary CanvasToneMapping {
+    SmpteSt2094App5ColorVolumeTransform smpteSt2094App5ColorVolumeTransform;
+  };
 ```
 
 Add a corresponding entry to the [WebCodecs video frame metadata registry](https://www.w3.org/TR/webcodecs-video-frame-metadata-registry/).
