@@ -12,20 +12,28 @@ This document proposes to achieve an alignment about high level concept and dire
 From there, the details of the individual specification changes can be taken care of in their respective groups.
 
 The following image shows an overview of the treatment of HDR content.
-The numbered symbols indicate features that need to be added (except 0), and proposes an order for adding them.
+There are three broad areas of feature work, with separate explainers for each API.
 
-There three broad components of the feature work:
-* The "blue crosses" are for [displaying HDR elements](#displaying-html-elements-and-the-dynamic-range-limit-css-property)
-* The "red stars" are for [drawing HDR content to a buffer](#drawing-hdr-content-to-a-bitmap-or-texture). See the individual explainers:
+* The "red stars" are for [drawing HDR content to a buffer](#drawing-hdr-content-to-a-bitmap-or-texture). See the **individual explainers below**:
   * [2D canvas drawing HDR headroom parameter](canvas-compositing-headroom.md)
   * [WebGL texture import HDR headroom parameter](webgl-unpack-headroom.md)
   * [WebGPU texture import and copy HDR headroom parameter](webgpu-external-headroom.md)
-* The "magenta suns" are for [attaching HDR metadata to canvases](#displaying-an-hdr-canvas). See the individual explainers:
+* The "magenta suns" are for [attaching HDR metadata to canvases](#displaying-an-hdr-canvas). See the **individual explainers below**:
   * [2D canvas tone mapping](canvas-tone-map.md)
   * [WebGL tone mapping](webgl-drawing-buffer-tone-map.md)
   * [SMPTE ST 2094-50 tone mapping](canvas-smpte-st-2094-50.md)
+* The "blue crosses" are for [displaying HDR elements](#displaying-html-elements-and-the-dynamic-range-limit-css-property)
+  * This work does not require any new APIs
 
 ![Diagram of HDR big picture](hdr-big-picture.svg)
+
+## Table of Contents
+1. [Background](#background)
+2. [Core features](#core-features)
+3. [Examples](#examples)
+4. [Privacy and security](#privacy-and-security)
+5. [Testing](#testing)
+6. [Alternates considered](#alternates-considered)
 
 ## Background
 
@@ -191,10 +199,6 @@ The [`dynamic-range`](https://www.w3.org/TR/mediaqueries-5/#dynamic-range) media
 
 Exactly how HDR the screen is, what its HDR headroom is, however, is not query-able.
 
-## Security and privacy
-
-The headroom-parameterized approach is designed to enable HDR without exposing any user fingerprinting vectors to the web.
-
 ## Examples
 
 The question of "how would I use these APIs" often comes up.
@@ -227,4 +231,52 @@ You will tone map your scene-referred luminance values to display-referred with 
 Maybe, if you arrange things right, you can manage to have this scene-referred to display-referred mapping be a no-op. But in general, physically-based scene-referred dynamic range is ginormous and totally unsuitable for direct display.
 
 You'll then configure your canvas to use SMPTE ST 2094-50 metadata indicating how to tone map display-referred at 4x to other headroom values.
+
+## Testing
+
+The "red star" APIs for
+[drawing HDR content to a buffer](#drawing-hdr-content-to-a-bitmap-or-texture)
+are easily testable by reading back the values that are written by the draw call,
+and verifying that they follow the math from the relevant HDR specifications.
+
+The "magenta sun" APIs for [attaching HDR metadata to canvases](#displaying-an-hdr-canvas)
+are also easily tested by verifying that drawing the resulting canvas
+or object (`ImageBitmap`, `VideoFrame`, `Blob`, etc) created from the canvas
+exhibits the expected tone mapping behavior indicated by the attached metadata.
+
+The "blue cross" [displaying HDR elements](#displaying-html-elements-and-the-dynamic-range-limit-css-property)
+are more complicated to test.
+The existing WPT tests implicitly only test the pixel values drawn to an SDR sRGB gamut display,
+which is very useful for verifing that tone mapping to SDR is correct.
+It would also be useful to allow some tests to create a "synthetic" output display,
+which is tracked by [this issue](https://github.com/web-platform-tests/wpt/issues/44320).
+
+## Privacy and security
+
+The headroom-parameterized approach is designed to enable HDR without exposing any user fingerprinting vectors to the web.
+
+This is emphasized in the exposition diagram by the red slashed circle indicating that the parameters that the screen uses for rendering shall not be accessible via Javascript.
+
+## Alternates considered
+
+### Linear versus log for HDR headroom
+
+An [issue](https://github.com/w3c/ColorWeb-CG/issues/129) that has had some deliberation is whether the APIs should surface
+HDR headroom as a ratio in linear space, or as the log base 2 of that ratio.
+
+The related specifications (ISO 21496-1 and SMPTE ST 2094-50) define headroom as log base 2 of the ratio.
+This can also be semantically useful because it allows us to say that an SDR device has "no headroom" when the headroom value is 0.
+This also aligns with the concept of "stops" in photography.
+
+Many parties have indicated that they find linear values more intuitive.
+When working in spaces like `srgb-linear` or `display-p3-linear`, the linear headroom values correspond to the color components.
+This corresponds to
+the Android API [`getHdrSdrRatio()`](https://developer.android.com/reference/android/view/Display.html#getHdrSdrRatio())
+the iOS API [`currentEDRHeadroom`](https://developer.apple.com/documentation/uikit/uiscreen/currentedrheadroom?language=objc).
+
+Several parties have requested that, no matter what we do, the name for the headroom parameter needs to indicate if it is "log2" or "linear" in the name.
+
+The position of this document is to use the "linear" term.
+It was undesirable to add "log2" to the name of the term in APIs (and would feel redundant because "HDR headroom" is defined as log2).
+Adding "linear" allows us to maintain the position that "HDR headroom is log2", because it is the "linear HDR headroom" (not "HDR headroom") that is used in the API.
 
