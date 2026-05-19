@@ -11,4 +11,4 @@ Repository for the Color on the Web Community Group https://www.w3.org/community
 
 # Issue tracking
 
-Please file issues directly on [GitHub](https://github.com/w3c/ColorWeb-CG/issues).
+Please file issues directly on [GitHub](https://github.com/w3c-cg/ColorWeb-CG/issues).
